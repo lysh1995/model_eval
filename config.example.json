@@ -1,0 +1,67 @@
+{
+  "_readme": [
+    "Copy to config.json and export the named env vars. KEYS ARE NEVER STORED HERE --",
+    "this file names the env var to read; it does not hold the secret.",
+    "",
+    "With no keys: everything judge-free (Lanes 0-2) runs on real data. Lane 3 falls back",
+    "to the mock provider so the pipeline is testable end to end.",
+    "",
+    "  export ANTHROPIC_API_KEY=sk-ant-...        # then set judges[].kind = anthropic",
+    "  export OPENROUTER_API_KEY=sk-or-...        # then set judges[].kind = openrouter",
+    "",
+    "THE JUDGE PANEL MUST BE FAMILY-DISJOINT. Self-preference is causal, scales with judge",
+    "capability, and does NOT cancel by averaging -- Claude-3.5 judging its own pairs went",
+    "64.3% -> 44.8%, BELOW CHANCE. A panel of three same-family judges is one judge with",
+    "extra steps. PoLL: tau 0.778 vs 0.667 for a single GPT-4, at 7-8x LOWER cost --",
+    "strict dominance, no tradeoff to weigh."
+  ],
+
+  "generator": {
+    "kind": "mock",
+    "model": "claude-sonnet-5",
+    "api_key_env": "ANTHROPIC_API_KEY",
+    "max_tokens": 1024,
+    "temperature": 0.8,
+    "seed": 0
+  },
+
+  "judges": [
+    {
+      "kind": "mock",
+      "model": "claude-sonnet-5",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "max_tokens": 512,
+      "temperature": 0.0,
+      "seed": 0,
+      "_family": "anthropic"
+    },
+    {
+      "kind": "mock",
+      "model": "openai/gpt-5.1",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "max_tokens": 512,
+      "temperature": 0.0,
+      "seed": 0,
+      "_family": "openai"
+    },
+    {
+      "kind": "mock",
+      "model": "google/gemini-3-pro",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "max_tokens": 512,
+      "temperature": 0.0,
+      "seed": 0,
+      "_family": "google"
+    }
+  ],
+
+  "data_dir": "data",
+  "out_dir": "out",
+
+  "_notes": {
+    "temperature": "Judges run at 0.0 and the value is part of evaluator_id. A judge bump is a BREAKING CHANGE: the system refuses to rescale old scores (GPT-4 went 84% -> 51.4% on one task in three months).",
+    "rubric_length": "Prompt caching needs a >=4096-token prefix to engage AT ALL, silently. Caching alone saves ~$370k/yr at 50M/day -- more than the rest of the platform costs. The rubric must exceed the threshold.",
+    "position_bias": "Swap-and-average is ON by default. Earlier advice to skip it relied on <=0.04 from benchmark data; a 541k-judgment study finds >0.10 in PRODUCTION judges. Measure ours before economizing.",
+    "abstention": "~19-20% of items are irreducibly contested. Abstentions route to a human queue and become a free calibration set on exactly the hard cases. Budget for it."
+  }
+}
