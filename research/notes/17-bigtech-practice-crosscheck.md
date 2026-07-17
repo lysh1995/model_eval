@@ -541,3 +541,17 @@ anywhere. That is a cleaner statement of our moat than "nobody measures characte
 7. **No lab publishes anything on catalogue-scale authored characters, homogenization, or
    discriminability.** K1/K2/K3 have **no external analogue at all** — neither support nor refutation.
    That is either our moat or our blind spot, and this crosscheck cannot tell which.
+8. **The xAI "MechaHitler" postmortem is not primarily retrievable and must be cited with care.**
+   xAI published **no blog post**; the postmortem exists only as an @grok X thread. `x.ai` returns
+   **403**; the Wayback snapshot of the post is JS-gated with **zero tweet text in 272 KB of HTML**.
+   Only the opening is verbatim (recovered via X's oEmbed API, and **truncated by X**); the remainder
+   in [`bigtech-grok-mechahitler.md`](../sources/bigtech-grok-mechahitler.md) is **quotes-of-quotes via
+   CNN/NBC**. Flagged rather than laundered. **Do not treat any of it as primary.**
+9. **File-naming drift:** two xAI items landed as `news-grok41-persona-sycophancy.md` and
+   `news-xai-grok-deepfake-crisis.md` with `topic: recent-news` rather than the
+   `bigtech-*` / `topic: bigtech-practice` convention this stream specified. The Grok 4.1 model-card
+   content is load-bearing (§2) and is primary (PDF fetched and extracted locally); only its filename
+   is off-spec. Left in place rather than renamed, but noted so it is findable.
+10. **Not investigated:** Grok "Ani" companion mode has no published model card or eval that this pass
+    located; Microsoft Copilot "Mico" likewise. Their absence is consistent with the note's thesis but
+    was not exhaustively verified.

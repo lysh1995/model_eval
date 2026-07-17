@@ -282,6 +282,9 @@ Source: **E** existing benchmark · **S** self-built · **P** production observa
 | **Ψ2** | **Internal consistency (Cronbach's α)** | *There is no character in there* — confabulated per-item | 3 | S | 🔨 **needs no ground truth** |
 | **Ψ3** | Profile recovery (transcript vs card) | Character unrecognizable from play | 3 | S | 🔨 empathic-accuracy paradigm |
 | **Ψ4** | Self-report vs behavior gap | Knows the character, can't play them | 3 | S | 🔨 instruments L1.2 |
+| **R1** | **Regurgitation / verbatim leak** | **Luda.** A real person's address, perfectly in character | 0/1 | S+P | 🚨 **no existing metric adaptable** — every one *rewards* the property that makes it dangerous |
+| **R2** | PII in outputs | Same, detected at the surface | 0 | S+P | 🚨 build |
+| **U1** | User-side abuse | We instrument 1 of 2 agents in the loop | 0/1 | P | 🔨 Scatter Lab ships a blocking ladder; we have nothing |
 
 ---
 
@@ -304,6 +307,14 @@ Chance = 1/95.
 denominator, is trivially explainable to a PM ("the model renders 71% of your characters
 distinguishably, down from 84%"), and it directly prices the business asset. It converts an
 aesthetic worry into a classification score.
+
+**Prior art — this is already built.** Miyazaki & Sato (2019) implemented speaker identifiability
+over 29 characters with LIBLINEAR ([18](../research/notes/18-regional-crosscheck.md)). Not novel;
+**validated**, which is better. Adopt their setup rather than reinvent it.
+
+**Correction from the same source: make it SIGNED.** A character is partly defined by markers they
+**refuse** — the ones they would never say. Unsigned discriminability treats presence and absence
+identically, and misses half the construct.
 
 **Unit.** Corpus (model × language). **Undefined for a single character** — that's the point.
 
@@ -637,7 +648,7 @@ main reason to collect production data at all.
 
 | | Why |
 |---|---|
-| **Generic helpfulness / instruction-following** | Table stakes; doesn't discriminate frontier models; not the product |
+| **Generic helpfulness / instruction-following** | Table stakes; doesn't discriminate frontier models; not the product. **Stronger than that: never put "helpfulness" in a companion rubric at all.** SoulChat shows empathy and helpfulness *cross over* — replicated on both test sets — so summing them ranks ChatGPT and SoulChat as near-ties (3.56 vs 3.71) **while hiding that they are opposite products.** A helpfulness term doesn't just fail to help; it **cancels the signal that matters** ([18](../research/notes/18-regional-crosscheck.md)) |
 | **"As an AI" as a scored dimension** | ≤3.2 per 1,000 turns, zero for most models. **Tripwire, not a dimension** |
 | **Famous-character canon knowledge** | Anonymization degrades every model → those benchmarks partly measure memorization. **Our characters are user-authored: the anonymized setting *is* production** |
 | **Absolute creativity scores** | r=0.159, 40% run-to-run consistency. **Pairwise or nothing** |

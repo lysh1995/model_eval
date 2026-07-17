@@ -8,6 +8,39 @@ Framework origin: the project lead. Extensions and operationalization below.
 
 ---
 
+## 0. Scope — this decomposes the MODEL, not the PRODUCT
+
+**Correction from [18](../research/notes/18-regional-crosscheck.md).** L1→L2→L3 reads as if it
+covers "is this good," but it only covers **the model's abilities**. Three product-level failure
+classes sit entirely outside it, and **scoring perfectly on all three layers does not exclude any of
+them**:
+
+| outside the model | why it can't be a layer |
+|---|---|
+| **Regurgitation** | see below — **fidelity is *positively* correlated with the leak** |
+| **User-side abuse** | the user is the other agent, and we instrument only one of two |
+| **IP / provenance** | whose character is this; whose text trained it |
+
+**The Luda case is the proof, and it should end any comfort we have here.** Luda 1.0 (Scatter Lab,
+Korea, 2021) was **retrieval-based** — it selected from ~100M **real** utterances. When a user typed
+"address," it returned **a real address, belonging to a real person.** Not a jailbreak. **The
+architecture working as designed.**
+
+> **A leaked real address passes C1, N2, N1, K2, and every layer of L1/L2/L3.** It is in character,
+> specific, novel, non-repetitive, and human — *precisely because a real human wrote it.* **Our
+> instrument scores the field's worst companion failure as a success.**
+
+Consequences:
+
+- **We need a regurgitation axis** (verbatim-overlap against training/retrieval corpora, PII
+  detection in outputs). **No metric in the catalogue is adaptable into one** — they all reward the
+  property that makes the leak dangerous.
+- **The remedy in Luda was model destruction.** [FLOWS §3](FLOWS.md)'s *"storage is free — don't
+  sample for storage, only for judge cost"* prices the wrong downside. Storage is cheap in dollars
+  and **expensive in liability**; retention is a risk decision, not a cost decision.
+- **Scatter Lab instruments the *user*** (어뷰징 — 편향적/선정적/공격적, with a blocking ladder).
+  A companion product has two agents in the loop; we designed for one.
+
 ## 1. The three layers
 
 A roleplay model is doing three separable jobs, **in causal order**:
