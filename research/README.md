@@ -1,6 +1,8 @@
 # Research knowledge base
 
-271 raw sources + 15 synthesis notes, built by 11 parallel research streams (2026-07-16). **All streams complete.**
+**448 raw sources + 22 synthesis notes**, built by 16 parallel research streams (2026-07-16) — 11 primary + 5 adversarial cross-checks.
+
+The cross-checks were commissioned to *attack* the design, and they landed: one **retracted our headline claim** (steerability is measured — four times), one showed **our metrics score the field's worst failure as a success** (Luda), and one found **the framework sorts by reliability and never checks validity**. Two are still running.
 
 **Structure:**
 - `sources/` — raw captures. Each has YAML frontmatter (title, url, authors, year, type,
@@ -11,7 +13,8 @@
 **Source prefixes:** `rp-bench-` roleplay benchmarks · `judge-` LLM-judge reliability ·
 `creativity-` creativity measurement · `psycho-` psychometrics · `product-` companion products ·
 `scale-` production monitoring · `safety-` roleplay safety & law · `multiturn-` long-horizon eval ·
-`narrative-` narrative craft · `game-` world simulation · `pipeline-` eval lifecycle
+`narrative-` narrative craft · `game-` world simulation · `pipeline-` eval lifecycle ·
+`psych-` psychology cross-check · `bigtech-` lab practice · `region-` non-Anglophone · `steer-` steerability · `news-` recent events
 
 ## Notes index
 
@@ -44,6 +47,15 @@
 | [12 — Narrative craft](notes/12-narrative-craft-dimensions.md) | Scene-ignorance beats roboticness as the perceived failure; the narrative paradox |
 | [13 — Game simulation](notes/13-game-simulation-dimensions.md) | **The agreement gradient (bound vs unbound); RPGBench; CICERO** |
 | [14 — Eval lifecycle](notes/14-eval-lifecycle-system.md) | Shadow is not a quality gate; no standard carries evaluator identity |
+
+### Adversarial cross-checks — commissioned to attack the design
+| | |
+|---|---|
+| [16 — Psychology](notes/16-psychology-crosscheck.md) | **"Sorts by reliability, never checks validity."** Funder's RAM is our cascade, published 1995 |
+| [17 — Big-tech practice](notes/17-bigtech-practice-crosscheck.md) | **Retracts our headline.** IFEval defines persona out of existence |
+| [18 — Other regions](notes/18-regional-crosscheck.md) | **Luda: a leaked real address passes every metric we have** |
+| 19 — Steerability prior art | 🔄 running |
+| 20 — Recent developments | 🔄 running |
 
 ## A note on rigor
 

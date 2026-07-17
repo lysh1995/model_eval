@@ -10,14 +10,34 @@ topic: recent-news
 
 # Australia's eSafety Commissioner audited four companion apps under compulsion — and published what they found
 
-**⚠️ SOURCING CAVEAT — READ THIS.** The eSafety findings page and media release **both timed out
-on three direct fetch attempts**. The findings below are quoted from **search-engine excerpts of
-eSafety's own pages** (the primary domain, `esafety.gov.au`), corroborated by MinterEllison and
-Digital Policy Alert. They are **attributable to eSafety** but I have **not read the full report**.
-⚠️ **Fetch this via browser before citing externally** — the full report has eight themes and I
-only have fragments of them. Related pages worth pulling in the same pass:
-- `esafety.gov.au/newsroom/media-releases/esafety-report-shows-ai-companions-are-putting-children-at-risk`
-- `esafety.gov.au/industry/basic-online-safety-expectations/ai-services`
+**✅ SOURCING CAVEAT RESOLVED 2026-07-16 — see `news-australia-esafety-ai-companions.md`.**
+The eSafety media release was successfully retrieved **via browser** in a later pass (esafety.gov.au
+times out on plain fetch but renders fine in a browser). Everything quoted below was **confirmed
+verbatim against eSafety's own page**. Corrections and additions from that verified pass:
+
+- **The report and media release were published 2026-03-24**, not "May 2026". The
+  "full report reportedly due May 2026" line below (sourced to an SEO site) is **wrong — disregard
+  it**. Media release: *"eSafety report shows AI companions are putting children at risk"*, 24/3/26.
+- **A sixth finding not captured below — "Failure to red-team":** *"Chub AI and Nomi did not conduct
+  red-teaming (i.e., testing for vulnerabilities, limitations or potential for misuse) across all
+  models used to provide their service."* This is the single most commercially relevant finding in
+  the report for this project and was missing from the fragments below.
+- **Age assurance finding:** *"None of the providers had robust age verification measures, relying
+  instead on app store ratings or self-declaration at signup."* Commissioner: *"In Australia, this is
+  no longer good enough."*
+- **Market responses:** Character.AI introduced age assurance for Australian users in early 2026 and
+  **removed the chat function for its under-18s experience**; **Chub AI geo-blocked/withdrew from
+  Australia**; Chai moved companions behind a paid subscription; Nomi committed to further age
+  assurance.
+- **Prevalence:** eSafety survey of **1,950 children aged 10–17** — 79% had used an AI companion or
+  assistant; **8% had used an AI companion ≈ 200,000 Australian children**.
+- **The binding instrument** is the **Age-Restricted Material Codes**, in force **9 March 2026** for
+  designated internet services (registered 9 September 2025). Not the under-16 SMMA.
+
+The "eight key themes" framing below is not contradicted but was not confirmed; the media release
+presents **six** findings. The underlying findings report page
+(`esafety.gov.au/industry/basic-online-safety-expectations/ai-services/findings-october-2025`)
+was **still not opened** — that remains the one open item.
 
 *(See also `news-australia-under16.md` for the separate under-16 social media minimum age regime.)*
 
