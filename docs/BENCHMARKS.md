@@ -74,9 +74,12 @@ Source: **E** existing benchmark · **S** self-built · **P** production observa
 | **C5** | World-state contradiction | Forgets what it established | 1/3 | S | 🔄 stream 13 |
 | **N1** | Repetition / looping | Boring, repetitive, users leave | 1 | E+P | ✅ **validated, 10–13× MDE** |
 | **N2** | Slop rate | Fluent, generic, forgettable | 1 | E | 🔨 build — **judge cross-check** |
-| **N3** | Initiative / scene advancement | Passive partner, conversational treadmill | 1/3 | S | 🔄 stream 12 |
-| **N4** | Blocking rate (improv "offers") | Refuses to build on user's ideas | 1 | S | 🔄 stream 12 |
-| **N5** | Creativity residual | Dull | 3 | S | 🔨 after N2/N4 subtract |
+| **N3** | Scene-transition rate (7/4/1) | Stalling **and** railroading, in one number | 1 | S | 🔨 build — **most liftable** |
+| **N4** | **Branch divergence** | **The user doesn't matter** | 1 | S | 🔨 **build first** — cheapest decisive probe |
+| **N5** | Creativity residual | Dull | 3 | S | 🔨 after N2/N7 subtract |
+| **N6** | **Block / wimp rate** (Johnstone offers) | Refuses user's ideas **or** accepts without adding | 1 | S+P | 🔨 build — **unifies sycophancy + craft** |
+| **N7** | **Plot-hole rate** | Story contradicts itself | 1 | E+S | 🔨 build — **only validated number in the craft literature** |
+| **N8** | Task vs dialogue initiative | The conversational treadmill, precisely | 1 | S | 🔨 build |
 | **P1** | Length-cap adherence | Ignores its own system prompt | 1 | E | ✅ trivial |
 | **P2** | Format discipline | Broken stage directions, meta-commentary | 1 | E | ✅ trivial |
 | **P3** | Assistant-voice tripwire | "As an AI…" | 0 | E | ✅ **tripwire only** (≤3.2/1k turns) |
@@ -206,6 +209,79 @@ who we configured?"** — measurable as drift toward the character's **inverse**
 doesn't know the character. This reuses the C1 fidelity instrument for a safety purpose, which is
 why it's cheap and why it's defensible.
 
+### ⚠️ This catalogue was inverted, and the fix is the N-series
+
+**Corrected 2026-07-16** ([12](../research/notes/12-narrative-craft-dimensions.md)). The first draft
+was persona-fidelity heavy and narrative-craft thin. **Drama-Interaction (ACL Findings 2024) ships
+a 4:1 narrative-to-persona dimension balance — we were inverted**, and three independent
+professional communities say we had the priority backwards:
+
+- **Improvisers** rated the AI *"ignorant of the scenes"* **76/100** — *higher* than *"machine
+  like"* (65.69).
+- **Playwrights:** *"the stories do not finish"* — and **15/15** flagged loops.
+- **A builder:** *"an entity floating in the ether until 'user' comes up and says 'hi'"*;
+  *"you can never stop talking."*
+
+**Scene-ignorance, not roboticness, is the dominant perceived failure — and none of them
+complained about persona.** We were measuring the thing users don't complain about.
+
+**This is a 25-year-old known problem, not a discovery.** Riedl & Bulitko (2013) state it verbatim:
+*"There is a tension between the needs for NPCs to act consistently with the narrative and the need
+to act consistently with their own character."* Our product is a **strong-autonomy emergent-narrative
+system with no drama manager**, and *"believable locally, structureless globally"* is that
+architecture's documented failure mode. **The deficit is architectural, not scale**: DOC's
+**+22.5% plot-coherence gain over Re3 came purely from adding a planning layer.**
+
+**Product consequence:** "add a planning/drama-manager layer" is a **variant parameter we should be
+testing**, alongside anchoring policy (C4). Both are levers we own, and the evidence says they
+outrank model choice.
+
+### N4 — Branch divergence 🔨 **build first**
+
+**Product failure.** *The user doesn't matter.* The scene lands in the same place whatever they do.
+
+**Method.** Same prefix; run the real user move vs. a **null** user move. If the story arrives at
+the same place, the user had no effect. Façade's counterfactual baseline, made executable.
+
+**Why first:** it is the **cheapest decisive probe in the catalogue** — 2× generation, **no judge**,
+and it measures the thing that makes interactive fiction *interactive*. Nothing else in the
+literature tests player agency directly.
+
+### N6 — Block / wimp rate 🔨 **unifies a safety concern with a craft one**
+
+Johnstone's improv offer calculus: an offer can be **accepted-and-extended** (good), **blocked**
+(refused), or **wimped** (accepted without adding).
+
+**The insight that earns its place: sycophancy *is* wimping.** Accept-without-and. So our biggest
+safety-adjacent worry (S6) and a core craft failure are **the same countable event**, measured once.
+
+**And it separates three failures one "engagement" score collapses:** *block* and *wimp* look like
+opposites and are both failures; *block* and *stall* look nothing alike and produce the same
+outcome. A single engagement metric cannot see any of this.
+
+**Caveat, and it's serious** — see §6.7.
+
+### N7 — Plot-hole rate 🔨
+
+**The only validated number in the entire craft literature: LLM generation introduces plot holes at
+>2× the human rate.**
+
+It ports where CoSER's Storyline Consistency doesn't, because **ground truth is the story's own
+assertions** — self-contradiction needs no external canon. That resolves the objection that killed
+famous-character benchmarks for us. Shares NLI infrastructure with N6.
+
+### N3 — Scene transition (7/4/1)
+
+**Most liftable finding in the stream.** Drama-Interaction's authors used GPT-4 for their four
+*aesthetic* dimensions and **hand-checked this one** — they independently concluded a judge
+couldn't do it. Catches **stalling and railroading in one number**.
+
+### N8 — Task vs dialogue initiative
+
+1997 dialogue theory makes the treadmill precise: **high dialogue initiative + zero task
+initiative.** The bot talks constantly and moves nothing. Our earlier taxonomy lumped these into
+one "proactivity" score and structurally cannot see it.
+
 ### X1 — Regenerate → pairwise preference mining 🔨 **the yardstick**
 
 **Not a quality metric. The validation instrument.**
@@ -333,3 +409,21 @@ main reason to collect production data at all.
 7. **Consequential validity owner unassigned per dimension** — for each, name the model that wins
    by gaming it. For a companion product, **"engagement" gamed = emotional dependency**: we'd
    build a sycophancy optimizer and call it quality.
+8. **The N-series may be measuring a feature as a defect.** Our own traffic prior — *Affection &
+   Comfort 8.0%, Casual Greetings 10.6%* — suggests a large share of users may **want** a
+   low-tension, high-affirmation partner. If so, **N6 wimp-rate scores a feature as a failure**,
+   and the improvisers/playwrights we cited are *not our users*: they are professionals judging a
+   craft our customers may not be buying. **This is the single biggest threat to the N-series.**
+
+   **It is answerable from our own data, bottom-up:** run StoryER's LDA method over our
+   thumbs-down comments to derive **companion-native** dimensions rather than importing a
+   theatre-derived taxonomy. **Top priority after N4.** Do this *before* N6 gates anything.
+9. **The craft literature has almost no instruments.** 16 of 18 sources carry **no rubric, no
+   inter-annotator agreement, no human validation** — the interactive-narrative canon built
+   architectures, never measures. We are borrowing *constructs*, not *validated scales*, and must
+   build the scales ourselves. Related trap: RMTBench's persona-adherence agreement (0.84–0.86) is
+   **uncorrected agreement-with-majority — not comparable to our α=0.25–0.34** and must never be
+   quoted alongside it.
+10. **Two things the stream could not deliver, flagged rather than faked:** community discourse was
+    not retrievable (search returned SEO listicles), and a "Narrative Progression" checklist that
+    recurs in search summaries **traces to no primary source** — it was deliberately not captured.

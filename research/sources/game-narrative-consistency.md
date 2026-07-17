@@ -131,6 +131,20 @@ Setup: **two professional web novel writers** independently annotated **200 stor
 1,000 planted errors**. The system claims a **3.2× improvement in error discovery rate**
 over human judgment (**550/1000 vs 171/1000 errors detected**).
 
+> ⚠️ **Reconciling 0.139 vs 0.171 — read this before citing either.** The table above reports
+> human recall **0.139**; the sentence directly under it reports **171/1000 = 0.171**. Both
+> appear to be correct and refer to different quantities: the table is explicitly labelled
+> **"(average)"** — i.e. the mean recall of the *two annotators taken individually* — whereas
+> **171 is the pooled union** of what *either* annotator found. **Arithmetic confirms the split:**
+> 550/171 = **3.216 ≈ the paper's claimed "3.2×"**, while 550/139 = 3.96, which would have been
+> reported as "4×". So the paper's headline comparison uses the **union (0.171)**, not the
+> average (0.139). An independent re-fetch of the paper also surfaced **"Overall F1=0.281"** in
+> prose against **0.229** in the table — consistent with the same average-vs-union split.
+> **Cite it as: individual novelists averaged ~0.14 recall; the two of them pooled found ~0.17.**
+> Do not pair "0.139" with "3.2×" in the same sentence — they are from different denominators
+> and a knowledgeable reader will catch it. The qualitative finding is unaffected and robust:
+> **professional human readers find well under a fifth of planted continuity errors.**
+
 ### ADVERSARIAL READING
 
 - **Recall is 0.550 — the detector misses nearly half of all planted errors** that it was

@@ -48,6 +48,25 @@ decompose every soft dimension until the objective part falls out, and send only
 residue to a judge. "Creativity" = novelty (computable) + non-slop (computable) + constraint
 satisfaction (computable) + charm (judge). Three of four need no model call.
 
+### The sharper version of that claim
+
+α=0.25–0.34 is usually read as *"humans can't agree on roleplay quality, so give up."* NarraBench's
+taxonomy says that's the wrong diagnosis. Narrative aspects come in three classes:
+
+| class | example | right instrument |
+|---|---|---|
+| **deterministic** | did it exceed the length cap? did it contradict the card? | computation — Lane 1 |
+| **consensus** | is this a plot hole? did the scene advance? | agreement *is* meaningful — judge/NLI, report κ |
+| **perspectival** | is this beautiful? is this character *compelling*? | **agreement is not the goal.** Report distribution, not a mean |
+
+**α=0.25–0.34 is not a failure of the raters. It is what you get when you score a *perspectival*
+aspect with a *consensus* instrument.** The error is a category error, and it is ours to stop
+making.
+
+So the platform's actual contribution is **matching instrument class to aspect class** — and
+refusing to average across classes. That is a methodological position, not a workaround, and it
+predicts which dimensions will *never* stabilize no matter how much we spend on judging.
+
 ---
 
 ## 2. Requirements
