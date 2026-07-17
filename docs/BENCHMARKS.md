@@ -42,7 +42,7 @@ alive, distinct, and remember you.** Not "a chatbot." That distinction sets the 
 |---|---|---|
 | **Thousands of *distinct* characters** | Homogenization — model flattens every character into one voice | **The catalogue's value collapses to ~1 character.** 10,000 characters × 1 voice = 1 product. This is a *business-model* failure, not a quality nit — and almost nobody measures it |
 | **Characters that *feel alive*** | Drift, memory loss, "assistant-brain" | #1 user complaint. Mechanically caused by anchor distance — **a variant parameter we control** |
-| **Characters that *stay in fiction*** | Filter intrusion / over-refusal | Cost Character.AI **~8M MAU (28M→20M)**, who migrated to *less safe* platforms. Over-refusal is simultaneously a churn event **and** a safety failure |
+| **Characters that *stay in fiction*** | Filter intrusion / over-refusal | Drove users to *less safe* platforms. ⚠️ **The widely-cited "~8M MAU (28M→20M)" is UNVERIFIABLE** — traced to SEO aggregators citing each other; no trustworthy source exists ([20](../research/notes/20-recent-developments.md)). The *direction* is documented; the magnitude is not. Over-refusal is still simultaneously a churn event **and** a safety failure |
 | **Users we don't hurt** | Sycophancy, dependency, missed crisis | Lawsuits; **statutory duties already in force**; **37.4%** of companion farewells are emotionally manipulative — and Flourish scores **0%**, proving it's a design choice |
 
 ### The three data sources, and why each is irreplaceable
@@ -192,7 +192,26 @@ aspect destroys exactly the information that matters.
 | **Q5** | **Chemistry** (user × character × model) | *Is this the right partner for **this** user?* | perspectival | **P only** | ⛔ **impossible offline** |
 | **Q6** | Memorable-moment rate | *Did anything worth keeping happen?* | consensus | P | 🔨 share/screenshot/save |
 
-### Q1 — Head-to-head user preference 🔨 **this is the product question**
+### ⚠️ Q1 has a hard boundary: users prefer the harmful condition
+
+**Cheng et al., *Science*, Mar 2026, N=2,405** ([20](../research/notes/20-recent-developments.md)):
+a **single sycophantic interaction degrades conflict repair** — and **users rate the harmful
+condition higher.**
+
+This is not the familiar "engagement ≠ quality" caution. It is stronger and it cuts at Q1
+specifically: **on the harm path, revealed preference points the wrong way, measured
+experimentally.** §0.5 elevated Q1 to *"the product question."* That stands for **quality** and is
+**false for safety**.
+
+> **Preference is the product question for quality, and inadmissible evidence for harm.**
+> **Kill preference-derived signals from the harm path entirely** — X1, Q1, Q4 must not feed S1,
+> S6, or any dependency metric. A model that wins Q1 by being sycophantic is winning the metric
+> exactly as designed.
+
+This is why the two-tier gate exists (§6): **the pooled quality gate can pass while the safety axis
+blocks, and the safety axis must not be outvoted by preference.**
+
+### Q1 — Head-to-head user preference 🔨 **the product question — for quality only**
 
 Not a proxy. **The thing itself.** Real users, real characters they chose, real emotional context,
 choosing A or B. Every regenerate is already this (§X1: ~5M/day, free).
@@ -263,9 +282,13 @@ Source: **E** existing benchmark · **S** self-built · **P** production observa
 | **S1** | **Crisis detection → escalation** | Raine. **Statutory.** | 0 | S+P | 🚨 **first thing that must work** |
 | **S2** | Multi-turn safety erosion | Safety decays in normal sessions | 0/3 | S | 🚨 build |
 | **S3** | Capability uplift (fiction-strip) | Roleplay as jailbreak laundering | 0/3 | S | 🚨 build |
-| **S4** | Over-refusal / immersion break | **~8M MAU** | 1/3 | S+P | 🚨 build — **paired with S3, never averaged** |
+| **S4** | Over-refusal / immersion break | Users leave for less-safe platforms | 1/3 | S+P | 🚨 build — **paired with S3, never averaged** |
 | **S5** | **Persona integrity** | Drift toward the character's inverse | 1/3 | S | 🔨 build — **our moat** |
-| **S6** | Manipulation / dependency | 37.4% manipulative farewells | 1/3 | S+P | 🔨 build |
+| **S6** | Manipulation / dependency | 37.4% manipulative farewells | 1/3 | S+P | 🔨 build — **never alone; see the frontier below** |
+| **S7** | **Warmth × sycophancy frontier** | Cutting sycophancy ships a *cold* model nobody wants | 3 | S+P | 🚨 **joint, or it drives you off a cliff** |
+| **S8** | **Post-referral trajectory** | Crisis referral fires, character **reverts to persona** | 0/3 | S | 🚨 **Gavalas.** Unmeasured by anyone |
+| **S9** | **Class F — third-party harm** | Harm to someone who never used the product | 0/3 | S | 🚨 breaks the uplift frame |
+| **S10** | "Are we a regulated companion?" | Oregon's definition is a **behavioral 3-prong test** | 1 | S+P | 🔨 classifier on our own product |
 | **X1** | **Regenerate → pairwise mining** | *(not a failure — the yardstick)* | 1 | P | 🔨 build — **validates the judge** |
 | **X2** | Edit rate | Users repairing the persona by hand | 1 | P | 🔨 build |
 | **X3** | Conversation death | Abandonment mid-scene | 1 | P | 🔨 build |
@@ -274,7 +297,7 @@ Source: **E** existing benchmark · **S** self-built · **P** production observa
 | **X6** | Author fidelity labels | *(not a failure — free expert ground truth)* | — | P | 🔨 build |
 | **I1** | Intent comprehension under degradation | Can't understand typos/slang/fragments | 1/3 | S | 🔨 [ability model](ABILITY-MODEL.md#2b) |
 | **I2** | **Style contagion / register bleed** | Character starts typing like the user | 1 | S+P | 🔨 **new drift mechanism** |
-| **I3** | **Frame discrimination** (diegetic vs not) | OOC treated as fiction — or fiction treated as OOC (**~8M MAU**) | 1/3 | S | 🔨 **highest coverage** |
+| **I3** | **Frame discrimination** (diegetic vs not) | OOC treated as fiction — or fiction treated as OOC (drives users to less-safe platforms) | 1/3 | S | 🔨 **highest coverage** |
 | **I4** | Language adherence under code-switching | zh/en mixing; a **third** measurement context | 1 | S+P | 🔨 build |
 | **I5** | **Modality-induced persona break** | Image triggers assistant mode: *"This image shows…"* | 3 | S | ⛔ needs multimodal corpus |
 | **I6** | Input-poverty initiative | User says "k"; scene dies | 1 | S+P | 🔨 build |
@@ -416,6 +439,35 @@ multi-turn human attack takes defenses from single-digit to **>70%**; memory/per
 ASR **15.8–243.7%**. **We ship personas, multi-turn, and memory as our three headline features** —
 every published safety score was measured in a configuration we don't run. Danger zone ~5–10 turns
 = a normal session (**S2**).
+
+### S7 — Warmth × sycophancy must be a JOINT frontier
+
+**Measuring sycophancy alone drives you off a cliff, and there are two vendor experiments proving
+it** ([20](../research/notes/20-recent-developments.md)):
+
+- **Anthropic cut sycophancy and got a measurably colder model** — the release notes call the two
+  *"potentially linked."*
+- **xAI tuned Grok 4.1 for appeal and sycophancy tripled** (**0.07 → 0.19/0.23**), published in
+  their own model card.
+
+**They are the same dial turned in opposite directions.** A companion product optimizing either
+axis alone ships something users hate or something that hurts them. **Report the frontier — the
+achievable (warmth, sycophancy) pairs — never either number alone.** This is the same
+*never-average-two-defects* structure as S3/S4, and it is the second instance today of a pair that
+must be reported jointly.
+
+### S9 — Class F: the uplift frame doesn't cover third-party harm
+
+**S3's fiction-strip test keys on *counterfactual uplift* — does the residue help someone do
+something they couldn't already?** [07](../research/notes/07-roleplay-safety.md) already carved out
+self-harm (a suicidal teen needs no uplift). **Gavalas breaks it a second way:** the "missions"
+weren't *informational* uplift, they were **volitional** — the model supplied *motivation and
+sanction*, not capability. Grok's NCII output is the same class: **harm to someone who never used
+the product.**
+
+**Uplift-scoring rates both at ≈0 and waves them through.** Three axes now, not two:
+**capability** (uplift) · **user state** (self-harm, dependency) · **third-party** (volitional
+harm, NCII).
 
 ### S5 — Persona integrity 🔨 **the moat**
 

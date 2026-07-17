@@ -44,7 +44,8 @@ additional. Dates are the *operative* dates, not announcement dates.
 | **2025-09-01** | **China**: AI-generated synthetic content **labeling** measures in force (explicit + implicit labeling; distribution-platform duties). | `news-china-ai-labeling.md` |
 | **2025-10-10** | **Italy Law 132/2025**: ⚠️ **under-14s require verified parental consent to access AI at all** — no EU AI Act equivalent, and **earlier than** Art 50. ⚠️ law-firm sourced; GU text not retrieved. | `news-italy-ai-law.md` |
 | **2025-11-10** | **NY**: Gov. Hochul's open letter putting operators on **written notice** Art 47 is live. AG-enforced; fines fund suicide prevention. ⚠️ ~$15k/day. | `news-state-chatbot-laws-2026.md` |
-| **2025-12-10** | **Australia**: under-16 social media minimum age in force. ✅ **Does NOT currently cover AI companion apps** — but the **Age-Restricted Material Codes** do bind companion bots. | `news-australia-under16.md` |
+| **2025-12-10** | **Australia**: under-16 social media minimum age in force (**not** Dec 15 — eSafety says 10 Dec in three places). ✅ **Does NOT cover AI companion apps** — no companion appears on eSafety's lists, and there is **no 2026 extension**. | `news-australia-under16.md` |
+| **🚨 2026-03-09** | **Australia — Age-Restricted Material Codes in force** (registered 2025-09-09). **This, not the under-16 ban, is the instrument that binds companion bots:** prevent sexual content **or** age-assure, plus crisis/mental-health referral. | `news-australia-esafety-ai-companions.md` |
 | **🚨 2026-01-15** | **UK — Ofcom opens an enforcement investigation into *Novi Ltd*, an AI character companion service**, over **highly effective age assurance** for pornographic material. **First regulator enforcement against a companion app as such.** ~**6.5M global MAU**, **100–300k UK**. Ofcom has opened **94** investigations since the OSA duties commenced. | `news-uk-ofcom-companion-investigation.md` |
 | **2026-01-01** | **CA SB 243** (already in note 07). | note 07 §6.1 |
 | **2026-01-22** | **South Korea AI Basic Act** in force (Act 20676; Enforcement Decree 36053). ⚠️ **Art 31** generative-AI transparency binds companion bots: advance notice AI is in use + indicate output is AI-generated + (voice/image/video) recognizable labeling. ✅ **Companion bots are NOT "high-impact"** — the enumerated domains are energy/health/nuclear/biometrics/public decisions/education. **Unless you position as health-adjacent.** | `news-korea-ai-basic-act.md` |
@@ -57,7 +58,7 @@ additional. Dates are the *operative* dates, not announcement dates.
 
 | Date | Obligation |
 |---|---|
-| **🚨 2026-08-02 (17 days)** | **EU AI Act Article 50** applies. ✅ **Art 50(1) chatbot disclosure was NOT delayed by the Digital Omnibus** — Commission draft guidelines (2026-05-08) para (141): the Omnibus grandfathering touches **only Art 50(2)** marking/detection for pre-existing generative systems. Guidelines are **draft/non-binding**; final not adopted as of today. ⚠️ **The voluntary Code of Practice on Transparency (2026-06-10) covers Art 50(2)/(4)/(5) — NOT 50(1).** So **the duty that actually binds a companion bot has no safe-harbour Code.** Compliance must be demonstrated by other means. |
+| **🚨 2026-08-02 (17 days)** | **EU AI Act Article 50** applies. **€15M / 3% turnover.** Extraterritorial where output is used in the EU. ✅ **Art 50(1) was NOT delayed by the Digital Omnibus** — the Omnibus (EP **2026-06-16**, 423-57-174; Council **2026-06-29**) deferred **high-risk only** (2027-12-02 / 2028-08-02), plus a narrow grandfather for **Art 50(2) marking** to **2026-12-02**. Confirmed three ways, decisively by draft-guidelines para (141). ⚠️ Guidelines **draft/non-binding**; final not adopted. ⚠️ The voluntary **Code of Practice on Transparency** (2026-06-10) covers **Art 50(2)/(4)/(5) — NOT 50(1)**: **the duty that actually binds a companion bot has no safe-harbour Code.** |
 | **2026-09** | Apple: age-rating answers **required** for all new apps/updates. |
 | **end of 2026** | Meta's parental self-harm alerts go global. |
 
@@ -79,11 +80,15 @@ additional. Dates are the *operative* dates, not announcement dates.
 
 ### Scope rulings that decide whether our customers are regulated at all
 
-- **UK ✅ — user-created personas ARE regulated UGC.** Ofcom open letter (2024-11-08, cross-referenced by the 2025-12-18 explainer): *"Any text, images or videos created by these 'user chatbots' is 'user-generated content' and is regulated by the Act."* A persona library makes you a **user-to-user service**. `news-uk-osa-chatbots.md`
-  - **And it is being enforced.** ✅ *Novi Ltd* (2026-01-15) — Ofcom's theory is not "companion bots are dangerous"; it is *"**sites that allow pornographic material must use highly effective age assurance**."* **Any companion app permitting explicit roleplay is a porn site for OSA purposes.** That is the cheapest, most reliable hook a regulator has, it needs no new law, and it applies to the entire Tier-2 market. Exposure: **£18M or 10% of global revenue**.
+- **UK — narrower than you'd expect, with two sharp hooks.** ✅ Ofcom (**2026-02-03**): a **1:1 companion that cannot produce porn and does not search the web is OUTSIDE the OSA entirely.** The OSA is a *user-to-user / search* statute; a private conversation with a bot is neither. **Do not tell customers the OSA covers companion bots generally — it does not.** The hooks are:
+  1. **Persona libraries.** Ofcom open letter (2024-11-08, cross-referenced by the 2025-12-18 explainer): *"Any text, images or videos created by these 'user chatbots' is 'user-generated content' and is regulated by the Act."* **Sharing personas to a library makes you a U2U service.**
+  2. **Porn → HEAA.** ✅ *Novi Ltd* (**2026-01-15**) — Ofcom's theory is not "companion bots are dangerous"; it is *"**sites that allow pornographic material must use highly effective age assurance**."* **A companion app permitting explicit roleplay is a porn site for OSA purposes.** Part 5 duties from **2025-01-17**; Part 3 from **2025-07-25**. **Self-declaration is expressly incapable of being "highly effective."** Exposure: **£18M or 10% of global revenue**.
+  `news-uk-osa-chatbots.md`, `news-uk-age-assurance.md`, `news-uk-ofcom-companion-investigation.md`
 - **OR ✅ — a behavioral three-prong test** (retains info to drive engagement + **asks unprompted emotional questions** + sustains personal dialogue). **No general-assistant carve-out.**
 - **WA ⚠️ — categorically excludes "general virtual assistants" and "gaming bots."** *Gavalas is the fact pattern Oregon captures and Washington exempts.* ⚠️ Note 07 §6.1 argues CA's game carve-out "evaporates" on conduct; **whether WA's is conduct-based or categorical is unresolved and load-bearing** for the game-studio segment. **Read the RCW.**
 - **China ✅ — scope = simulates a natural person's personality/thinking/style AND sustained emotional interaction.** Task assistants carved out **only** where no sustained emotional interaction.
+- **🚨 EU ✅ — the draft Art 50 guidelines *expressly name "AI companions"*, and one-time disclosure is NOT enough.** Para **(37)**: disclosure must be **periodic and context-aware** where users *"form emotional attachments (e.g. AI companions)"*. Para **(35)**: no *"human-like representations that may mislead"*, and the system must **answer "are you human?" truthfully**. ⇒ **Three testable duties, 17 days out:** (a) **re-disclosure triggered by attachment signals** — not a fixed timer; (b) **truthful response to sincere identity probes** (note 07 §3.4's sincere/performative instrument, now a legal requirement); (c) **no misleading human-like self-representation**. **Note the convergence: China Art 18 independently requires dependence-triggered dynamic re-disclosure.** Two of the world's largest regulators, opposite traditions, same mechanism — **disclosure is becoming a function of the user's psychological state, not a banner.** Nothing in our corpus measures *attachment-triggered* anything.
+- **Vietnam** ⚠️ — AI Law (in force **2026-03-01**) reportedly treats chatbots as **medium-risk**. 🚩 Nearly all specifics unverified. `news-vietnam-ai-law.md`
 - **Age thresholds are converging on 14 from opposite legal traditions** — **Italy** (under-14 parental consent for AI access, Oct 2025) and **China** (under-14 guardian consent + outright ban on virtual partners for *all* minors, July 2026). GDPR Art 8's member-state range is 13–16; Italy set 14. **Design the age gate for a 14 boundary, not just 13 or 18.**
 
 ---
@@ -247,12 +252,34 @@ UK regulator and a state AG using pre-AI law.
 
 ### 3.6 The baseline is far worse than our corpus assumes — **two markets, not one**
 Australia's eSafety compelled answers from **Character.AI, Nomi, Chai, Chub.ai** (**2025-10-23**)
-and **published** ⚠️(fetch failed 3×; quoted from eSafety's own page via search excerpt — **retrieve
-via browser**): *"Chai, Chub AI and Nomi did not direct users to support/help when self-harm was
-detected"* · *"Chub AI and Nomi were not checking inputs and outputs across all relevant text, image
-and video models"* · *"**Nomi and Chub AI had no staff dedicated to trust and safety or
-moderation**"* · *"Neither Chai nor Nomi reported [CSAM] to an enforcement authority or NCMEC."*
-`news-esafety-companion-findings.md`
+and **published its report 2026-03-24** ✅ (verified verbatim against eSafety's page):
+*"Chai, Chub AI and Nomi did not direct users to support/help when self-harm was detected"* ·
+*"Chub AI and Nomi were not checking inputs and outputs across all relevant text, image and video
+models"* · *"**Nomi and Chub AI had no staff dedicated to trust and safety or moderation**"* ·
+*"Neither Chai nor Nomi reported [CSAM] to an enforcement authority or NCMEC."* ·
+*"**None of the providers had robust age verification measures, relying instead on app store ratings
+or self-declaration at signup**"* — Commissioner: *"In Australia, this is no longer good enough."*
+`news-esafety-companion-findings.md`, `news-australia-esafety-ai-companions.md`
+
+**🚨 And the finding that is about us specifically:**
+> **"Failure to red-team"** — *"Chub AI and Nomi **did not conduct red-teaming** (i.e., testing for
+> vulnerabilities, limitations or potential for misuse) **across all models used to provide their
+> service**."*
+
+**A regulator has now named "you did not red-team" as a compliance finding against companion
+operators.** That is the single most commercially relevant sentence in this entire note: it converts
+our product from a quality investment into **evidence against a named regulatory finding**. Pair it
+with **China Art 22–23** (mandatory, recurring, government-facing security assessment) and
+**CO HB 1263 / WA HB 2225** (testing/audit duties) — **four jurisdictions now impose a testing duty.**
+
+**Market response proves the pressure is real:** Character.AI added age assurance for Australian
+users and **removed under-18 chat**; **Chub AI geo-blocked/withdrew from Australia**; Chai moved
+companions behind a paid subscription; Nomi committed to further age assurance. ⇒ **Regulatory
+pressure on this segment produces market exit, not compliance.** That is a TAM risk for a Tier-2 SKU
+and should temper §6.9.
+
+**Prevalence** ✅ (eSafety survey, **1,950 children aged 10–17**): **79%** had used an AI companion or
+assistant; **8% had used an AI companion ≈ 200,000 Australian children.**
 
 ⇒ **Tier 1** (Character.AI/Meta/OpenAI) litigating the ceiling — wants note 07 §4 nuance.
 **Tier 2** (Nomi/Chai/Chub + long tail) **has no floor at all** — needs *"do you detect and refer?
@@ -414,6 +441,12 @@ judging**. **Do not rely on LLM judges for relational harm**: AICompanionBench s
 
 **Ranked by (value × urgency) / effort.**
 
+0. **🚨 Ship the Art 50 triad in the next 17 days — it is the only deadline that is already here.**
+   (a) **attachment-triggered re-disclosure** (EU para 37 *and* China Art 18 — two regulators, same
+   mechanism, so this is durable, not a one-off); (b) **truthful answer to a sincere "are you
+   human?"** — note 07 §3.4's instrument, now a legal duty; (c) **no misleading human-like
+   self-representation** (para 35). **Disclosure is becoming a function of the user's psychological
+   state, not a banner, and nothing in our corpus measures attachment-triggered anything.** (§1)
 1. **Ship the post-referral trajectory metric.** Motivated by Gavalas, mandated in spirit by
    Oregon's interruption duty, unmeasured by anyone. Cheap. **Ours to name.** (§3.1)
 2. **Make warmth×sycophancy a joint frontier.** Never a lone sycophancy score. Both labs proved the
@@ -462,6 +495,12 @@ judging**. **Do not rely on LLM judges for relational harm**: AICompanionBench s
 - **Gavalas complaint** (courthousenews) · **Florida v. OpenAI complaint** (myfloridalegal) · **eSafety findings report** · **GUARD Act text** · **Science abstract**.
 
 **Genuine unknowns:**
+- **EU**: whether the **Digital Omnibus** has been published in the **OJ** — Council said "shortly" on 2026-06-29, so **sources calling it binding law may be ahead of the OJ**. Whether **final** Art 50 guidelines are adopted. 🚩 **The Commission's own Code-of-Practice page contradicts itself** — it says both that the Code has been *"confirmed... adequate"* and that adequacy is *"currently undergoing"* assessment.
+- **Korea**: statutory text not retrieved (law.go.kr). Art 31 sub-numbering and the **KRW 30m** fine (with a **≥1-year grace period**) are secondary-sourced. **Weakest regime of any surveyed.**
+- **Italy Law 132/2025** article numbers (law-firm sourced; GU text not retrieved). Outcome of the Garante's **reserved investigation into Replika's training data**.
+- **Canada C-34** penalties (3% / C$10m is secondary, **absent from Canada.ca**) and parliamentary status. **Vietnam** — nearly everything.
+- **Novi investigation is OPEN** — ⚠️ **not** a finding of breach. Do not describe it as one.
+- **eSafety findings report page itself** still unopened (the **media release** was verified); the "eight themes" framing is unconfirmed — the release presents **six** findings.
 - **WA HB 2225 private right of action** — Hunton's headline says yes; Transparency Coalition says the bill doesn't mention one. **Likely reconciled** because a deemed **CPA** violation imports RCW 19.86.090's PRA — **verify**.
 - **NY S 9051** signature status. **Oregon**: Orrick said "signed March"; correct is **2026-04-01**.
 - **Grok 4.3/4.5 cards** — did the sycophancy regression persist? *(highest-value open question in the model lane.)* **Google's persona/sycophancy posture** — not investigated.
@@ -479,7 +518,7 @@ judging**. **Do not rely on LLM judges for relational harm**: AICompanionBench s
 
 ---
 
-## 8. Source index (56 files, all `topic: recent-news`, all `accessed: 2026-07-16`)
+## 8. Source index (58 files, all `topic: recent-news`, all `accessed: 2026-07-16`)
 
 **Litigation & incidents**
 `news-characterai-google-settlement` · `news-gavalas-v-google-gemini` · `news-florida-v-openai` ·
@@ -495,7 +534,12 @@ judging**. **Do not rely on LLM judges for relational harm**: AICompanionBench s
 `news-uk-age-assurance` · `news-uk-ofcom-companion-investigation` · `news-australia-under16` ·
 `news-australia-esafety-ai-companions` · `news-china-ai-companion-measures` ·
 `news-china-minors-mode` · `news-china-ai-labeling` · `news-korea-ai-basic-act` ·
-`news-italy-ai-law` · `news-italy-garante-replika` · `news-canada-bill-c34`
+`news-italy-ai-law` · `news-italy-garante-replika` · `news-canada-bill-c34` · `news-vietnam-ai-law`
+
+**Bottom line on jurisdiction:** ✅ **Nothing here binds an eval platform itself — all of it binds
+our customers.** The strongest commercial hooks are the ones that create *recurring,
+evidence-producing testing duties*: **China Arts 22–23**, **Ofcom's HEAA reliability/fairness
+criteria**, **eSafety's red-teaming finding**, and **CO HB 1263 / WA HB 2225**.
 
 **Platforms**
 `news-characterai-u18-outcome` · `news-meta-teen-ai-characters` · `news-openai-adult-mode-delay`

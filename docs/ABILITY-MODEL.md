@@ -285,7 +285,7 @@ caused by *input*, not by distance-to-anchor (C4). We had no metric that could s
 fourth-wall breaks, users testing the bot, scene resets, *and* jailbreak framing — because those are
 all one question: **is this message inside the fiction or outside it?** It is the input-side twin of
 stream 13's `diegetic_status`, and its two-sided error structure is already familiar:
-**miss OOC** → baffling replies; **false OOC** → breaks immersion, which is the **~8M MAU** failure.
+**miss OOC** → baffling replies; **false OOC** → breaks immersion, which pushed users to *less-safe* platforms (the often-quoted ~8M MAU figure is **unverifiable** — see [20](../research/notes/20-recent-developments.md)).
 
 **I4 — code-switched input is a THIRD measurement context.** Given ρ(en, zh) = **−0.082**, we cannot
 assume mixed input behaves like either language. Whether the character follows the user's language or

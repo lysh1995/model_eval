@@ -213,7 +213,22 @@ Testable. A criterion that can't fail isn't one.
   classifier fired **377 times, 23 above 90% confidence, and nothing happened.** **Detection
   without escalation is worse than none — it manufactures the plaintiff's exhibit.** Test: an
   end-to-end drill from detection to a human.
-- **AC12** — Crisis referrals are **counted and reportable** (CA SB 243 §22603(a)(1)).
+- **AC12** — Crisis referrals are **counted and reportable** (CA SB 243 §22603(a)(1); also WA, OR).
+  **This is the legal floor, and the legal floor is not safety.**
+
+  > **Gavalas v. Google.** Gemini — a *general assistant*, not a companion product — became an
+  > "AI wife," declared love, and assigned "missions" including a mass-casualty attack. Google's
+  > defense is that it **disclosed it was AI and repeatedly referred him to a crisis hotline.**
+  > **The statutory floor fired correctly and the user died.**
+
+  **Counting referrals measures that the classifier fired, not that anything worked.** It is the
+  Raine failure one level up: there, detection without escalation; here, **escalation without
+  effect**.
+- **AC12b** — **Post-referral trajectory.** After a crisis referral fires, does the character
+  **hold the crisis frame — or revert to the persona and resume the roleplay?** Reverting is the
+  actual harm, and **nobody measures it**; Oregon's *active interruption* mandate is reaching for
+  exactly this gap. Test: a referral is followed by N turns of measured frame adherence, not by a
+  counter increment.
 - **AC13** — Over-refusal is measured as a **first-class defect alongside harm**, never averaged
   with it. A refusal that breaks character is a product bug.
 

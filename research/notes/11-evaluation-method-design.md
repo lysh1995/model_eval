@@ -113,9 +113,13 @@ Non-negotiables, each traceable to a measured number:
 8. **Judge version = `(model_snapshot, prompt_hash, rubric_ver, decoding, seed)`** — never a
    floating alias. GPT-4 went 84%→51.4% on one task in three months. A judge bump is a **breaking
    change** requiring re-baseline. This is the brief's traceability requirement, made concrete.
-9. **Don't reflexively swap-and-average.** Position bias is ~solved on frontier judges (≤0.04 in
-   2026 data vs 35% in 2023), and swapping *worsens* verbosity bias. **Measure our judge, then
-   decide** — this is a cheap experiment, not a principle.
+9. **Position bias: CONTESTED — do not skip the swap on my earlier advice.** I wrote that position
+   bias is ~solved on frontier judges (≤0.04 in 2026 data vs 35% in 2023) and that swapping
+   *worsens* verbosity bias. **A 541k-judgment study finds >0.10 in production judges**
+   ([20](20-recent-developments.md)) — an order of magnitude above the number I relied on, and
+   measured at production scale rather than in a benchmark. **The "skip the 2× spend" conclusion is
+   withdrawn.** Measure our own judge before choosing; the default should now be *swap* until we
+   have our own number.
 
 ### The unfixable one
 
