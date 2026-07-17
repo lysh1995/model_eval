@@ -426,9 +426,42 @@ shape:
 — "*what does this character want that they'd never admit?*" — targets precisely the trait class with
 the worst cross-judge agreement.**
 
-### 2.9 κ ≈ 0.78–0.94 for L1 is not plausible as stated
+### 2.9 ★★ κ ≈ 0.78–0.94 for L1 — there is a direct counterexample in our exact condition
 
-Three literatures agree agreement is a function of **trait observability**:
+**Rasmussen (2005), *BMC Psychiatry* 5:45 — 8 trained raters, 4 MOVIE CHARACTERS, TIPI.** Fictional
+targets, fixed referent, raters trained in personality psychology. **This is our condition almost
+exactly.** The ICCs:
+
+| trait | ICC |
+|---|---|
+| **Extraversion** | **.88** |
+| Conscientiousness | .68 |
+| Agreeableness | .50 |
+| Neuroticism | .37 |
+| **Openness** | **.05** |
+
+**An 18× spread, on the same 4 characters, from the same 8 raters, in one sitting** — and it
+reproduces the visibility ordering exactly (John & Robins: observability × agreement r = .36–.50;
+evaluativeness × agreement r = −.29 to −.53).
+
+> **"Bound to a referent" does not deliver uniformity.** A sheet saying "*she is deeply curious*"
+> gives raters **a proposition, not a cue**. The referent constrains what the *right answer* would be;
+> it does not make the answer *visible*.
+
+**The κ band IS achievable — but as a property of item design, not of L1.** Standardized-patient
+portrayal accuracy reaches **κ = .80–.89** using **3-point anchored behavioural items**. Two cautions
+from that same study, both of which land on us:
+
+- **α was .40–.56** — raters agreed on items that **don't form a construct**. (Exactly the Faux Pas
+  ICC=.996 / r≈0 pattern again, and exactly note 04's reason to report both α *and* the
+  discriminant matrix. Agreement per item ≠ a coherent scale.)
+- **Trained SPs portraying identical briefs differed significantly from each other (p<.05).** **That
+  is the human L2 variance baseline** — professionals given the same character sheet do not converge —
+  **and it may swamp the model differences we're hunting.** Before treating model-to-model divergence
+  on a sheet as signal (note 15's whole premise), we need to know that it exceeds the *human*
+  divergence on the same sheet.
+
+Three literatures independently agree agreement is a function of **trait observability**:
 
 - **Kenny:** consensus "ranging from about **.20 at zero acquaintance to about .40 at long-term
   acquaintance**"; "**traits that are more behavioral, external or observable show more consensus.**"
@@ -502,11 +535,39 @@ label. If agreement barely drops, we measured S. **This should gate the note-15 
 Judges agreeing about a character doesn't make them right. The sheet **underdetermines** most
 interesting questions — which is why L1.1's probes are interesting *and* why they won't have κ=.9.
 
-### 3.5 Difference-score reliability
-Elasticity is a **difference score**. The reliability of a difference between two correlated measures
-is **low when the measures are highly correlated** — and our two conditions are designed to be one
-word apart. **Elasticity may be near-unmeasurable at small doses** because the *estimator* is dead,
-not the model. → large doses, many rungs, report elasticity's own SEM.
+### 3.5 ★★ Difference-score reliability — our experimental control destroys our own metric
+
+Elasticity is a **difference score**, and difference scores have a closed-form reliability:
+
+```
+              r_xx + r_yy − 2·r_xy
+    r_DD  =  ──────────────────────
+                 2·(1 − r_xy)
+```
+
+**When `r_xy = r_xx = r_yy`, `r_DD = 0` exactly.** Two measurements at .90 reliability can yield a
+difference that is **pure noise**.
+
+**And our design maximizes `r_xy` on purpose.** Same seed, same character, same scenario, one word
+changed — note 04 §7.3 correctly calls pairing "the free win" for *power*. But the same correlation
+that shrinks `σ²_d` and buys us power **also drives the reliability of the individual Δ to zero**:
+
+> **Good experimental control drives the steerability metric to zero.** The better we run the
+> experiment, the less reliable each cell's Δ becomes. This is not a tension we can tune our way out
+> of — it's the arithmetic.
+
+**Rogosa's rebuttal partly rescues us, and the boundary is exactly where the framework lives:**
+difference scores are **unbiased for mean-level claims** ("does emphasis move this model, on
+average?" — fine). They are **not** usable for **per-model rankings**, **per-character scores**, or
+**correlating steerability with anything** — which is precisely what L2.2 wants (a steerability
+leaderboard, a per-character matrix, and open question 3's "does steerability predict Q1?").
+
+**Fix:** **do not treat per-cell Δs as data.** Fit a hierarchical model over the raw (un-differenced)
+outcomes with dose as a predictor, and read the **variance components / random slopes**. The slope
+*is* the elasticity, estimated with partial pooling, and it never forms an unreliable difference.
+This is the same mixed-effects infrastructure as note 04 §3/§7.4/§8.4 and §4.2 below — **four
+sections, one model.** Also: large doses and many rungs (§4.4) raise `σ²_true` and pull `r_DD` off
+the floor.
 
 ### 3.6 Nobody has shown "in-character-ness" is a reliably rateable construct
 Searched; the literature is thin to nonexistent. **That is itself a finding** — we are about to assume
@@ -586,17 +647,36 @@ Fleeson and CAPS give not just the critique but the metric *and* the target numb
 
 ### 4.5 ★ Asch's warm/cold as ground truth for the off-diagonal
 Replicate warm/cold on a character sheet; compare the model's off-diagonal to **Asch's human
-off-diagonal**, which is selective and has 80 years of replication.
+off-diagonal**, which is selective, quantified, and has 80 years of replication.
 
 ```
 diagonal      → does the perturbed trait move?                    (steerability)
-off-diagonal  → does it move the traits Asch's subjects moved,
-                and leave alone the ones they left alone?          (FIDELITY, not crosstalk)
+off-diagonal  → does warm→cold move `generous` ~91%→8%
+                and leave `honest` at ~96%?                        (FIDELITY, not crosstalk)
                 + is it flat and even?  → that's OUR judge's halo, not the model
 ```
 
-**Converts the biggest unbounded engineering complaint into a bound comparison.** A model with zero
-crosstalk fails this test — correctly.
+**Converts the biggest unbounded engineering complaint into a bound comparison with a numeric human
+key.** A model with zero crosstalk fails this test — correctly.
+
+**But stop calling it a matrix** (Asch Exp. IV): report the off-diagonal **per sheet context**, and
+**test coefficient stability across contexts as its own result** rather than assuming it. Asch's
+`obedient—weak—shallow—warm—unambitious—vain` list is the ready-made second context — run both and
+see whether "warm"'s coefficient survives. If it doesn't (Asch says it won't), **that is the finding**,
+and it kills "entanglement" as a model-level defect while leaving the per-sheet diagnostic intact.
+
+### 4.5b ★ The standardized-patient protocol — the only place anyone hits our κ target
+SP portrayal accuracy reaches **κ = .80–.89** with **3-point anchored behavioural items**. That is
+the *existence proof* for high-agreement character rating, and it tells us the mechanism: **not
+boundedness — item design.** Concretely: behavioural anchors, 3 points, one observable per item.
+(Converges with note 04 §1.3's BARS prescription, with Ickes' 0/1/2 scale, and with the Meisner
+study's κ=0.86–0.88 for *utterance-type coding*. **Four independent literatures: code observable
+events on coarse anchored scales, and agreement follows. Ask for a judgement, and it doesn't.**)
+
+**And take their control condition:** measure **human** portrayal variance on our own sheets before
+interpreting model variance. Trained SPs given identical briefs differed at p<.05. **If humans
+diverge as much as our models do, note 15's cross-model divergence is not an L1 signal — it's the
+character sheet's underdetermination, which is an *authoring* finding, not a model finding.**
 
 ### 4.6 Ickes' scoring, verbatim
 - **The 0/1/2 content-similarity scale.** Coarse, α≈.90. (Note 04 §1.3 chose 0–5 from a single
@@ -671,13 +751,23 @@ Use **Bayes factors** on the L1 inter-probe matrix. "We found no correlation" is
 4. **Report L1 as `model × sheet`**, sheet-side variance broken out (RAM's relevance/availability are
    the sheet's, not the model's).
 
-5. **Stratify every L1/L2 number by trait observability.** Never pool observable and internal traits.
+5. **Stratify every L1/L2 number by trait observability and evaluativeness; report κ per attribute
+   class.** Never pool observable and internal traits — Rasmussen's ICCs run **.88 → .05** on four
+   movie characters. **This is both more defensible AND a stronger contribution than a uniform band**,
+   because it tells authors *which parts of a character sheet are gradeable at all* — which is the
+   style-guide deliverable, arrived at from a different direction.
 
 6. **Rewrite L2.1** into the three separated measures with human benchmark bands (§4.3). Flag `>.90`
    as rigidity.
 
-7. **Rewrite L2.2's off-diagonal** to the three-way diagnosis (realism / halo / bug) against Asch
-   (§4.5). Calibrate the x-axis and report an exponent per trait (§4.4).
+7. **Rewrite L2.2's off-diagonal** to the three-way diagnosis (realism / halo / bug) against Asch's
+   numeric key (§4.5). **Stop calling it a matrix** — Asch Exp. IV says the coefficients aren't
+   stable across sheets; report per-context and test stability as a result. Calibrate the x-axis and
+   report an exponent per trait (§4.4).
+
+7b. **Never compute a per-cell Δ.** Fit dose as a predictor in a hierarchical model and read the
+   random slopes (§3.5). Our own experimental control drives `r_DD` to zero; the difference score is
+   unsalvageable for exactly the three uses L2.2 wants it for.
 
 8. **Delete "nobody has checked it for character sheets"** from L2.3. Asch, 1946.
 
@@ -693,11 +783,16 @@ Use **Bayes factors** on the L1 inter-probe matrix. "We found no correlation" is
     run the MMLU incremental-validity check first, because it's one correlation and potentially
     fatal.
 
-**Two experiments the literature says are novel contributions, not just internal hygiene:**
-- **Regress portrayal quality on comprehension.** Nobody has ever done it, in humans or models.
+**Three experiments the literature says are novel contributions, not just internal hygiene:**
+- **Regress portrayal quality on comprehension.** Nobody has ever done it, in humans or models —
+  tested as a **necessity claim** (§4.1), it's a publishable first.
 - **The forced-pre-analysis ablation** both Stanislavski and Meisner predict: **does forcing L1-style
   analysis before roleplay *degrade* it?** If yes, the cascade is not just unsupported — it's
   backwards, and our probe design is iatrogenic.
+- **The human portrayal-variance baseline on our own sheets** (§4.5b). SPs given identical briefs
+  diverge at p<.05. **Until we know the human floor, we cannot tell whether note 15's cross-model
+  divergence is a model signal or just an underdetermined character sheet.** This is the cheapest of
+  the three and it re-interprets work we've already done.
 
 ---
 

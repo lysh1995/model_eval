@@ -63,6 +63,29 @@ Unrecoverable figures are marked as such rather than estimated. The design rests
 this session an inflated source count (312 vs the actual 271) was written into *this file*, in the
 section about rigor, and caught on review. The failure mode is not exotic; it is the default.
 
+### The tools themselves return wrong answers silently
+
+Two independent instances, both caught, both of a kind that produces **confident false findings** rather
+than errors:
+
+- **`grep` silently returned 0 on files containing NUL bytes.** macOS grep treats such files as binary
+  and **exits 0 with no output and no error**. `grep -oi "intent" cicero.norm` → **0**; Python → **197**.
+  This published two **false zeros** before being caught — *"IFEval contains no tone/style"* (true:
+  tone=11, style=28), **an absence that inverted the real finding**, and *"RLUF role-play = 0"* (true: 2),
+  which had **buried RLUF's most important result**. All counts were re-run in Python.
+- **A naive `grep -i persona` returned 13 hits in Gemini 1.5 — all 13 were "personal data."** Word-boundary
+  regex gives the true answer: **zero**. The inflated figure was nearly reported.
+
+**A tool that returns a plausible wrong number is more dangerous than one that crashes.** Neither of these
+looked like a failure.
+
+### A fabrication guard worth keeping
+
+`kappa` / `Fleiss` / `Krippendorff` / `inter-rater` / `Cohen's` appear **0 times across all 14 Google and
+Meta primary documents.** Neither org reports **any** inter-rater reliability statistic anywhere.
+**Therefore: any κ attributed to those papers is fabricated.** This is a checkable invariant, and it exists
+because a research tool in this project *did* invent a Fleiss' κ=0.73 earlier the same day.
+
 Confidence tiers are recorded in [../docs/RESEARCH-PLAN.md](../docs/RESEARCH-PLAN.md#confidence-assessment).
 Notably **low-confidence**: bias magnitudes on *our* judge (unmeasured — blocked on API key), the
 sampling floor's dependence on a guessed traffic shape, and the MIT dependency finding

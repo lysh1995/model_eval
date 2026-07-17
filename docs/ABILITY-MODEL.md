@@ -283,6 +283,51 @@ mechanism (six distractors at the front cost nothing; the same six *between* car
 > names. That is **convergent validity for the construct** — the framework picked right, it just
 > wasn't first. We now have a **citable prior** instead of a claim, which is a better position.
 >
+> #### …and the retraction was itself too broad. The precise claim:
+>
+> **Academia measures steerability. The two largest model providers do not.**
+>
+> - **Google:** `persona` appears **zero times across ~340 pages** of primary docs (Gemini 1.5/2.5
+>   reports, Gemini 2.5/3/3.1/3-Flash cards, Gemma 3, IFEval). `steerability`: **zero.** Its only
+>   roleplay eval ever published — Gemini 1.5's **"Charm Offensive"** — sits under **dangerous
+>   capabilities → persuasion**, i.e. *rapport as a hazard*, and was **deleted in Gemini 2.5.**
+>   Roleplay survives in Google's docs **only as an attack vector.**
+> - **Meta:** the only org that *names* it — Llama 3 **§4.3.7 "Steerability,"** explicitly covering
+>   *"response length, format, tone and **character/persona**."* But **all 8 mentions sit in the
+>   methods pages; zero in Results.** It is a **training target, never a metric.** Llama 4 asserts
+>   *"a more steerable model"* in prose with **zero numbers**, drops IFEval entirely — while shipping
+>   a **"companionable"** persona as its recommended system prompt.
+>
+> #### The root cause: IFEval defines persona out of existence
+>
+> **This is the deepest finding in the cross-check.** IFEval — Google-authored, used by both orgs —
+> founds itself on declaring tone unmeasurable:
+>
+> > *"when judging … 'write with a funny tone' … **the underlying standard is greatly unclear**"*
+>
+> …and then defines instruction-following as **the complement of the unmeasurable part**. Yet **35 of
+> its prompts carry style/tone instructions** — *"in the style of Taylor Swift"*, *"Shakespearean
+> style"*, *"Write in a crazy coach screaming style. Use all capital letters"* — **and it scores only
+> the capital letters.**
+>
+> **The industry's definition of instruction-following definitionally excludes persona.** Nobody
+> measures our thing because it was **carved out at the foundation** of the benchmark everyone
+> inherited. That is not an oversight to point at; it is the strongest argument that this work is
+> load-bearing.
+>
+> #### Two more that land on our design
+>
+> **Llama Guard is architecturally blind to persona** — its four inputs are *(taxonomy, task type,
+> conversation, output format)*. **No persona slot**, and it is trained to *"only take into account
+> the given categories."* It **cannot** detect a persona break, and cannot know whether roleplay is
+> sanctioned. **This independently confirms the S5 persona-integrity moat** ([07](../research/notes/07-roleplay-safety.md)):
+> because *we* authored the character, we can ask a question the standard guardrail structurally cannot.
+>
+> **RLUF names "Role-playing and character interactions" as its #1 Love-lift use case** — and finds
+> **reward hacking there**: *"Bye! Sending Love!"*, a **persona-collapse tic none of Meta's published
+> evals can catch.** The largest deployment of companion-adjacent RLHF reward-hacked *our exact
+> category*, and its own instrument was blind to it.
+>
 > **What actually survives, and it's author-endorsed** — IBM's own Limitations disclaim *joint
 > steerability* and *multi-turn*:
 >
