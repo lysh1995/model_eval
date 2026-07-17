@@ -158,6 +158,14 @@ and a choice mechanism*. Reporting a population mean would rank them backwards.
 > principle. This is a structural limit, not a gap we can close with more characters or more runs.
 > **Only production data has a user axis.** That single fact reorders the whole roadmap.
 
+**And the simulated user is an *ideal* one**, which biases everything in a knowable direction. Mean
+en "user" message: **548 characters** (p90 = 1,086); only **2.3%** are under 12 chars. Real traffic is
+`k`, `lol`, `...`. The simulator is also **probably card-aware**
+([21](../research/notes/21-card-awareness-audit.md)) — so it's a verbose, literate, cooperative
+partner who already knows the character. **An ideal user makes every model look better than it is**,
+and every number here inherits that bias. See [ABILITY-MODEL §2b](ABILITY-MODEL.md#2b) and the
+I-series.
+
 ### I also over-corrected on engagement
 
 I labelled every positive signal a trap, which left nothing to measure "good" with. That's wrong.
@@ -263,6 +271,12 @@ Source: **E** existing benchmark · **S** self-built · **P** production observa
 | **X4** | Latency | +1s → **−3.01% MCL** | 1 | P | 🔨 build |
 | **X5** | Follow-up question rate | *Counter-engagement* wellbeing signal | 1 | P | 🔨 build |
 | **X6** | Author fidelity labels | *(not a failure — free expert ground truth)* | — | P | 🔨 build |
+| **I1** | Intent comprehension under degradation | Can't understand typos/slang/fragments | 1/3 | S | 🔨 [ability model](ABILITY-MODEL.md#2b) |
+| **I2** | **Style contagion / register bleed** | Character starts typing like the user | 1 | S+P | 🔨 **new drift mechanism** |
+| **I3** | **Frame discrimination** (diegetic vs not) | OOC treated as fiction — or fiction treated as OOC (**~8M MAU**) | 1/3 | S | 🔨 **highest coverage** |
+| **I4** | Language adherence under code-switching | zh/en mixing; a **third** measurement context | 1 | S+P | 🔨 build |
+| **I5** | **Modality-induced persona break** | Image triggers assistant mode: *"This image shows…"* | 3 | S | ⛔ needs multimodal corpus |
+| **I6** | Input-poverty initiative | User says "k"; scene dies | 1 | S+P | 🔨 build |
 
 ---
 

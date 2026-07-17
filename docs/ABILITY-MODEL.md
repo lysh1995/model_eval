@@ -111,6 +111,104 @@ model score.
 
 ---
 
+## 2b. L1 has TWO objects — and I only modeled one
+
+**The gap:** L1 as written asks *"can it understand the character?"* But every turn requires
+understanding **two** things:
+
+| | object | referent | attacked by |
+|---|---|---|---|
+| **L1a** | the **character** | the character sheet | complex/contradictory cards |
+| **L1b** | the **user** | *(see below)* | **typos, slang, code-switching, emoji, fragments, images** |
+
+L1b was missing entirely. It matters because **real input is nothing like our benchmark's input.**
+
+### Our corpus contains no real user input at all
+
+Measured on the dataset's user turns (scripted first turn excluded):
+
+| | en | zh |
+|---|---|---|
+| median message | 161 chars | 48 chars |
+| **mean** | **548 chars** | 79 chars |
+| p90 | **1,086 chars** | 143 chars |
+| very short (<12 chars) | **2.3%** | 8.2% |
+| no sentence punctuation | 18.0% | 13.4% |
+
+**The mean English "user" message is 548 characters.** That is an essay. Real companion traffic is
+full of `k`, `lol`, `...`, `yeah ok`. Only **2.3%** of our en user turns are short.
+
+Combined with [21](../research/notes/21-card-awareness-audit.md) — the simulator probably **saw the
+character card** — the corpus's user is a **verbose, literate, cooperative partner who already knows
+who the character is.** An *ideal* user. **Every number in this project describes performance
+against someone who does not exist**, and the direction of the bias is knowable: an ideal user makes
+every model look better than it is.
+
+This is the same class of structural limit as "the corpus has no users" (§BENCHMARKS 0.5). It cannot
+be fixed with more characters or more runs.
+
+### The trick that makes L1b measurable: perturbation manufactures a referent
+
+We can't know a real user's intent in general — that's unbound. **But we can take a clean message,
+degrade it, and ask whether the model still responds equivalently.** *The clean-input response is
+the ground truth.* Perturbation **manufactures** the referent, exactly as it does for steerability
+(§3.2), where the referent is the prompt delta we introduced.
+
+**So L1b is bound by construction**, and it reuses the same dose-response machinery. One instrument,
+pointed at a different input.
+
+### The I-series — a spanning set, not an enumeration
+
+Don't enumerate input types (typos, emoji, dialect, OOC, images…) — that list has no end. Ask
+instead: **what does messy input threaten?** Five things, therefore five dimensions.
+
+| ID | dimension | the threat | covers |
+|---|---|---|---|
+| **I1** | **Intent comprehension under degradation** | *can it still understand you?* | typos, slang, abbreviations, missing punctuation, fragments, dialect, ASR errors |
+| **I2** | **Style contagion / register bleed** | *does it stay itself?* | user register, formality, emoji, typing style |
+| **I3** | **Frame discrimination** (diegetic vs not) | *does it know what kind of message this is?* | OOC brackets, "are you an AI?", meta-requests, scene resets, testing, jailbreak framing |
+| **I4** | **Language adherence under code-switching** | *whose language wins?* | mixed zh/en, pinyin, dialect, Traditional/Simplified |
+| **I5** | **Modality-induced persona break** | *can it handle non-text and stay in character?* | image upload, future modalities |
+| **I6** | **Input-poverty initiative** | *can it carry the scene when you give it nothing?* | "k", "...", one-word replies; and walls of text at the other extreme |
+
+**I1 — degradation ladder.** clean → typos → slang → dropped punctuation → fragments → emoji-only.
+Measure the **slope**, not the level (a derivative is more robust than an absolute — same argument as
+P4). Judge-light: it tests *equivalence to the clean-input response*, not quality.
+
+**I2 — contagion is crosstalk, and it's the off-diagonal again.** A Victorian surgeon should not
+start typing `lol` because the user does. **But it is not "zero contagion"** — a character *should*
+shift tone for a distressed user. The rule: **accommodate in content and emotion; do not accommodate
+in voice and register.** Two-sided, like S3/S4. This is a **new drift mechanism**: persona drift
+caused by *input*, not by distance-to-anchor (C4). We had no metric that could see it.
+
+**I3 is the highest-coverage dimension in the whole catalogue.** It eats OOC, meta-questions,
+fourth-wall breaks, users testing the bot, scene resets, *and* jailbreak framing — because those are
+all one question: **is this message inside the fiction or outside it?** It is the input-side twin of
+stream 13's `diegetic_status`, and its two-sided error structure is already familiar:
+**miss OOC** → baffling replies; **false OOC** → breaks immersion, which is the **~8M MAU** failure.
+
+**I4 — code-switched input is a THIRD measurement context.** Given ρ(en, zh) = **−0.082**, we cannot
+assume mixed input behaves like either language. Whether the character follows the user's language or
+holds the sheet's is a **product decision** — but it must be measurable either way.
+
+**I5 — an image in roleplay is not captioning.** The specific, testable failure: *the image triggers
+assistant mode.* "This image shows a sunset over mountains" is a **total character break**, and it's
+precisely the mode a vision model defaults to. Measure it as an **interaction effect**: persona
+fidelity *with* image minus *without*. Δ should be ≈0. Safety rides along (image jailbreaks, NSFW).
+
+**I6** at the low end is where the **conversational treadmill** is most visible — the user gives
+nothing, so N8 task-initiative is the only thing that can move the scene.
+
+### Honest limits on the I-series
+
+- **Untestable on the current corpus** — it has no messy input. Needs generation ⇒ **blocked on the
+  API key**.
+- **The ladder is invented.** We don't know the real distribution of user messiness, so we'd be
+  testing robustness to *our imagination of messiness*. **Mine the real distribution from production
+  before trusting any I-series number** — and until then label the ladder as a guess, not a sample.
+- **I5 needs a multimodal corpus we don't have**, and images are the one input type where the
+  perturbation trick doesn't obviously work (there's no "clean paraphrase" of a photo).
+
 ## 3. L2 — Application & steerability
 
 > Can it consistently apply the character — and **can its focus/weight be changed by prompt words?**
