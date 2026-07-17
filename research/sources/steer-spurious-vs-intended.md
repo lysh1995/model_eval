@@ -1,8 +1,8 @@
 ---
 title: "Spurious vs. intended prompt sensitivity — CheckList (INV/DIR), metamorphic relations, and the gap between two disjoint literatures"
 url: https://aclanthology.org/2020.acl-main.442/
-authors: "Primary: Marco Tulio Ribeiro, Tongshuang Wu, Carlos Guestrin, Sameer Singh (CheckList, ACL 2020 Best Overall Paper). Secondary: Sungmin Kang, Juyeon Yoon, Nargiz Askarbekkyzy, Shin Yoo (METAL, ICST 2024); Kyle Meng et al. / Anonymous (Continuous LM Interpolation, arXiv 2404.07117)"
-year: 2020–2024
+authors: "Primary: Marco Tulio Ribeiro, Tongshuang Wu, Carlos Guestrin, Sameer Singh (CheckList, ACL 2020 Best Overall Paper). Secondary: Sungmin Kang, Juyeon Yoon, Nargiz Askarbekkyzy, Shin Yoo (METAL, arXiv 2312.06056); Sara Kangaslahti, David Alvarez-Melis (Continuous LM Interpolation, arXiv 2404.07117, TMLR 2025)"
+year: 2020–2025
 type: synthesis-of-sources
 accessed: 2026-07-16
 topic: steerability
@@ -69,7 +69,7 @@ pure noise.
 ## 2. The same split, independently, in software engineering: metamorphic relations
 
 **METAL: Metamorphic Testing Framework for Analyzing Large-Language Model Qualities** — arXiv 2312.06056
-(Kang, Yoon, Askarbekkyzy, Yoo; ICST 2024)
+(Kang, Yoon, Askarbekkyzy, Yoo)
 
 METAL splits its **13 perturbation functions** into exactly these two classes:
 
@@ -203,6 +203,7 @@ divide-operation away from work that already exists.**
 ## 5. The one adjacent measurement of ENTANGLED, and it cuts AGAINST the design
 
 **Continuous Language Model Interpolation for Dynamic and Controllable Text Generation** — arXiv 2404.07117
+(Sara Kangaslahti, David Alvarez-Melis; TMLR 2025)
 
 Five style attributes: **simplicity, formality, politeness, sentiment, humor.** Entanglement measured via
 simplex plots of attribute scores across mixing weights λ, plus "average cosine similarity between the LoRA

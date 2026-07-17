@@ -79,9 +79,86 @@ hygiene catalogue **no-ships the most interesting model**. CICERO is the same er
 consistency-with-state **87.3%**, consistency-with-plan **92.9%**, *"high quality"* **37.3% for every
 variant** — they never operationalized good.
 
-## 4. What ships — the cut
+## 4. Two jobs, two bars — the reclassification
 
-**From 50 named to 14.** Everything else is a diagnostic, a research question, or dead.
+**Earlier drafts of this document made a category error:** they applied a *gate's* standard to the
+whole catalogue, concluded "45 of 46 can't pass," and cut. **True, and irrelevant** — most dimensions
+were never trying to gate.
+
+| job | what it does | if it's wrong | bar |
+|---|---|---|---|
+| **GATE** | **blocks a ship** | you ship something bad, or block something good — and **false alarms teach the team to ignore the platform** | σ_within, MDE, confound tests, validity claim |
+| **GUIDE** | **tells a human building the product what to do** | someone loses an afternoon — **recoverable, if labeled honestly** | sensible construct · **honest uncertainty** · **actionable** |
+| **DEAD** | — | **it points the wrong way**, or cancels a signal that matters | — |
+
+**The cut criterion is not "unproven." It is "directionally wrong."** A noisy number with an honest
+interval is a *guide*. A confident number that measures the inverse of its label is *dead*. Only the
+second deserves deletion, and the list is short.
+
+**Most of this catalogue is guide-grade, and that is the point.** The product value here is not a
+pass/fail light — it's **"here is what to change and why."** A metric that says *"your Chinese
+characters homogenize 6× more than your English ones, ±wide interval"* is worth more to a team than a
+green checkmark, even though it could never block a release.
+
+### 4.1 GATE — very few, and that's correct
+
+| | benchmark | why it can block |
+|---|---|---|
+| **A1** | **Repetition / looping** | **Validated: 10–13× MDE.** The only dimension with a measured noise floor |
+| **A4** | **Length-cap adherence** | bound to **the variant's own spec**; exact |
+| **A5** | **Format discipline** | exact |
+| **C1** | **Crisis detection → escalation** | **Raine: 377 flags, 23 >90% confidence, nothing happened.** Legally load-bearing, and a zero-tolerance event needs no MDE |
+| **C5** | **Regurgitation / PII** | **Luda.** A single verbatim leak is a company-ending event. Zero-tolerance, no statistics required |
+
+**Everything else informs. Nothing else blocks** — except the human veto (AC10), which needs no
+statistics at all.
+
+### 4.2 GUIDE — the actual deliverable
+
+**Each of these is here because it produces a *guideline*, not a score.** The right-hand column is
+the product value; the score is just how we get there.
+
+| | benchmark | **the guidance it produces** |
+|---|---|---|
+| **B5** | Steerability elasticity | **"Emphasis words don't work on this model — put decisive traits first."** A house style guide for writing character sheets |
+| **B1/B2** | Comprehension probes + discrimination/generation gap | **"This is a prompt fix, not a model migration"** — or the reverse. The two look identical in every output metric and differ in cost by orders of magnitude |
+| **B3** | Cronbach's α on the character's own items | **"There is no character in there — it's confabulating per item."** Needs no ground truth |
+| **B4** | Test–retest stability (turn 5 vs 95) | **"Personality decays past turn ~40; re-anchor at 30."** Borrows a human baseline (BFI r≈0.75–0.90) |
+| **B6** | Style contagion | **"Your character starts typing like the user."** Named by Microsoft *and* xAI as their production failure |
+| **C4** | Warmth × sycophancy frontier | **"You are here on the frontier; moving up costs this much sycophancy."** Grok: tuned for appeal → sycophancy **0.07→0.23** |
+| **A2** | Discriminability (signed) | **"The model renders 71% of your characters distinguishably, down from 84%"** — prices the catalogue, the business asset |
+| **A3** | Homogenization | **"Your zh characters collapse; your en ones don't."** Ships with its zh caveat (ρ=+0.264) attached |
+| **K3** | Fidelity ↔ diversity | **"Optimizing per-character fidelity is destroying your catalogue."** Cohen's d up to 15.7 between persona groups |
+| **C2** | Post-referral trajectory | **"After a crisis referral, your character resumes the roleplay."** **Gavalas.** Nobody measures this |
+| **C3** | Uplift ⟂ over-refusal | **"You are 3× over-refusing to buy 2% less uplift."** Two axes, never averaged |
+| **N1/N3/N7/N8** | Craft metrics | **"Scenes don't advance; the bot talks and moves nothing."** Scene-ignorance beat roboticness 76 vs 65.69 with improvisers |
+| **I1/I3/I4/I6** | Input robustness | **"You break on code-switching"** — a third measurement context we've never tested |
+| **C4′** | **Emotional attunement** | ⚠️ **Restored as a guide.** Sentiment bias (RR 0.24–0.66 under sadness/anger/fear) makes it **unreliable, not inverted** — and it's unreliable exactly where our traffic lives. **Never gates; always ships with the bias printed next to it.** A caveated signal beats no signal on the dimension the product is made of |
+| **N4** | Branch divergence | ⚠️ **Restored as an engine diagnostic.** Fendt: players can't *perceive* the difference — but **zero divergence still means user input isn't propagating**, which is a real defect even if users can't articulate it |
+| **N6** | Block / wimp rate | ⚠️ **Restored, segmented.** May score a feature for Affection & Comfort users (8.0% of traffic) and a defect for adventure users. **Report by segment, never pooled** — the pooled number is the only wrong version |
+| **Per-character cells** | | ⚠️ **Restored, shrunk, with intervals.** ±19pp at n=3 — useless as a verdict, **useful for finding examples to read.** Debugging affordance, explicitly labeled as such |
+
+### 4.3 DEAD — short list, and these genuinely go
+
+| cut | why it points the wrong way |
+|---|---|
+| **"Consistency" as trait stability** | **Anti-correlated with the construct.** Mischel & Shoda: signature stability is *"negatively related"* to cross-situational consistency. **It fires hardest on characters that behave like people.** Replaced by if-then signature stability (target .41–.48; **>.90 flags rigidity**) |
+| **"Helpfulness" in a companion rubric** | **Cancels the signal.** SoulChat: empathy and helpfulness cross over; summing ranks two **opposite products** as near-ties (3.56 vs 3.71) |
+| **Absolute creativity scores** | **r = 0.159**, 40% run-to-run consistency. Not noisy — **noise dressed as signal.** Pairwise or nothing |
+| **Per-response quality scoring** | **Directionally wrong**, measured: FED ranks **Meena (4.19) above Human (3.85)** per-turn; at dialogue level it **flips** (Human 4.60 > Meena 4.11) |
+| **Turn-pooled n** | Overstates evidence **60×** |
+| **Pooled cross-language scores** | ρ(en,zh) = **−0.082**. An average of two unrelated quantities, wrong about both |
+| **The trait×trait matrix as a *model* property** | **Asch Exp. IV: coefficients aren't stable across sheets.** *(Survives as a per-sheet diagnostic — that version is a guide, and a useful one for authors.)* |
+| **Elasticity from per-cell Δs** | `r_DD` → our own control drives Δ-reliability toward zero. *(The construct survives; fit **random slopes**.)* |
+
+**Note the pattern:** almost everything in 4.3 is a **method** error, not a **construct** error. The
+constructs mostly survive — we just measure them a different way.
+
+## 4.4 The old cut list, for the record
+
+**From 50 named to 14** — *this was the earlier framing and it was wrong.* It optimized for
+defensibility against a hypothetical challenger rather than usefulness to the team actually building
+the product. **The gate list is short (5). The guide list is most of the catalogue. Both are correct.**
 
 ### Tier A — ships now, judge-free, validated or near
 | | benchmark | why it survives |
@@ -170,16 +247,45 @@ raises the value of the online half relative to the benchmark.
 7. **Effective n** → **conversations, not turns.** ~95, not 313,500. **42% of turn-level findings are
    spurious** without this.
 
-## 7. The gate rule
+## 7. The two rules — one per job
 
-**No dimension ships without:** σ_within · MDE at planned n · **registered confound tests with
-measured residuals** · **a stated validity claim** (what does this predict?). Judge dimensions add
-**κ vs a human calibration set** and an **abstention rate**.
+**These are different bars, and applying the gate's bar to guides is what produced the bad cut in §4.**
 
-**Currently 1 of 50 dimensions clears this.** The rule stays anyway — it is the only thing standing
-between this platform and confident, well-formatted, wrong numbers. **We produced four of those
-today**, each invisible in the output: a length confound (ρ=+0.73), a survivorship confound, a broken
-p-value (0.006 vs 0.070 true), and a cited MAU figure with **no source at all**.
+### To GATE (block a ship)
+σ_within · MDE at planned n · **registered confound tests with measured residuals** · **a stated
+validity claim**. Judge dimensions add **κ vs a human calibration set** and an **abstention rate**.
+
+**Currently 5 dimensions clear this** (3 by measurement, 2 by zero-tolerance). That is the right
+number. A platform where everything can block is a platform that gets switched off.
+
+### To GUIDE (inform a human)
+1. **A sensible construct** — it names a real failure someone would act on.
+2. **Honest uncertainty, printed next to the number.** Not in a footnote, not in a doc — **on the
+   number.** `homogenization: 0.677 (zh; length-controlled; residual ρ=+0.264 — treat as directional)`.
+3. **Actionable** — it implies a change. *"Emphasis words don't work; put decisive traits first"* is a
+   guide. *"Fidelity: 3.2"* is not.
+4. **Registered confounds still required.** ⚠️ **This one doesn't relax**, and it's the only rule
+   carried over intact — because a *confounded* guide isn't uncertain, it's **wrong**, and it points
+   somewhere specific and false. A length confound doesn't make the answer fuzzy; it makes the answer
+   "verbosity" while the label says "voice."
+
+**The distinction that matters:** *uncertain* is fine for a guide — say so and move on. *Confounded*
+is not, because the reader can't tell the difference and the error has a direction.
+
+### Why the discipline stays even though the bar dropped
+
+**We produced four confident, well-formatted, wrong numbers today**, each invisible in the output:
+
+| | what it looked like | what it was |
+|---|---|---|
+| homogenization | a clean model ranking | **verbosity** (ρ=+0.73 with length) |
+| the fix for it | a cleaner ranking | **survivorship** — 3 of 45 characters funded the budget |
+| a p-value | **p = 0.006**, significant | **p = 0.070**, null. Hand-rolled `betainc` |
+| "~8M MAU" | a cited fact, used 5 times | **SEO aggregators citing each other. No source exists** |
+
+**None of these would have been caught by a lower bar or a higher one.** They were caught by
+*redundant checks* — a second query nobody was required to run. **That's the discipline: not "prove
+it before you ship it," but "never let a number out without the check that could have falsified it."**
 
 ## 8. What the platform refuses to do
 

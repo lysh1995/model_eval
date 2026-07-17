@@ -95,9 +95,14 @@ class Repetition:
     noise_floor = NoiseFloor(sigma_within=0.0847, mde_pp=2.08, source="scripts/noise_floor.py")
 ```
 
-**A metric without a registered confound test does not load.** This is not a review step. We shipped
-two invisible confounds in one afternoon (length ρ=+0.73 → then survivorship); the only thing that
-caught them was a second query nobody was required to run.
+**A metric without a registered confound test does not load** — and this rule does **not** relax for
+guide-grade metrics ([EVAL-DESIGN §7](EVAL-DESIGN.md)). *Uncertain* is fine for a guide: print the
+interval and move on. **Confounded is not** — a confounded metric isn't fuzzy, it's **wrong in a
+specific direction**, and the reader cannot tell. A length confound doesn't blur the answer; it makes
+the answer "verbosity" while the label still says "voice."
+
+`noise_floor` is **required to gate, optional to guide.** Most metrics declare
+`role=GUIDE` and ship with an interval instead of an MDE.
 
 ### 2.3 Judge service (Lane 3)
 Pairwise vs frozen anchors · family-disjoint panel of 3 · reference-anchored · **swap-and-average**

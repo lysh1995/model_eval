@@ -14,14 +14,16 @@ Status: **draft, incomplete** · 2026-07-16
 | **Lane 3 (judge) validated** | **0.** Every judge number here is borrowed from literature. Our κ, position bias, sentiment bias, abstention rate: **all unknown, blocked on the API key** |
 | **Q-series (the actual product question)** | **0 built, 0 possible offline.** Needs production data that does not exist yet |
 | **I-series (real user input)** | **0 built, 0 testable on this corpus** — it contains no messy input, and the degradation ladder is *invented* until we mine the real distribution |
-| **Per-benchmark noise floors** | **1 of 50** (N1) — so **49 of 50 cannot currently ship** under our own gate rule. But see Ψ1: a validated questionnaire **donates** a calibrated noise floor (human BFI test–retest r≈0.75–0.90) instead of us paying to establish one |
+| **Per-benchmark noise floors** | **1 of 50** (N1). ⚠️ **This was the wrong thing to count.** Only ~5 dimensions need to *gate*; the rest need to **guide**, and a guide needs an honest interval, not an MDE — see [EVAL-DESIGN §4](EVAL-DESIGN.md). Ψ1 also **donates** a calibrated noise floor (human BFI r≈0.75–0.90) rather than us buying one |
 | **Research streams** | 11 primary + **4 of 5 adversarial cross-checks landed. They retracted our headline claim, killed one of our own cited numbers, and found our metrics score Luda's failure as a success.** Steerability prior-art still running |
 
 **What this document is:** a defensible argument about *what to measure and why*, with the
 measurement theory worked out and two metrics actually validated.
 
-**What it is not:** a finished spec. Anyone reading §1 as a build list will build 49 dimensions
-that cannot pass their own gate.
+**What it is not:** a finished spec. But **"can it pass the gate?" is the wrong question for most of
+it** — the product value is *"here is what to change and why,"* not a pass/fail light. A metric that
+says *"your zh characters homogenize 6× more than your en ones, ±wide interval"* beats a green
+checkmark. **Gate: 5. Guide: most of the catalogue. Both correct.**
 
 ---
 
