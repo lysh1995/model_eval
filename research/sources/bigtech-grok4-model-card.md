@@ -8,7 +8,11 @@ accessed: 2026-07-16
 topic: bigtech-practice
 ---
 
-# Grok 4 Model Card — xAI's only real eval publication
+# Grok 4 Model Card — xAI's first real eval publication
+
+> ⚠️ **CURRENCY WARNING — read `bigtech-grok-system-cards.md` before citing this file.**
+> This card is from **Aug 2025**. It supports the claim "xAI asserts prompt-steering works but never measures it." **That claim is stale as a description of xAI today.** The **Grok 4.20 System Card (Apr 2026)** introduces `+SP override violation rate` — a tracked, cross-generational measurement of whether a system prompt moves behavior (0.16 → 0.32) — and a contrastive sycophancy eval. Cite this file only for the Aug 2025 state, or for the lineage.
+> What remains true across **all five** xAI safety publications (Feb 2025 → Apr 2026): **zero** mentions of persona, companion, character, roleplay, or drift.
 
 **Verification method:** PDF fetched **directly from `data.x.ai`, HTTP 200, 252,686 bytes**, text extracted locally with `pypdf` (8 pages, 23,815 chars). All quotes and numbers below are grepped from that extraction, not from any summary. (Note: `x.ai/2025-08-20-grok-4-model-card.pdf` 301-redirects; the canonical host is `data.x.ai`.)
 

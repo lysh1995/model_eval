@@ -8,19 +8,19 @@ Status: **draft, incomplete** · 2026-07-16
 
 | | |
 |---|---|
-| **Benchmarks named** | **46** (30 hygiene + 6 quality + 6 input + 4 psychometric) |
+| **Benchmarks named** | **50** (34 hygiene/safety + 6 quality + 6 input + 4 psychometric) |
 | **Benchmarks fully specced** | **~18.** §2 expands only the load-bearing ones; the rest are a row in a table and a claim |
 | **Benchmarks validated on our data** | **2** — N1 repetition (10–13× MDE) and K1 homogenization (*length-controlled only, zh residual unresolved*) |
 | **Lane 3 (judge) validated** | **0.** Every judge number here is borrowed from literature. Our κ, position bias, sentiment bias, abstention rate: **all unknown, blocked on the API key** |
 | **Q-series (the actual product question)** | **0 built, 0 possible offline.** Needs production data that does not exist yet |
 | **I-series (real user input)** | **0 built, 0 testable on this corpus** — it contains no messy input, and the degradation ladder is *invented* until we mine the real distribution |
-| **Per-benchmark noise floors** | **1 of 46** (N1) — so **45 of 46 cannot currently ship** under our own gate rule. But see Ψ1: a validated questionnaire **donates** a calibrated noise floor (human BFI test–retest r≈0.75–0.90) instead of us paying to establish one |
-| **Research streams** | 11 complete; **5 cross-checks in flight** (psychology · big-tech practice · other regions · steerability prior-art · recent news) — any of which may overturn what's here |
+| **Per-benchmark noise floors** | **1 of 50** (N1) — so **49 of 50 cannot currently ship** under our own gate rule. But see Ψ1: a validated questionnaire **donates** a calibrated noise floor (human BFI test–retest r≈0.75–0.90) instead of us paying to establish one |
+| **Research streams** | 11 primary + **4 of 5 adversarial cross-checks landed. They retracted our headline claim, killed one of our own cited numbers, and found our metrics score Luda's failure as a success.** Steerability prior-art still running |
 
 **What this document is:** a defensible argument about *what to measure and why*, with the
 measurement theory worked out and two metrics actually validated.
 
-**What it is not:** a finished spec. Anyone reading §1 as a build list will build 45 dimensions
+**What it is not:** a finished spec. Anyone reading §1 as a build list will build 49 dimensions
 that cannot pass their own gate.
 
 ---

@@ -1,7 +1,11 @@
 # How we evaluate: which fields, how to grade, how to normalize
 
-Status: **proposal for review.** Grounded in notes 00–10. Two research streams (safety,
-multi-turn) still outstanding — the safety tier is provisional.
+Status: **proposal for review, with corrections.** Grounded in notes 00–22.
+
+⚠️ **Superseded in part.** [ABILITY-MODEL.md](../../docs/ABILITY-MODEL.md) now carries the positive
+construct (L1→L2→L3) this note lacked; [BENCHMARKS §0.5](../../docs/BENCHMARKS.md) records that a
+defect-only catalogue *no-ships the most interesting model* (RPGBench). Item 9 below (position bias)
+is **withdrawn**. The organizing principle survives; the claim that it is *sufficient* does not.
 
 ---
 
