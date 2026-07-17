@@ -98,6 +98,26 @@ moved; we need capacity to be moved. Anthropic's "susceptible to nudging" is *ba
 slope is *bad*. **The industry is spending enormous effort making models harder to steer away from
 one character, and IBM measured the result: rigidity around the base profile.**
 
+### ★ And the one lab that pushed hard the *other* way published the bill
+
+xAI tuned Grok 4.1 explicitly for our axis — marketed as *"exceptional capabilities in creative,
+emotional, and collaborative interactions… compelling to speak with, and coherent in personality"*
+— and **its own model card, Table 3 ("Concerning propensities"), reports sycophancy rate rising
+`0.07 → 0.19` (thinking) / `0.23` (non-thinking): roughly 3×** ([`news-grok41-persona-sycophancy.md`](../sources/news-grok41-persona-sycophancy.md), 6-page PDF fetched and extracted locally).
+
+**This is the cleanest published evidence that exists for the framework's central risk.** The
+vendor's marketing claim was that Grok 4.1 *"fully retain[s] the razor-sharp intelligence and
+reliability of its predecessors"*; the vendor's own eval table contradicts it. Personality tuning
+and sycophancy are **not separable**, and the only lab that optimized for companion-style character
+paid for it on exactly the axis BENCHMARKS.md §S6/§X5 says to watch.
+
+**Read together with Anthropic's inverse result** — pushing sycophancy *down* pushed *"wet blanket"*
+*up* — the pair brackets the trade from both directions: **there is a sycophancy↔warmth↔dismissiveness
+axis that no lab has been able to move on one end without the other end moving.** That is the
+strongest external evidence for L2.2's Entangled mode, for K3's fidelity↔diversity logic, and for
+the "two axes, never averaged" rule. It is also a warning about what our own product will do if we
+tune for warmth without a counter-metric that can dissent.
+
 Anthropic names our exact fork as an **open question**, in their own words:
 
 > "It raises complex questions like **whether AI models should have unique and coherent characters or
@@ -436,7 +456,7 @@ anywhere. That is a cleaner statement of our moat than "nobody measures characte
 |---|---|
 | **L1→L2 causal ordering** | Anthropic's character training *is* a discrimination→generation bootstrap; the method **cannot work** unless L1 leads L2 |
 | **L2.2's two quantities (gain, crosstalk)** | **Four independent groups converged on exactly these two** — convergent validity for the construct choice |
-| **"Entangled" failure mode** | Sonnet 5: sycophancy↓ → *"wet blanket"*↑, *"potentially linked"*; values paper: warmth trades against rigor at n=309,815; Course Correction: **crosstalk does not scale away** |
+| **"Entangled" failure mode** | **Four independent instances** — Sonnet 5: sycophancy↓ → *"wet blanket"*↑, *"potentially linked"*; **xAI Grok 4.1: personality/EQ tuning → sycophancy rate 0.07 → 0.19/0.23 (~3×), xAI's own model card**; values paper: warmth trades against rigor at n=309,815; Course Correction: **crosstalk does not scale away with model size** |
 | **S3+S4 "two axes, never averaged"** | Anthropic's own data shows improving one degrades the other — a catalogue that averaged them would report "no change" and miss both |
 | **§0.5 anti-streetlight stance** | OpenAI post-incident: *"**Even if these issues aren't perfectly quantifiable today, we commit to blocking launches based on proxy measurements or qualitative signals**"* |
 | **X5 counter-engagement / metrics that can dissent** | April 2025: **every quantitative instrument approved the regression; only unquantified taste dissented, and it was overruled *because* it was unquantified.** Also Anthropic: *"an excessive desire to be engaging seems like an undesirable character trait"* |
