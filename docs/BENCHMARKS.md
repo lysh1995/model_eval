@@ -8,13 +8,14 @@ Status: **draft, incomplete** · 2026-07-16
 
 | | |
 |---|---|
-| **Benchmarks named** | 36 (30 hygiene + 6 quality) |
-| **Benchmarks fully specced** | **~10.** §2 expands only the load-bearing ones; the rest are a row in a table and a claim |
+| **Benchmarks named** | **42** (30 hygiene + 6 quality + 6 input) |
+| **Benchmarks fully specced** | **~14.** §2 expands only the load-bearing ones; the rest are a row in a table and a claim |
 | **Benchmarks validated on our data** | **2** — N1 repetition (10–13× MDE) and K1 homogenization (*length-controlled only, zh residual unresolved*) |
 | **Lane 3 (judge) validated** | **0.** Every judge number here is borrowed from literature. Our κ, position bias, sentiment bias, abstention rate: **all unknown, blocked on the API key** |
 | **Q-series (the actual product question)** | **0 built, 0 possible offline.** Needs production data that does not exist yet |
-| **Per-benchmark noise floors** | **1 of 36** (N1). The gate rule says no dimension ships without one — so **35 of 36 cannot currently ship** |
-| **Research streams pending** | game/world simulation (C5) |
+| **I-series (real user input)** | **0 built, 0 testable on this corpus** — it contains no messy input, and the degradation ladder is *invented* until we mine the real distribution |
+| **Per-benchmark noise floors** | **1 of 42** (N1). The gate rule says no dimension ships without one — so **41 of 42 cannot currently ship** |
+| **Research streams** | 11 complete; **5 cross-checks in flight** (psychology · big-tech practice · other regions · steerability prior-art · recent news) — any of which may overturn what's here |
 
 **What this document is:** a defensible argument about *what to measure and why*, with the
 measurement theory worked out and two metrics actually validated.
