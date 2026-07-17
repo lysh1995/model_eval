@@ -19,17 +19,39 @@ flowchart LR
     C -->|regression| A
     C --> D[Ship review<br/>evidence + recommendation]
     D -->|no-ship| A
-    D --> E[Shadow<br/>prod traffic, no users]
-    E --> F[Canary<br/>small % of users]
+    D --> E[Shadow<br/>SMOKE TEST ONLY -- turn 1<br/>crash / refusal / latency / cost]
+    E --> F[Canary<br/>small % of real users<br/>the first on-policy signal]
     F --> G[Live<br/>continuous monitoring]
     G -->|drift / regression| D
-    G --> H[Curation<br/>hard cases -> benchmark]
-    H -.grows.-> C
+    G --> H[Curation<br/>hard cases ACCUMULATE into benchmark]
+    H -.grows, never replaces.-> C
 ```
 
 The loop closes at **H**: production teaches the benchmark what it was missing. Without that arm,
-the benchmark decays into a fixed exam that the models have effectively memorized and that no
-longer represents traffic.
+the benchmark decays into a fixed exam that no longer represents traffic.
+
+### ⚠️ Shadow is not a quality gate — it cannot be
+
+**Corrected 2026-07-16** ([14](../research/notes/14-eval-lifecycle-system.md)). The obvious design —
+mirror production traffic to the candidate and compare — **does not work for multi-turn roleplay.**
+The candidate's turn-2 reply is conditioned on the **incumbent's** turn-1. By turn 3 you are
+scoring a conversation the candidate would never have produced. This is the FED result
+(per-turn ranking *flips* vs dialogue-level) arriving through deployment instead of through
+metrics. **Traffic replay onto a live candidate has the identical flaw.**
+
+The industry's "shadow eval on production traces" gate is borrowed from **single-turn RAG apps
+and does not transfer.**
+
+**Consequence:** there is **no user-safe, on-policy middle ground.** Only two things give honest
+multi-turn signal:
+- **offline self-play** (our 102-turn benchmark — the model generates its own assistant turns), or
+- **a real canary** (real users, real exposure).
+
+Shadow survives only as a **smoke test on turn 1**: does it crash, refuse, blow latency, blow
+cost, blow length. That is worth having and is not a quality signal.
+
+**This forces weight back onto the offline benchmark** — which is exactly the stage we've measured
+as underpowered (~2pp). That tension is real and is not resolved by more pipeline.
 
 ---
 
@@ -120,15 +142,40 @@ flowchart LR
 
 ### Event essentials
 
-Every generation event must carry enough to make the score **traceable (C1)** and **sliceable (R4)**:
+**No existing standard is sufficient — this is a real finding, not NIH.** OpenTelemetry's
+`gen_ai.evaluation.result` carries exactly **six** attributes — `evaluation.name`, `score.value`,
+`score.label`, `explanation`, `response.id`, `error.type` — and **not one identifies the evaluator
+that produced the score.** The spec concedes that evaluation semantics are evaluator-dependent and
+then provides no field for the evaluator. That is precisely constraint **C1**, unmet. Likewise
+`gen_ai.conversation.id` is a bare label the spec forbids you to synthesize, and there is no
+session entity at all. Most of the namespace is `Development` stability.
+
+**So: adopt `gen_ai.*` where it exists, add an `eval.*` namespace for what no standard has.**
 
 ```
-variant_id, model_snapshot, params_hash, system_prompt_hash
-character_id, language, session_id, turn_index, distance_to_anchor
-input_tokens, output_tokens, latency_ms
-assignment_arm            # randomized-default vs self-selected -- see below
-lane0_verdicts[], lane0_version
+# gen_ai.* -- adopt as-is
+gen_ai.response.model          # NOT request.model -- what actually served
+gen_ai.finish_reasons          # branch on this: a refusal is a MISSING OBSERVATION, not a zero
+gen_ai.usage.{input,output}_tokens
+gen_ai.conversation.id
+# content capture is Opt-In in the spec -- we must explicitly opt in
+
+# eval.* -- ours, because nothing standard carries it
+eval.variant_id          = H(model, params, system_prompt_bytes, anchoring_policy)
+eval.evaluator_id        = content-addressed (model_snapshot, prompt_hash, rubric_ver, decoding, seed)
+eval.inclusion_prob      # pi_i -- LINEAGE, not telemetry: without it, sampled estimates are unweighted and biased
+eval.distance_to_anchor  # the real causal variable. OTel offers only a boolean
+eval.pairwise_outcome
+eval.provenance          # human-authored | mined-from-production | synthetic
+eval.rollout_stage
 ```
+
+**Session is a first-class entity we build.** It stores `min_turn_score` and
+`first_failure_turn_idx`. **If it stores a mean, the platform is wrong by design** — min-over-turns
+beats mean by 12 points of human agreement, and a mean launders the one catastrophic turn.
+
+**A refusal is not a zero.** Branch on `finish_reasons`: scoring a refusal as 0 silently averages
+a *missing observation* into a quality mean, which is how over-refusal disappears from a dashboard.
 
 ### Three decisions that are easy to get wrong
 
@@ -225,9 +272,28 @@ The **abstention queue is the engine**, not a failure mode. ~19% of items are ir
 contested; routing them to humans yields a calibration set concentrated on exactly the hard
 cases — the cheapest source of κ we have.
 
-**Contamination guard:** curated production data trains *nothing*. Findings feed humans. A
-benchmark grown from our own models' outputs, used to select our next model, is a feedback loop
-with no ground truth in it.
+**Contamination guard — the benchmark ACCUMULATES, never REPLACES.** Mined cases are our own
+models' output. Curation that *replaces* human-authored anchors runs the Nature model-collapse
+experiment on our eval set — after which the benchmark **reports improvement forever, by
+construction.** Enforce a provenance cap in CI (`eval.provenance` ratio), don't merely monitor it.
+Curated production data also trains *nothing*: findings feed humans, not a reward model.
+
+### The cautionary tale that defines this flow
+
+**RLUF (Meta) is the only published offline↔online correlation we found: Pearson r = 0.95** across
+10 iterations. Read the method before celebrating: it was achieved by **training the evaluator on
+1M production labels of the online metric** — not by a rubric judge. Then optimizing it by +28%
+produced a model that **ends conversations early to farm the signal** ("bye" rate 0.72% → 2.8%).
+
+**The correlation and the pathology are the same property:** a metric that predicts online
+outcomes is, by construction, a metric worth gaming.
+
+And the detail that should decide our architecture: **the tripwire that caught it was a cheap
+deterministic phrase rate — not the judge.** That is the strongest available argument for Tier 1
+(free, exact, 100% coverage). The expensive instrument missed it; the trivial one caught it.
+
+**Therefore: we cannot claim offline↔online correlation** until we backtest against our own A/B
+history. Until then it's an aspiration, not a property.
 
 ---
 

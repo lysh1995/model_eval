@@ -76,14 +76,51 @@ Conditions vary the rule supervision (human-written rules / LLM-generated rules 
 - **59.9%** — CONFIRMED. GPT-4's best accuracy on **non-trivial (dynamic) full state transitions** with human-written rules.
 - **76.8%** — **NOT FOUND.** No such figure appears in the paper. The nearest actual value is **77.1%** — action-driven (ℱ_act) full-state prediction, human rules, dynamic. (77.5% is the static-state counterpart.) The commonly-cited pairing should be **59.9% / 77.1%**.
 
-### Human baseline
+### Game progress / reward prediction (ℱ_R, Table 3)
+
+| Condition | Accuracy |
+|---|---|
+| With LLM rules | **92.1%** |
+| Without rules | **61.5%** |
+
+**+30.6 points from having rules in context.** Directly relevant: an explicit world-bible/state block in context should massively improve consistency. That is a *product* recommendation falling out of an eval finding, and it is testable on our grid.
+
+### Human baseline (Table 4)
 On challenging transitions, humans reached **~80%** vs. GPT-4's **~50%**.
+
+⭐ **This is a noise floor for state prediction, and it must be read carefully.** 80% is far better than the α = 0.25–0.34 we see on aesthetics — this is the core reason to prefer world-state dimensions. But it is **not 100%**, which kills the naive claim that "world state is objective, therefore free of the ground-truth problem." Even with JSON-vs-JSON and a code oracle available, humans disagree with the oracle 20% of the time on hard cases. Our contradiction auditor will not beat this. (Caveat: small n, and the "humans" were the authors — the 80% is itself soft.)
+
+### ⚠️ The compounding claim — an extrapolation, not a measurement
+
+> "After 10 steps, average simulation accuracy would reduce to 0.599^10 ... or less than 1%"
+
+**0.599^10 = 0.6% assumes each step's error is independent and that any single error is fatal.** Neither holds cleanly: errors concentrate on specific hard properties (a model that gets `temperature` wrong at step 1 likely gets it wrong at step 2 — positively correlated, making the true curve *less* steep than the product rule), while error propagation through an already-corrupted state pushes the other way. **The paper never measures the actual 10-step rollout curve.**
+
+**Do not cite the <1% figure as an empirical result.** Cite 59.9% single-step, and cite the compounding as the authors' own argument, flagged as an assumption. Measuring the *real* decay curve is a genuine, cheap contribution available to us.
 
 ## Key findings
 
 - **Environment-driven transitions are the failure mode.** ℱ_env collapses to **38.6%** (full) / **22.2%** (diff) on dynamic states — far below the 77.1% on action-driven transitions. Modeling what happens *on its own*, independent of the agent's action, is dramatically harder than modeling the direct consequences of an action.
 - **Static vs. dynamic gap.** Static (nothing-changes) transitions score much higher — e.g. ℱ_env diff 92.3% static vs. 22.2% dynamic. Aggregate accuracy is inflated by trivial cases; only the dynamic slice is diagnostic.
-- **Rules help, modestly.** Human rules 59.9% vs. no rules 54.1% on ℱ (full). LLM-generated rules (59.0%) are nearly as good as human-written ones.
+- **Rules help, modestly.** Human rules 59.9% vs. no rules 54.1% on ℱ (full). LLM-generated rules (59.0%) are nearly as good as human-written ones. But on ℱ_R the rules effect is large (+30.6pp) — so "rules help modestly" is true for state, false for reward.
+
+## Failure modes (qualitative only)
+
+> "GPT-4 is more likely to make an error when arithmetic, common-sense, or scientific knowledge is needed"
+
+> "Errors are concentrated on non-trivial properties that requires arithmetic (e.g., temperature, timeAboveMaxTemp), common-sense (e.g., current_aperture, current_focus), or scientific knowledge"
+
+> "When predicting action-driven and environment-driven transitions in a single step, GPT-4 tends to focus more on action-driven transitions, resulting in more **unaltered value errors**"
+
+**No quantified error counts beyond the accuracy percentages** — the failure taxonomy is qualitative. A gap we could fill.
+
+Authors' interpretation: LLMs learn **correlational rather than causal** models of world dynamics.
+
+## Limitations (verbatim)
+
+> "This work considers two strong in-context learning LLMs, GPT-3.5 and GPT-4, in their ability to act as explicit formal simulators. We adopt these models because they are generally the most performant off-the-shelf models across a variety of benchmarks. While we observe that even GPT-3.5 and GPT-4 achieve a modest score at the proposed task, we acknowledge that we did not exhaustively evaluate a large selection of large language models, and other models may perform better."
+
+> "The state spaces produced in this work are focused around the domain of common-sense and early (elementary) scientific reasoning... it does not address using LLMs as simulators for highly domain-specific areas, such as physical or medical simulation."
 
 ---
 

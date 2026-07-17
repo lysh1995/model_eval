@@ -176,6 +176,15 @@ Testable. A criterion that can't fail isn't one.
   Non-negotiable: OpenAI's April 2025 sycophancy rollback happened *because* A/B tests approved
   the model and expert dissent was overruled. Test: the ship gate has a human veto that requires
   no statistical justification.
+- **AC10b** — **The gate compares intervals, never point estimates.** Every CI tool surveyed fails
+  a PR "if any metric regresses" — at our measured noise floor that fires on **every** PR and gets
+  disabled within a fortnight. A gate that doesn't know its own MDE is theatre. **This is the
+  differentiator, not the harness.** Test: submit a variant with a delta below MDE; the gate must
+  pass it *and say so*.
+- **AC10c** — **The benchmark accumulates, never replaces.** Mined cases are our own models'
+  output; curation that replaces human-authored anchors runs the model-collapse experiment on our
+  eval set, after which it **reports improvement forever by construction**. Test: CI enforces a
+  provenance cap on `eval.provenance`; a PR breaching it fails.
 
 ### Safety (R5) — legally load-bearing
 - **AC11** — Crisis detection is wired to **escalation**, not just logging. In the Raine case the
