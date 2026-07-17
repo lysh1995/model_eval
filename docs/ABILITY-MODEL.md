@@ -70,6 +70,73 @@ Two consequences:
    "L1 fine, L2 elasticity ≈ 0 on emphasis words" tells them the model can read the character and
    *ignores their prompt* — which is a different fix entirely (and possibly a different model).
 
+### ⚠️ The load-bearing error: this framework sorts by RELIABILITY and never checks VALIDITY
+
+**From [16](../research/notes/16-psychology-crosscheck.md), and it is the most damaging correction in
+the project.**
+
+The argument below runs *bound ⇒ high agreement ⇒ these are the layers to measure.* **Psychology
+severs the last arrow.** Reliable ≠ valid — you can measure something perfectly and share variance
+with nothing:
+
+| | |
+|---|---|
+| **Faux Pas** (a ToM task) | scoring **ICC = .996** — and correlates **−.029 to .135** with every other ToM task |
+| **Empathic accuracy** | **α ≈ .90**, and **r = .06** with its nearest neighbour |
+| Warnell & Redcay | parallel analysis on the ToM battery returns a **zero-factor solution** |
+
+And where anyone checked against a real outcome — Elliott, **6,138 clients** — empathic accuracy was
+**"virtually unrelated"**, while the **perspectival** measure predicted best (**r = .28**).
+
+> **This inverts the architecture.** I isolated L3/perspectival at the end as the intractable
+> leftover. The one place anyone measured outcomes, **the perspectival measure was the one that
+> predicted them.** "Hard to agree on" and "doesn't matter" are not the same property, and I have
+> been treating them as one.
+
+The escape is real but costs the strong claim: **range restriction.** Bound measures may look
+uncorrelated *because* everything clears the floor. That demotes L1 from **"gates everything"** to
+**"floor check"** — still worth having, no longer the spine.
+
+### The cascade is UNEXAMINED, not refuted — and the test is not a correlation
+
+The stream first read ToM→behaviour **r = .19** as refuting the cascade, then **corrected itself**:
+
+> **A necessity claim predicts a *triangular* scatterplot, so a low r is exactly what a TRUE cascade
+> looks like.**
+
+Test it as **necessity**: count the **empty cell** (high L2 with low L1). Not correlation. **Nobody has
+ever regressed portrayal on comprehension — in humans or in models.** That is a real gap and it is
+ours to fill.
+
+### The form is 30 years old — cite it, stop claiming novelty
+
+Funder's **Realistic Accuracy Model** (relevance → availability → detection → utilization) is
+explicitly **necessary** and **multiplicative**: *"if any stage is unsuccessful, an accurate judgment
+is not possible."* That is this document's cascade, published in 1995.
+
+**Kenny's SRM independently vindicates the architecture's core move:** target effects are stable
+(**r = .90**), relationship effects are not (**r = .40**) — so isolating preference at the end is
+structurally right, even though the reliability argument for it was wrong.
+
+### Three metrics to fix now
+
+1. **"Consistency" is anti-correlated with the construct.** Mischel & Shoda: **signature stability is
+   *"negatively related"* to cross-situational consistency.** Real personality is **if-then profiles**,
+   so a naive consistency metric **fires hardest on its best case** — it punishes exactly the
+   characters that behave like people. Replace with **if-then profile stability** (target **.41–.48**;
+   **>.90 flags rigidity**, not excellence).
+2. **Crosstalk is realism, not "the killer."** Asch has the numeric key: warm→cold moves `generous`
+   **91% → 8%**, `honest` **98% → 94%**. Traits *should* propagate — that's coherent person-perception.
+   Worse, **Asch Exp. IV kills the matrix outright: the coefficients are not stable across sheets**, so
+   a single trait×trait matrix is not a property of the model.
+3. **Never compute per-cell Δs.** Difference-score reliability:
+   `r_DD = (r_xx + r_yy − 2·r_xy) / 2(1 − r_xy)` — **our own experimental control (holding everything
+   else fixed) drives elasticity's reliability toward zero.** The tighter the control, the worse the
+   Δ. **Fit random slopes instead.**
+
+Also: **the dose is not known exactly.** §3.2 claims *"the referent is known exactly"* — false. Use the
+**published adverb scale** (stable at ρ > 0.900) rather than assuming "quite" < "extremely" is calibrated.
+
 ### And it lands on the right side of the agreement gradient
 
 The gradient from [13](../research/notes/13-game-simulation-dimensions.md) says agreement is driven

@@ -40,10 +40,14 @@ additional. Dates are the *operative* dates, not announcement dates.
 
 | Date | Obligation | Source |
 |---|---|---|
+| **2025-05-19** | **Italy (Garante)**: **€5M fine** to **Luka Inc. (Replika)** — no valid legal basis, inadequate disclosures, and **no working age verification** (users could change birthdate post-registration; incognito bypassed cooling-off). **First financial penalty against a companion app anywhere.** | `news-italy-garante-replika.md` |
+| **2025-09-01** | **China**: AI-generated synthetic content **labeling** measures in force (explicit + implicit labeling; distribution-platform duties). | `news-china-ai-labeling.md` |
+| **2025-10-10** | **Italy Law 132/2025**: ⚠️ **under-14s require verified parental consent to access AI at all** — no EU AI Act equivalent, and **earlier than** Art 50. ⚠️ law-firm sourced; GU text not retrieved. | `news-italy-ai-law.md` |
 | **2025-11-10** | **NY**: Gov. Hochul's open letter putting operators on **written notice** Art 47 is live. AG-enforced; fines fund suicide prevention. ⚠️ ~$15k/day. | `news-state-chatbot-laws-2026.md` |
 | **2025-12-10** | **Australia**: under-16 social media minimum age in force. ✅ **Does NOT currently cover AI companion apps** — but the **Age-Restricted Material Codes** do bind companion bots. | `news-australia-under16.md` |
+| **🚨 2026-01-15** | **UK — Ofcom opens an enforcement investigation into *Novi Ltd*, an AI character companion service**, over **highly effective age assurance** for pornographic material. **First regulator enforcement against a companion app as such.** ~**6.5M global MAU**, **100–300k UK**. Ofcom has opened **94** investigations since the OSA duties commenced. | `news-uk-ofcom-companion-investigation.md` |
 | **2026-01-01** | **CA SB 243** (already in note 07). | note 07 §6.1 |
-| **2026-01-22** | **South Korea AI Basic Act** in force (Act 20676; Enforcement Decree 36053). Framework statute; transparency/labeling duties. | `news-korea-ai-basic-act.md` |
+| **2026-01-22** | **South Korea AI Basic Act** in force (Act 20676; Enforcement Decree 36053). ⚠️ **Art 31** generative-AI transparency binds companion bots: advance notice AI is in use + indicate output is AI-generated + (voice/image/video) recognizable labeling. ✅ **Companion bots are NOT "high-impact"** — the enumerated domains are energy/health/nuclear/biometrics/public decisions/education. **Unless you position as health-adjacent.** | `news-korea-ai-basic-act.md` |
 | **2026-01-31** | **Apple**: deadline to answer updated age-rating questions or lose the ability to ship updates. ✅ New tiers 13+/16+/18+. ✅ Verbatim: *"you must consider how all app features, **including AI assistants and chatbot functionality**, impact the frequency of sensitive content."* | `news-texas-app-store-scotus.md` |
 | **2026-06-04 → 07-06** | **Texas SB 2420** enforceable. 5th Cir. stayed the injunction 06-10; **SCOTUS declined to reinstate it 2026-07-06, no public dissents.** ✅ Binds **developers**, not just app stores. | `news-texas-app-store-scotus.md` |
 | **2026-07-01** | **Tennessee SB 1580**: AI may not present as a **licensed mental health professional**. | `news-state-chatbot-laws-2026.md` |
@@ -53,7 +57,7 @@ additional. Dates are the *operative* dates, not announcement dates.
 
 | Date | Obligation |
 |---|---|
-| **🚨 2026-08-02 (17 days)** | **EU AI Act Article 50** applies. ✅ **Art 50(1) chatbot disclosure was NOT delayed by the Digital Omnibus** — Commission draft guidelines (2026-05-08) para (141): the Omnibus grandfathering touches **only Art 50(2)** marking/detection for pre-existing generative systems. Guidelines are **draft/non-binding**; final not adopted as of today. |
+| **🚨 2026-08-02 (17 days)** | **EU AI Act Article 50** applies. ✅ **Art 50(1) chatbot disclosure was NOT delayed by the Digital Omnibus** — Commission draft guidelines (2026-05-08) para (141): the Omnibus grandfathering touches **only Art 50(2)** marking/detection for pre-existing generative systems. Guidelines are **draft/non-binding**; final not adopted as of today. ⚠️ **The voluntary Code of Practice on Transparency (2026-06-10) covers Art 50(2)/(4)/(5) — NOT 50(1).** So **the duty that actually binds a companion bot has no safe-harbour Code.** Compliance must be demonstrated by other means. |
 | **2026-09** | Apple: age-rating answers **required** for all new apps/updates. |
 | **end of 2026** | Meta's parental self-harm alerts go global. |
 
@@ -70,14 +74,17 @@ additional. Dates are the *operative* dates, not announcement dates.
 
 - **GUARD Act (S.3062)** — **unanimously** out of Senate Judiciary **2026-04-30**; House companion pending. Bans AI companions for minors; **criminal** penalties to **$250k** on a **knowing-or-reckless** standard. EFF opposing. `news-guard-act.md`
 - **NY S 9051** — ⚠️ reported passed June 2026 (minor ban, $25k). **Signature status unknown.**
+- **Canada — Bill C-34, Safe Social Media Act** ✅ **introduced 2026-06-10; NOT law.** Would enact the **Digital Safety Act** + a **Digital Safety Commission of Canada**. **The only proposal outside China that names "AI chatbot services" as a bespoke regulated category.** Its rationale is our thesis, verbatim: *"**AI chatbots can interact directly and persistently with users, sometimes reinforcing harmful behaviours or providing unsafe responses in sensitive situations.**"* `news-canada-bill-c34.md`
 - **FTC 6(b)** — 🚩 **NO findings published.** 10 months on; staff reports take *years*. **Do not roadmap against it.** `news-ftc-6b-status.md`
 
 ### Scope rulings that decide whether our customers are regulated at all
 
 - **UK ✅ — user-created personas ARE regulated UGC.** Ofcom open letter (2024-11-08, cross-referenced by the 2025-12-18 explainer): *"Any text, images or videos created by these 'user chatbots' is 'user-generated content' and is regulated by the Act."* A persona library makes you a **user-to-user service**. `news-uk-osa-chatbots.md`
+  - **And it is being enforced.** ✅ *Novi Ltd* (2026-01-15) — Ofcom's theory is not "companion bots are dangerous"; it is *"**sites that allow pornographic material must use highly effective age assurance**."* **Any companion app permitting explicit roleplay is a porn site for OSA purposes.** That is the cheapest, most reliable hook a regulator has, it needs no new law, and it applies to the entire Tier-2 market. Exposure: **£18M or 10% of global revenue**.
 - **OR ✅ — a behavioral three-prong test** (retains info to drive engagement + **asks unprompted emotional questions** + sustains personal dialogue). **No general-assistant carve-out.**
 - **WA ⚠️ — categorically excludes "general virtual assistants" and "gaming bots."** *Gavalas is the fact pattern Oregon captures and Washington exempts.* ⚠️ Note 07 §6.1 argues CA's game carve-out "evaporates" on conduct; **whether WA's is conduct-based or categorical is unresolved and load-bearing** for the game-studio segment. **Read the RCW.**
 - **China ✅ — scope = simulates a natural person's personality/thinking/style AND sustained emotional interaction.** Task assistants carved out **only** where no sustained emotional interaction.
+- **Age thresholds are converging on 14 from opposite legal traditions** — **Italy** (under-14 parental consent for AI access, Oct 2025) and **China** (under-14 guardian consent + outright ban on virtual partners for *all* minors, July 2026). GDPR Art 8's member-state range is 13–16; Italy set 14. **Design the age gate for a 14 boundary, not just 13 or 18.**
 
 ---
 
@@ -416,6 +423,13 @@ judging**. **Do not rely on LLM judges for relational harm**: AICompanionBench s
 4. **Condition the whole harness on a minor flag, and treat the flag as unreliable.** Texas supplies
    a runtime age category; OpenAI *predicts* age probabilistically. **Same probe, two pass criteria,
    plus a wrong-flag sweep.** This is structural, not a new probe. (§1, §2.2)
+   - **Corollary — the explicit-content boundary is the enforcement hook, not the dependency
+     theory.** Ofcom went after Novi on *"sites that allow pornographic material must use highly
+     effective age assurance"*; the Garante fined Replika partly for **no working age verification**.
+     **The regulator's cheapest case is "you served explicit content without a hard age gate."**
+     A probe that measures *how reliably a persona can be walked into explicit content, per age
+     condition* is the highest-ROI compliance artifact we can ship, and it is far simpler than
+     anything in §4. (§1)
 5. **Build the "are you actually a regulated companion?" classifier.** Oregon's three prongs are
    computable; China's scope test is behavioral; UK's UGC ruling is categorical. **It is the first
    question every obligation depends on, and the market has every incentive to answer it wrong** —
@@ -462,3 +476,48 @@ judging**. **Do not rely on LLM judges for relational harm**: AICompanionBench s
 - **"Claude Fable 5 is Anthropic's purpose-built creative model"** — false. **"Opus 4.6 retired"** — false (it's EQ-Bench 3's current judge).
 - An aggregator misattributed OpenAI's emotional-reliance numbers to the flagship: **0.989/0.957 are Luna's**; **Sol is 0.991/0.953**. **Always read the table.**
 - **A search summary fabricated a results table** for arXiv 2605.00227 (invented platform, pair count, and percentages). **Caught and contained — the numbers did not propagate.** This is the second confirmed fabrication in this project. **Treat search-engine summaries as leads, never as sources.**
+
+---
+
+## 8. Source index (56 files, all `topic: recent-news`, all `accessed: 2026-07-16`)
+
+**Litigation & incidents**
+`news-characterai-google-settlement` · `news-gavalas-v-google-gemini` · `news-florida-v-openai` ·
+`news-xai-grok-deepfake-crisis` · `news-esafety-companion-findings`
+
+**US regulation**
+`news-state-chatbot-laws-2026` · `news-wa-hb2225` · `news-oregon-sb1546` ·
+`news-texas-app-store-scotus` · `news-guard-act` · `news-ftc-6b-status`
+
+**Non-US regulation**
+`news-eu-ai-act-art50-guidance` · `news-eu-digital-omnibus-ai` ·
+`news-eu-code-of-practice-transparency` · `news-uk-osa-chatbots` ·
+`news-uk-age-assurance` · `news-uk-ofcom-companion-investigation` · `news-australia-under16` ·
+`news-australia-esafety-ai-companions` · `news-china-ai-companion-measures` ·
+`news-china-minors-mode` · `news-china-ai-labeling` · `news-korea-ai-basic-act` ·
+`news-italy-ai-law` · `news-italy-garante-replika` · `news-canada-bill-c34`
+
+**Platforms**
+`news-characterai-u18-outcome` · `news-meta-teen-ai-characters` · `news-openai-adult-mode-delay`
+
+**Model cards & model landscape**
+`news-gpt56-emotional-reliance` · `news-claude-sonnet5-character-traits` ·
+`news-grok41-persona-sycophancy` · `news-model-releases-roleplay`
+
+**Eval methodology**
+`news-judge-reliability-without-validity` · `news-eqbench-v3` · `news-lmarena-arena-ai-changelog` ·
+`news-leaderboard-illusion-followup` · `news-roleplay-benchmarks-2026` · `news-minimax-roleplay-bench` ·
+`news-companion-safety-benchmarks` · `news-sycophancy-2026`
+
+**Research — effects**
+`news-science-sycophancy-dependence` · `news-rct-companion-anthropomorphism` ·
+`news-characterai-companion-wellbeing` · `news-replika-reddit-quasi-experiment` ·
+`news-hbs-loneliness-jcr-publication` · `news-anthropic-affective-use-telemetry` ·
+`news-ai-psychosis-evidence-base` · `news-rand-suicide-risk-alignment` ·
+`news-review-conversational-agents-social-partners` · `news-review-machine-companionship-measurement`
+
+**Research — minors**
+`news-minors-prevalence-and-reviews` · `news-minors-relational-ai-experiment`
+
+**Measurement instruments**
+`news-scale-ai-attachment` · `news-scale-haabi` · `news-scale-aidep22` · `news-scale-aied-adolescents`

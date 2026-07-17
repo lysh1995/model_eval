@@ -53,6 +53,22 @@ characters, or run it *within* character — perturb sheet length for a fixed ch
 convergence directly. The second is the real experiment and needs the API key. Note it is also just
 the **L2.2 steerability design** pointed at a different parameter.
 
+## ⚠️ CONFOUNDED — shared stereotype (added 2026-07-16)
+
+[16](16-psychology-crosscheck.md) identifies a confound that undercuts this note's premise:
+**at low acquaintance, 100% of judge consensus is shared *stereotype*, not accuracy.** Two strangers
+agree about a person because they share a cultural prior, not because they read them well.
+
+**Models share pretraining.** So cross-model agreement on a character may measure **shared
+archetype priors**, not shared comprehension of the card — the two are indistinguishable in this
+design. The en hard-cluster being three British aristocrats (Ashworth ×2, Blackwood) now reads as a
+*prediction* of this confound rather than a curiosity: those are strongly stereotyped archetypes
+where priors are strong and could dominate the card.
+
+**Required control:** score an **archetype-only** condition — strip the card to its archetype label
+and re-measure convergence. Whatever agreement survives is prior, not comprehension. **Until that
+runs, this note measures an unknown mixture and its headline should not be used.**
+
 ## The hardest and easiest characters to read
 
 | | en | zh |

@@ -2,7 +2,7 @@
 
 **Topic owner:** construct validity of [ABILITY-MODEL.md](../docs/ABILITY-MODEL.md)
 **Date:** 2026-07-16
-**Sources:** `research/sources/psych-*.md` (35 files)
+**Sources:** `research/sources/psych-*.md` (41 files)
 
 **Scope:** the ability model claims roleplay quality decomposes into three causally ordered layers
 (L1 comprehension → L2 application & steerability → L3 creativity), that failures cascade downward
@@ -18,7 +18,9 @@ whether we are re-inventing a validated wheel, or building a square one.
 refuted — nobody has ever regressed portrayal quality on comprehension, in humans or models. What is
 refuted is the framework's *justification*: "these layers are bound, therefore high-agreement,
 therefore the ones to measure." Boundedness buys reliability, not validity, and the two come apart
-violently. Three of the framework's specific metrics are also wrong in ways psychology can fix.**
+violently — Faux Pas scores at ICC=.996 and correlates ~0 with every other measure of the same thing.
+Four of the framework's specific metrics are wrong in ways psychology can fix, and one (the
+steerability matrix) is not a well-defined object.**
 
 | claim | verdict | evidence |
 |---|---|---|

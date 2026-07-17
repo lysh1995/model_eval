@@ -23,6 +23,7 @@
 | [10 — Noise floor](notes/10-noise-floor.md) | Variance decomposition from the 3 runs/cell. **What the platform can and cannot detect** |
 | [15 — L1 convergent reading](notes/15-l1-convergent-reading.md) | Do models agree on how to read a character? Characters vary 4–5x in readability |
 | [21 — Card-awareness audit](notes/21-card-awareness-audit.md) | **Did the user simulator see the character card?** Suggestive yes — which would mean our drift numbers are a lower bound |
+| [22 — SRM chemistry](notes/22-srm-chemistry.md) | **The chemistry term measured**: model×character = 6.7% (en) / 14.6% (zh) — on a metric where it should be ~0 |
 
 ### Design
 | | |
