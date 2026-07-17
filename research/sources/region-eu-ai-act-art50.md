@@ -74,24 +74,41 @@ marking duty, and only for systems already on the market before 2 Aug 2026.
 > offences, subject to appropriate safeguards for the rights and freedoms of third parties, and in
 > accordance with Union law."
 
-### Does a companion inferring user emotion trigger 50(3)?
+### Does a companion inferring user emotion trigger 50(3)? — RESOLVED: NO for text-only
 
-**Probably NOT on text alone — but this turns on a definition, and the answer flips if you add voice
-or camera.** Analysis (my reasoning, flagged as such):
+**Answer: NO for a text companion. YES, plausibly, if you add voice or camera.** This turns entirely
+on the Art. 3(39) definition, which I fetched and verified:
 
-- "emotion recognition system" is a **defined term** in Art. 3(39), and the definition is tied to
-  **biometric data**. Art. 50(3) reinforces this by speaking of persons "exposed thereto" and pairing
-  it with biometric categorisation.
-- A companion inferring "user seems sad" from **typed text** is not obviously processing *biometric*
-  data, so 50(3) likely does not bite.
-- **A voice companion is a different story.** Inferring emotion from vocal tone/prosody is much closer
-  to biometric-based emotion recognition, and 50(3) would then plausibly apply — plus the Art. 9 GDPR
-  problem sharpens.
-- **UNVERIFIED**: I did not fetch the exact Art. 3(39) definition text or Recital 18 in this pass.
-  Confirm the precise definition before relying on the text-only conclusion. This is the single
-  weakest link in this file.
+**Art. 3(39) — VERBATIM:**
+> "'emotion recognition system' means an AI system for the purpose of identifying or inferring
+> emotions or intentions of natural persons on the basis of their biometric data"
+
+**Art. 3(34) — VERBATIM:**
+> "'biometric data' means personal data resulting from specific technical processing relating to the
+> physical, physiological or behavioural characteristics of a natural person, such as facial images or
+> dactyloscopic data"
+
+Therefore:
+- The definition is **gated on biometric data**. Inferring "user seems sad" from the **semantic content
+  of typed text** is not processing biometric data — text content is not "physical, physiological or
+  behavioural characteristics" resulting from "specific technical processing" of the body.
+  **A text-only companion doing sentiment/affect inference does NOT trigger Art. 50(3).**
+- **A voice companion very plausibly DOES.** Inferring emotion from vocal prosody/tone is processing a
+  physiological/behavioural characteristic — that is biometric data, and the purpose is inferring
+  emotions. 50(3) would then apply, and the disclosure duty falls on the **deployer**.
+- Same for a video/avatar companion reading facial affect ("such as facial images" is named
+  explicitly in 3(34)).
+- **Watch this edge**: 3(34) includes **"behavioural characteristics"**, and unlike the GDPR
+  definition it does **not** require that the processing "allow or confirm unique identification".
+  So the AI Act's biometric-data definition is *broader* than GDPR's. Keystroke dynamics / typing
+  cadence used to infer emotional state would be a genuinely arguable case. Content-based inference
+  is not.
 - Note the sting in the tail: 50(3) *expressly* pins the GDPR onto the same processing. It is a
   transparency duty **plus** a cross-reference to the Art. 9 problem.
+
+**Roadmap consequence: a voice feature imports a new regulatory obligation (50(3) deployer disclosure)
+that the text product does not have, and sharpens the Art. 9 GDPR problem at the same time. Worth
+flagging before voice is scoped.**
 
 ## Art. 50(4) — deepfakes and public-interest text — VERBATIM
 

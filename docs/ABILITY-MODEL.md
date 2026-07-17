@@ -277,6 +277,134 @@ work, conflicts resolve toward the user. That's a deliverable an authoring team 
 
 ---
 
+## 3b. Psychometric instruments — the questionnaire is not a scoreboard
+
+**The naive idea:** administer the BFI to the character, get a Big Five profile, compare to the
+card. **This fails immediately** — the card has no ground-truth profile, and nobody said the
+character's traits map onto Big Five factors.
+
+**The idea that works:** a validated questionnaire is **a bank of bound items with known
+psychometrics**. That makes it five instruments, and *"what's the score"* is the least useful one.
+
+### Use 1 — Coherence = test-retest stability ★ **the best use**
+
+Administer the same instrument to the same character at **turn 5 and turn 95**. Don't ask what the
+profile *is*. Ask **whether it moved.**
+
+**Why this is the strongest idea in this document:** psychology has *already established the human
+baseline*. BFI test-retest is **r ≈ 0.75–0.90** over weeks. So we get a **calibrated noise floor for
+free** — the one thing [10](../research/notes/10-noise-floor.md) says every dimension needs and that
+costs us dearly to establish ourselves. If a character's profile moves more between turn 5 and turn
+95 than a *human's* does over six weeks, that is drift **against an external, pre-validated
+yardstick** rather than against a threshold we invented.
+
+It is also **bound**: the turn-5 profile is the referent for the turn-95 profile. Straight into the
+κ≈0.78–0.94 regime of the agreement gradient.
+
+### Use 2 — Representation vs. confabulation = internal consistency ★★ **needs no ground truth at all**
+
+Big Five subscales have ~8 items each measuring one latent trait. In humans, **Cronbach's α ≈ 0.8**.
+
+Administer the items to the character and compute **α on the character's own responses.**
+
+- **α ≈ 0.8** → the model has a *stable internal representation* of this person, and the items are
+  reading it.
+- **α ≈ 0** → the model is answering **item by item with no underlying trait**. It is
+  **confabulating a personality one question at a time.**
+
+**This requires no ground truth about the character whatsoever** — the instrument's factor structure
+*is* the test. It answers the deepest version of your L1 question: not "did it get the character
+right?" but **"is there a character in there at all, or just locally plausible text?"** I know of
+nothing else in the catalogue that can ask that.
+
+### Use 3 — The steerability matrix gets its axes ★★
+
+My §3.2 crosstalk matrix had a hole I glossed over: **where do the axes come from?** If I invent
+"shy," "cruel," "curious," I have no idea whether they're independent — so an off-diagonal reading
+could just mean my axes overlap.
+
+**Psychometrics solved this.** Big Five factors are constructed for **discriminant validity** —
+decades of factor-analytic work establishing that they vary independently. Use them (or the **30 NEO
+facets**, via the **public-domain IPIP-NEO-120** — NEO-PI-R itself is copyrighted) as the matrix
+axes, and the off-diagonal becomes **interpretable**: crosstalk against axes already proven
+orthogonal *in humans* is real entanglement in the model, not an artifact of my vocabulary.
+
+### Use 4 — Fidelity = profile recovery (this is empathic accuracy)
+
+Have a rater fill out the instrument **as the character, from the transcript alone**. Separately,
+fill it out **from the card**. Compare.
+
+**This is the agreement-gradient trick applied to persona:** it converts the unbound *"is this in
+character?"* (α=0.25–0.34 — and RPGBench measured human–human agreement on persona consistency at
+**Pearson −0.310**, literally anti-correlated) into **44 bound items** with a numeric referent.
+**The questionnaire IS the record that turns question 2 into question 1.**
+
+This is also, in psychology's own terms, the **empathic accuracy** paradigm — a 40-year-old
+validated design for "how well did one party read another." We should be borrowing it, not
+reinventing it.
+
+### Use 5 — The self-report/behavior gap = L1.2, instrumented
+
+Administer the questionnaire (**self-report**) *and* measure behavioral correlates in the actual
+roleplay (initiative rate, words per turn, who drives the scene). **Compare.**
+
+A character who self-reports high Extraversion and behaves introvertedly means the model **knows the
+character but can't play them** — exactly the L1.2 discrimination/generation gap, now with a
+calibrated instrument on the "knows" side. Cheap fix vs. model migration, told apart.
+
+---
+
+### So: MBTI or Big Five? **Both — at different layers.**
+
+**MBTI is bad measurement.** Roughly **50% of people change type on at least one dimension within
+five weeks**; it forces binary cuts at the median of *continuous, normally distributed* traits, so
+everyone near the middle flips on re-test; the 16 types have no established predictive validity. As
+an **instrument** it would manufacture the very instability we're trying to detect — our drift metric
+would fire on the questionnaire's own noise.
+
+**But MBTI has something Big Five doesn't: ecological validity.** Character authors *actually think
+in MBTI.* Fan wikis, character sheets, and roleplay communities are saturated with it — **and it is
+culturally enormous in exactly our zh market**, where MBTI is mainstream social vocabulary in a way
+it no longer is in the West. Our authors will describe characters as INTJ whether or not we approve.
+
+**So split the layers:**
+
+| layer | use | why |
+|---|---|---|
+| **Instrument** (what we measure with) | **HEXACO** or IPIP-NEO facets | valid psychometrics, known reliability, established orthogonality |
+| **Interface** (what authors read and write) | **MBTI**, translated | it's the vocabulary they already have — including, especially, in Chinese |
+
+Measurement layer ≠ presentation layer. Reporting a HEXACO profile to an author who thinks in MBTI is
+a product failure; *measuring* in MBTI is a science failure. Do both correctly.
+
+**Why HEXACO over Big Five specifically:** the sixth factor is **Honesty-Humility**, and companion
+catalogues are full of villains, manipulators, tricksters, and morally complex characters. **Big Five
+cannot represent "is this character honest"** — it has no axis for it. For our content, that's not a
+refinement; it's a missing dimension.
+
+### The objection that could kill all of this
+
+**Mischel's person–situation debate.** If personality is really **if-then signatures** (*"in
+situation A she does P; in situation B she does Q"*) rather than trait levels, then a character
+*should* look inconsistent across situations — **in a patterned way** — and a naive trait-stability
+metric would **punish realism**. A perfectly consistent character is a flat one.
+
+If that holds, Use 1 needs restating: **coherence is stability of the *signature*, not of the trait
+level.** Same instrument, different estimand. The psychology cross-check
+([16](../research/notes/16-psychology-crosscheck.md), in flight) was explicitly asked to test this —
+it's the single most likely way this whole section is wrong.
+
+### Status
+
+**All five uses need generation ⇒ blocked on the API key.** They are cheap (items are short, and Use
+2 needs no ground truth), and Uses 1–3 are the highest-value key-gated experiments in the project:
+they deliver a **calibrated noise floor**, a **confabulation detector**, and **validated axes for the
+steerability matrix** — three things we currently lack and cannot derive from the corpus.
+
+Prior art exists and must be checked before building: **InCharacter** (psychological interviews),
+**PersonaLLM** (BFI administration), **PsychoBench**, and *"Editing Personality for LLMs."* The
+psychology and steerability streams are both hunting it.
+
 ## 4. L3 — Creativity & storytelling
 
 > Can it make something worth reading?

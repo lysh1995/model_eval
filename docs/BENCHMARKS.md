@@ -278,6 +278,10 @@ Source: **E** existing benchmark · **S** self-built · **P** production observa
 | **I4** | Language adherence under code-switching | zh/en mixing; a **third** measurement context | 1 | S+P | 🔨 build |
 | **I5** | **Modality-induced persona break** | Image triggers assistant mode: *"This image shows…"* | 3 | S | ⛔ needs multimodal corpus |
 | **I6** | Input-poverty initiative | User says "k"; scene dies | 1 | S+P | 🔨 build |
+| **Ψ1** | **Trait test-retest stability** (turn 5 vs 95) | Personality drifts | 3 | S | 🔨 **free calibrated noise floor** (human BFI r≈0.75–0.90) |
+| **Ψ2** | **Internal consistency (Cronbach's α)** | *There is no character in there* — confabulated per-item | 3 | S | 🔨 **needs no ground truth** |
+| **Ψ3** | Profile recovery (transcript vs card) | Character unrecognizable from play | 3 | S | 🔨 empathic-accuracy paradigm |
+| **Ψ4** | Self-report vs behavior gap | Knows the character, can't play them | 3 | S | 🔨 instruments L1.2 |
 
 ---
 
