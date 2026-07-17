@@ -95,6 +95,29 @@ rigor. That is the streetlight fallacy with a citation list. The NarraBench find
 measured by **reporting the distribution**, not by **omitting the aspect**. This document quoted
 that and then did the opposite.
 
+### This is not a hypothetical failure — it is measured, twice
+
+**RPGBench ran the experiment** ([13](../research/notes/13-game-simulation-dimensions.md)):
+
+> **Claude 3.5 Sonnet: best on interestingness (0.722), best on factual consistency (0.991),
+> WORST on mechanic score (0.113)** — the most engaging engine breaks its own rules in ~89% of
+> rounds.
+
+**A hygiene-only catalogue no-ships the most interesting model.** Rule adherence and quality are
+not merely independent here — they are **inversely** related. Every benchmark in §1 is a rule-
+adherence metric.
+
+**And CICERO is this document's failure, already shipped.** Meta built a superhuman Diplomacy
+agent engineered against consistency-with-state (**87.3%**) and consistency-with-plan (**92.9%**)
+— while *"high quality"* sat at **37.3% for every variant.** They optimized the bound properties
+beautifully and **never operationalized "good."** A world-class team made exactly this mistake
+with far more resources than we have.
+
+**RPGBench also breaks our α floor further, in our exact domain:** human–human agreement on
+**persona consistency** is **Pearson −0.310**. Two humans rating whether an NPC stayed in
+character are *anti-correlated* — worse than chance. So even "character fidelity," the dimension
+this whole field is built on, is **perspectival, not consensus**, when humans are asked directly.
+
 ### Three consequences that change the design
 
 **1. The Q-series is the product. Everything else is hygiene.**
@@ -369,9 +392,28 @@ outrank model choice.
 **Method.** Same prefix; run the real user move vs. a **null** user move. If the story arrives at
 the same place, the user had no effect. Façade's counterfactual baseline, made executable.
 
-**Why first:** it is the **cheapest decisive probe in the catalogue** — 2× generation, **no judge**,
-and it measures the thing that makes interactive fiction *interactive*. Nothing else in the
-literature tests player agency directly.
+**Why it looked like the best idea in the catalogue:** 2× generation, **no judge**, and it measures
+the thing that makes interactive fiction *interactive*.
+
+> ### ⚠️ Corrected — I recommended "build first" and stream 13 contradicts it
+>
+> **Fendt et al.: players cannot distinguish real branching from fake.** Perceived agency and
+> actual agency **come apart**. N4 measures *actual* divergence — which, on this evidence, users
+> may not be able to perceive at all.
+>
+> That inverts the conclusion: **a model that convincingly *fakes* agency may deliver the same
+> product experience as one that genuinely branches**, and N4 would score them oppositely while
+> users rate them the same. Stream 13's verdict on player agency is explicit: **don't ship it** —
+> SOTA is an unvalidated Likert scale.
+>
+> **N4 is not retired, but it is demoted and reframed.** It is a *diagnostic* about the engine
+> (does the user's input propagate at all?), **not** a quality metric, and it must not gate. The
+> product construct is **perceived** agency, which lives in Q1/Q4 and is only measurable with real
+> users.
+>
+> This is the §0.5 error recurring inside a fix for §0.5: I reached for the thing that was cheap
+> and judge-free and called it decisive, when what makes it cheap — no humans needed — is exactly
+> why it can't answer the question.
 
 ### N6 — Block / wimp rate 🔨 **unifies a safety concern with a craft one**
 
@@ -407,6 +449,48 @@ couldn't do it. Catches **stalling and railroading in one number**.
 1997 dialogue theory makes the treadmill precise: **high dialogue initiative + zero task
 initiative.** The bot talks constantly and moves nothing. Our earlier taxonomy lumped these into
 one "proactivity" score and structurally cannot see it.
+
+### C5 — World-state contradiction, and the agreement gradient
+
+**The organizing insight from stream 13, and the most actionable idea in the research:** the divide
+isn't *objective vs subjective*. It's **bound vs unbound** — how tightly the question is tied to a
+retrievable referent.
+
+| question | agreement |
+|---|---|
+| *"Is claim X supported by **record entry Y**?"* | **κ ≈ 0.78–0.94** (FactScore) |
+| *"Does this turn contradict **something earlier**?"* | **65.28%** unanimous (DECODE) |
+| *"Is this good?"* | **α = 0.25–0.34** |
+
+> **The record's job is not storage. It is converting question 2 into question 1.**
+> That is a **~0.4–0.6 κ swing from restructuring the question alone** — larger than any judge
+> upgrade available to us, and it costs nothing but engineering.
+
+This generalizes past world-state: **wherever we can bind a judgment to a retrievable referent, we
+should**, and the binding is worth more than a better judge. It refines NarraBench's three classes
+into a lever: *consensus* aspects become *deterministic-ish* by supplying the referent.
+
+**Viability — yes as a ranker, no as a flag.** DECODE's best detector on natural dialogue:
+**precision 23.94% at 4.27% prevalence** — ~3.2 false alarms per true catch — while
+simultaneously holding **AUC 87.16** and **r=0.81 against humans at the bot level.** Both are true
+at once. This is [10](../research/notes/10-noise-floor.md)'s conclusion arriving from a new
+direction: **a cell-mean instrument, not a transcript annotator.** Never surface per-turn flags.
+
+**The headline trap — check this on every consistency paper we cite:**
+
+| paper | headline | the minority-class truth |
+|---|---|---|
+| DECODE | balanced accuracy **93%** | precision **23.94%** on natural dialogue |
+| FactScore | "**<2%** error" | aggregate cancellation hiding per-fact **F1 53.3** |
+| ContractNLI | accuracy **0.892** | contradiction **F1 0.405** |
+
+**Whenever a consistency paper leads with accuracy, the minority-class F1 is roughly half.**
+
+**The diegetic problem — and it's worst on our best content.** FactScore explicitly disclaims text
+containing deception. **Fiction is deception.** Characters lie, scheme, misremember, and conceal —
+that's not a failure of the story, it *is* the story. Without a **`diegetic_status`** field
+distinguishing *the author asserts X* from *the character claims X*, contradiction precision is
+**worst on the best writing.** Any naive contradiction auditor punishes a well-written liar.
 
 ### X1 — Regenerate → pairwise preference mining 🔨 **misfiled: this is Q1's data**
 
@@ -561,3 +645,19 @@ main reason to collect production data at all.
 10. **Two things the stream could not deliver, flagged rather than faked:** community discourse was
     not retrievable (search returned SEO listicles), and a "Narrative Progression" checklist that
     recurs in search summaries **traces to no primary source** — it was deliberately not captured.
+11. **LongStoryEval is a published negative result against the architecture we were about to
+    build.** Incrementally-maintained records finished **last**, with the stated cause
+    *"accumulating inconsistency"* — the record degrades faster than it helps. **Test record
+    fidelity vs. turn depth before building anything on top of it; it gates C5 and S5 entirely.**
+12. **Goodhart is measured here, not theorized:** a **15× detector/human gap** opens after
+    optimizing against the detector. Every automated dimension in this catalogue is a future
+    optimization target with a known decay curve.
+13. **Rule adherence decays fast and we run 100× longer than anyone tested.** Multi-IF: models lose
+    **17–27% instruction-following over *three* turns.** Our dialogues run **102**. Nobody has
+    measured this regime — the honest position is that we don't know the shape, and it's cheap to
+    find out (deterministic, no judge).
+14. **A research tool fabricated a results section during this work.** WebFetch invented an entire
+    table, including a plausible Fleiss' κ=0.73. It was caught, after which arithmetic checking
+    found **two real errors in DECODE's published table.** All load-bearing numbers in stream 13
+    were re-extracted from primary PDFs via pypdf. **Assume any number not traced to a PDF is
+    unverified** — including, potentially, some in this document.

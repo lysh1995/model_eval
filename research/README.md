@@ -1,6 +1,6 @@
 # Research knowledge base
 
-210 raw sources + synthesis notes, built by 11 parallel research streams (2026-07-16).
+271 raw sources + 15 synthesis notes, built by 11 parallel research streams (2026-07-16). **All streams complete.**
 
 **Structure:**
 - `sources/` — raw captures. Each has YAML frontmatter (title, url, authors, year, type,
@@ -38,16 +38,28 @@
 | [06 — Production scale](notes/06-production-scale-monitoring.md) | Tiering, sampling, drift, the cost model at 50M/day |
 | [07 — Roleplay safety](notes/07-roleplay-safety.md) | Two-axis safety; the fiction-strip test; the legal floor |
 | [08 — Multi-turn eval](notes/08-multiturn-conversation-eval.md) | Unit of analysis; min-over-turns; off-policy replay validity |
-| [12 — Narrative craft](notes/12-narrative-craft-dimensions.md) | 🔄 storytelling dimensions with objective correlates |
-| [13 — Game simulation](notes/13-game-simulation-dimensions.md) | 🔄 world state, consequence, agency |
-| [14 — Eval lifecycle](notes/14-eval-lifecycle-system.md) | 🔄 collection schema, dry-run → online → loop |
+| [12 — Narrative craft](notes/12-narrative-craft-dimensions.md) | Scene-ignorance beats roboticness as the perceived failure; the narrative paradox |
+| [13 — Game simulation](notes/13-game-simulation-dimensions.md) | **The agreement gradient (bound vs unbound); RPGBench; CICERO** |
+| [14 — Eval lifecycle](notes/14-eval-lifecycle-system.md) | Shadow is not a quality gate; no standard carries evaluator identity |
 
 ## A note on rigor
 
 Streams were instructed to flag fabricated or unverifiable numbers rather than pass them through.
-Two independently caught invented figures from web summarizers and corrected three citation errors
-against source PDFs; unrecoverable figures are marked as such rather than estimated. The design
-rests on numbers like κ≈0.53 and ρ=−0.082 — eight agents that check beat eight that agree.
+Unrecoverable figures are marked as such rather than estimated. The design rests on numbers like
+κ≈0.53 and ρ=−0.082 — agents that check beat agents that agree.
+
+**This was not paranoia. It caught three real things:**
+
+1. **A research tool fabricated an entire results section** — WebFetch invented a table including a
+   plausible Fleiss' κ=0.73. Caught by cross-checking; stream 13 then re-extracted every
+   load-bearing number from primary PDFs via `pypdf`.
+2. **Arithmetic checking then found two genuine errors in DECODE's *published* table.**
+3. Two other streams independently caught invented figures from web summarizers and corrected three
+   citation errors against source PDFs.
+
+**Assume any number not traced to a PDF is unverified — including in our own documents.** During
+this session an inflated source count (312 vs the actual 271) was written into *this file*, in the
+section about rigor, and caught on review. The failure mode is not exotic; it is the default.
 
 Confidence tiers are recorded in [../docs/RESEARCH-PLAN.md](../docs/RESEARCH-PLAN.md#confidence-assessment).
 Notably **low-confidence**: bias magnitudes on *our* judge (unmeasured — blocked on API key), the

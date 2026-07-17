@@ -69,6 +69,24 @@ Their conclusion, verbatim: *"objective scores offer a stable foundation for com
 
 ⇒ **If you only measure what feels good, you ship the model that breaks the world.** That is the product pitch, and it is now an empirical result rather than a hypothesis.
 
+### ⭐⭐ CICERO: a superhuman system shipped without ever operationalizing "good"
+
+Meta's Diplomacy agent ([src](../sources/game-cicero-diplomacy.md)) had 2 experts annotate the same 126 situations:
+
+| Dimension | Score |
+|---|---|
+| Consistent with **game state** | **87.30%** |
+| Consistent with **its plan** | **92.86%** |
+| **"High quality"** (aesthetic) | **37.30%** |
+
+**The two objective columns are high and separate the ablations monotonically. The aesthetic column is low for every variant and separates nothing.** Meta **built filters for the first two and none for the third** — and beat humans. ⇒ **A shipped, superhuman dialogue agent was engineered entirely against consistency, never against quality.** That is the strongest existence proof available that our dimension choice is the right one. (Caveat: **no IAA is reported anywhere in the paper**, and no lying rate is measured — "largely honest" is a design claim, not a result.)
+
+### ⚠️ The counter-example, and it is our exact product shape
+
+**LMRL-Gym's Car Dealer task** ([src](../sources/game-lmrl-gym.md)) — persona-driven, multi-turn, **no programmatic arbiter** — produced **40.4–57.2 across all seven methods**. *No signal at all.* Meanwhile the same GPT-4 scores **0** on Chess/Endgames (programmatic verifier) and **~95** on 20 Questions/Guess (**another LLM** as arbiter).
+
+⇒ **Two lessons, both uncomfortable.** (a) **When the environment is made of the same stuff as the agent, scores inflate** — an LLM-arbitrated metric is not an objective one. (b) **The one task shaped like our product is the one where measurement collapsed.** This is the honest counterweight to CICERO: consistency measurement works *when there is an external arbiter*. Our entire §4 is an attempt to manufacture one.
+
 **But five findings cut the bet down, and all five are load-bearing:**
 
 1. **Contradiction is not an oracle.** DECODE: only **65.28%** of *deliberately authored* contradictions won unanimous assent from 3 verifiers; **15.5%** were rejected by 2 of 3. Humans on state prediction with a *code oracle available*: **80%**, not 100%. Humans detecting plot holes: **0.76** accuracy (random = 0.50). **The ceiling is ~65–85%, not ~100%.** Anyone selling "objective, therefore exact" hasn't read the tables.
@@ -120,6 +138,7 @@ Cost tiers follow [note 11](11-evaluation-method-design.md): **L1** = determinis
 | 8 | **Intention Following** | Did the reply engage what the user actually tried to do? | Single-turn, local, judgeable | **L3** | **Converges from two directions:** Interactive Drama "Intention Following" ≈ MiniMax "AI Ignores User" ([note 01](01-roleplay-benchmarks.md) §4) |
 | 9 | **Player Influence / Agency** | Would the story have gone differently had the user chosen otherwise? | **Counterfactual branch:** re-roll from turn *t* with a different user action; measure trajectory divergence | **L3++** | ⚠️ **Weak — see §6.** SOTA is a 1–5 Likert, 6 annotators, no rubric, no IAA. And **Fendt: players can't tell real branching from fake** |
 | 10 | **Spatial/Map Coherence** | Locations and connectivity stay consistent | Graph consistency over asserted adjacency | **L2** | Skill Check Map Design (best **3/5**) |
+| 11 | **⭐ Knowing–Doing Gap** | The model *knows* a fact out-of-band but *acts* against it in play | **Two-condition difference score:** probe out-of-band ("Does Ana know her brother died?") vs. measure in-play behavior (does Ana reference him as living?). **Both conditions objective; the gap is the metric** | **L1–L2** | **Strong construct.** BALROG ([src](../sources/game-balrog.md)): models correctly state that rotten food is harmful, then eat rotten food in play. **Cleanly separates *knowledge* failure from *application* failure** — and only the second is fixable by prompting |
 
 ### The ordering is the roadmap
 
@@ -128,6 +147,8 @@ Cost tiers follow [note 11](11-evaluation-method-design.md): **L1** = determinis
 > ⚠️ **Countability is necessary, not sufficient — screen for range.** A sibling finding worth promoting to a rule: Story Shaping's win rate (100 vs 100) and game score (5.00 vs 5.00) are **identical across conditions**; Static-vs-Agentic's task completion is **100% vs 100%**. Perfectly objective, perfectly useless. **Every candidate dimension must clear a demonstrated-range gate before it ships**, alongside note 10's noise-floor gate. RPGBench quantifies the payoff: objective metrics discriminated **~9×** better than subjective ones (range 0.652 vs 0.015).
 
 > ⭐ **Prefer fine-grained progress to binary pass/fail.** BALROG's stated design goal is a metric *"that still allows us to observe fine-grained progress"* — because binary completion on hard tasks is all zeros and yields no gradient. Its NetHack numbers make the case: **o1-preview's 1.57%** would be **0%** under binary scoring, and its genuine **3×** advantage over Claude 3.5 Sonnet would be invisible. Applied to us: **Skill Check's GM-P-GM at "max 1/5 for every model" is exactly this failure** — a binary metric saturated at the floor, which cannot rank the models it is scoring. Dimension 3 must be scored on partial credit (did it refuse? did it explain? did it offer an alternative?), not pass/fail, or it will have range zero on arrival.
+
+> ⭐ **Print the random baseline next to every countable dimension.** The corpus makes this point three times independently: **Random beats the engineered agents on 8 of 9 TextWorld Treasure Hunter levels**; Random beats DRRN on ScienceWorld Task 4-2 (**0.63 vs 0.56**); and **all four Jericho agents score exactly 36 on `advent` — because the player starts with 36 points.** Also FactScore's "Always Random" scoring **ER 7.5%**, and DECODE's **95.73%** majority baseline. **Objective ≠ informative.** A dimension without its trivial baseline printed beside it is not a measurement, it is a decoration.
 
 > ⚠️ **Refusals must be a separate reported category, never folded into a score.** BALROG's Gemini-1.5-Pro scored **0% on TextWorld** because of a **safety-filter false positive** — and that zero propagated into its headline rank. **Objectivity does not protect against infrastructure artifacts, and a refusal is indistinguishable from incapacity inside an aggregate.** Given [note 01](01-roleplay-benchmarks.md) §5.7 (judges refuse to score intimate content — a sixth of real traffic), this is a live hazard for us, not a hypothetical one.
 
@@ -226,6 +247,8 @@ turn ──> [1] extract candidate facts (closed schema + open triples)
 4. **Never report contradiction *accuracy*.** At 4.27% prevalence the majority baseline is **95.73%**. Report precision/recall/AUC **at a stated threshold, with prevalence**. "Our auditor is 95% accurate" is achievable by always predicting "no contradiction."
 5. **Measure prevalence on our own corpus first.** Everything below depends on it, and 4.27% is Blenderbot-era assistant chat, not roleplay.
 6. **τ is a product decision.** Precision 23.94 is at τ=0.5. AUC 87.16 says the ranking underneath is sound enough to pick a different point: high-τ for a *flagging* surface, τ=0.5 for a *rate*.
+7. **⭐ You can only count violations you allow to occur.** BALROG lets models emit free-form actions, then detects/logs/falls back — **but never publishes the invalid-action rate.** GAMEBENCH hands agents an *enumerated* action list, making illegal moves structurally impossible and therefore **unmeasurable**. The social-deduction papers do the same via parsers. **The field has systematically engineered away the very failure we want to count.** ⇒ **Our harness must let the model break the rule and log it, not constrain it into compliance.** Any scaffolding that repairs or re-prompts on violation destroys the measurement. (Cite BALROG for the design; there is no number to cite.)
+8. **⭐ Add a Simon Says admission gate.** TALES uses a trivial mechanical instruction-following probe that correlates **r = 0.83** with competence across **122 games** — a cheap screen that catches models which cannot follow the harness's format at all, before their scores pollute the leaderboard. **We should gate on this**: a model failing the trivial probe should be reported as *ungated*, not scored, or its zeros will read as world-modeling failure when they are formatting failure.
 
 ---
 
