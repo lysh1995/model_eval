@@ -65,6 +65,54 @@ Note also "**adapts to your vibe**" — Microsoft is now shipping tone-mirroring
 
 ---
 
+## ★ Follow-up check: the tone knob is GONE, and "real talk" is undocumented ★
+
+I checked Microsoft's **official support documentation** to see whether "real talk" or any tone control is actually documented as a product feature.
+
+Source: **"Conversation modes in Microsoft Copilot" | Microsoft Support**
+`https://support.microsoft.com/en-us/topic/conversation-modes-in-microsoft-copilot-575efe12-eb34-4437-885a-440f7623cffb`
+(fetched raw, HTTP 200, 114,640 bytes; 8,630 chars of text extracted)
+
+The complete list of conversation modes, verbatim:
+
+> Copilot supports multiple conversation modes:
+> **Quick response**: Provides straightforward, instantaneous responses.
+> **Think Deeper**: Takes up to 10 seconds to provide a more thoughtful response.
+> **Study and learn**: Optimized to explain concepts and guide you to an answer, rather than just providing direct answers.
+> **Smart**: Use the GPT-5 model to respond. Thinks deeply or quickly depending on the task.
+> **Search**: Brings you the most up-to-date answers from the web, with citations.
+
+Term counts over the full support page:
+
+| Term | Count |
+|---|---|
+| real talk / Real Talk | **0** |
+| Precise | **0** |
+| Balanced | **0** |
+| Creative | **0** |
+| tone | **0** |
+| personality | **0** |
+| persona | 1 → *false positive* ("Microsoft 365 **Personal**") |
+
+**Two findings, both material:**
+
+1. **The Precise/Balanced/Creative tone selector no longer exists.** Every current "conversation mode" is a **reasoning-effort or model-routing control** — how long it thinks, which model answers, whether it searches. **None of them is a tone or persona control.** The framing sentence makes this explicit, verbatim: "Depending on the complexity of your question, you may want Microsoft Copilot to invoke AI models that are faster or that can spend more time reasoning over a response." Microsoft's user-facing persona steering surface has been **retired**, and what replaced it steers *compute*, not *character*.
+
+2. **"real talk" is announced in a CEO blog post and does not appear in the official product documentation at all.** It is marketing copy, not a documented feature with defined behavior.
+
+**Revised arc — Microsoft's tone control regressed rather than matured:**
+
+| Date | Persona/tone control | Published evidence it works |
+|---|---|---|
+| Feb 2023 | Precise / Balanced / Creative selector shipped (6 days post-Sydney) | none |
+| ~2024–25 | **selector removed** | no published rationale |
+| Oct 2025 | "real talk" conversation style announced in blog | none; undocumented in support |
+| Jul 2026 (accessed) | modes = effort/routing only; no tone control | n/a |
+
+So the honest summary is not "Microsoft shipped the same unmeasured knob twice." It is worse: **Microsoft shipped a tone knob, never measured it, removed it, and its successor exists only in a blog post.** Three years on from the incident that motivated it, Microsoft ships *no documented persona control at all* — while shipping a character (Mico) and a companion strategy.
+
+*(Reported removal rationale — "to limit the cognitive overhead of model selection on the end-user" — appears in third-party coverage. **I could not verify this from a Microsoft primary source and mark it UNVERIFIED.** The removal itself is verified by absence from current official docs.)*
+
 ## What this source does NOT contain
 
 - **No persona guardrails.** Despite the task's hope for "published Microsoft persona guardrails," this post contains none. No spec, no rules, no constraints, no red-lines.
@@ -75,6 +123,40 @@ Note also "**adapts to your vibe**" — Microsoft is now shipping tone-mirroring
 - **No comprehension/execution separation.**
 - **No mention of Sydney/Bing 2023** anywhere.
 - **No safety assessment or system card** accompanies the release.
+
+## ★ Definitive answer to "any published Microsoft persona guardrails or character eval?" — NO ★
+
+I checked Microsoft's official responsible-AI disclosure for the product.
+
+Source: **"Transparency Note for Microsoft Copilot" | Microsoft Support**
+`https://support.microsoft.com/en-us/topic/transparency-note-for-microsoft-copilot-c1541cad-8bb4-410a-954c-07225892dbc2`
+(fetched raw, HTTP 200, 135,664 bytes; **33,671 chars of text** — a substantial document)
+
+Word-boundary counts over the full text:
+
+| Term | Count |
+|---|---|
+| persona | **0** |
+| character | **0** |
+| companion | **0** |
+| Mico | **0** |
+| tone | **0** |
+| personality | **0** |
+| drift | **0** |
+| Sydney | **0** |
+| sycophancy | **0** |
+| personas | 1 → see below |
+| turn | 1 → false positive ("which **in turn** can...") |
+
+**Microsoft's 33,000-word responsible-AI transparency document for Copilot does not contain the words persona, character, companion, tone, personality, drift, or sycophancy — and does not mention Mico, the character Microsoft shipped in the same product.**
+
+The single `personas` hit is the tell. Verbatim:
+
+> **Red teaming** — Techniques used by experts to assess the limitations and vulnerabilities of a system and to test the effectiveness of planned mitigations. **Red team testing includes testers adopting both benign and adversarial personas to identify potential risks and are distinct from systematic measurement of risks.**
+
+**The only appearance of "persona" in Microsoft's entire Copilot transparency documentation is as a costume worn by a human red-teamer — and Microsoft explicitly flags that this is "distinct from systematic measurement of risks."** By Microsoft's own definition, their only persona-related practice is the one they say is *not* measurement.
+
+That is the answer to the research question, in Microsoft's own words: **there is no published Microsoft persona guardrail and no character eval.**
 
 ## Related surfaces (noted, not separately documented)
 
