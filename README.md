@@ -8,12 +8,14 @@ in production. Built around one claim:
 > "creativity" or "character fitting" is the hard part, and if the instrument is bad the platform
 > is an expensive random number generator that produces confident, well-formatted, wrong answers.
 
-**Status:** research complete (11 streams, 271 sources, 15 notes). Design in review. **Implementation not started** — see [BENCHMARKS.md](docs/BENCHMARKS.md) completion status: 36 benchmarks named, 2 validated, 1 of 36 has a noise floor.
+**Status:** research complete (16 streams, 475 sources, 26 notes). Design decided. **Platform built and running** — 3,303 LOC, zero dependencies, end-to-end on real data with no API key. **10 of 13 requirements fully met**; the 3 partial ones are blocked on an API key, not on design. See [HONEST-REVIEW.md](docs/HONEST-REVIEW.md) for what doesn't work.
 
 ## Start here
 
 | | |
 |---|---|
+| **[docs/HONEST-REVIEW.md](docs/HONEST-REVIEW.md)** | **What works, what doesn't, and the six times a plausible number was wrong** |
+| **[QUICKSTART.md](QUICKSTART.md)** | Run it — zero deps, no API key |
 | **[PROJECT.md](PROJECT.md)** | Mission, requirements, acceptance criteria, open decisions, risks |
 | **[docs/ABILITY-MODEL.md](docs/ABILITY-MODEL.md)** | **What makes a roleplay model good**: comprehension -> application & steerability -> creativity |
 | **[docs/BENCHMARKS.md](docs/BENCHMARKS.md)** | The benchmark catalogue, and an honest account of what it does not measure |
