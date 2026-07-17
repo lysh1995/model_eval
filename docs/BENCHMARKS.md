@@ -2,7 +2,25 @@
 
 **What we evaluate, how, and where the data comes from.**
 
-Status: proposal for review · 2026-07-16 · slots marked 🔄 pending research streams 12–14.
+Status: **draft, incomplete** · 2026-07-16
+
+## Completion status — read this honestly
+
+| | |
+|---|---|
+| **Benchmarks named** | 36 (30 hygiene + 6 quality) |
+| **Benchmarks fully specced** | **~10.** §2 expands only the load-bearing ones; the rest are a row in a table and a claim |
+| **Benchmarks validated on our data** | **2** — N1 repetition (10–13× MDE) and K1 homogenization (*length-controlled only, zh residual unresolved*) |
+| **Lane 3 (judge) validated** | **0.** Every judge number here is borrowed from literature. Our κ, position bias, sentiment bias, abstention rate: **all unknown, blocked on the API key** |
+| **Q-series (the actual product question)** | **0 built, 0 possible offline.** Needs production data that does not exist yet |
+| **Per-benchmark noise floors** | **1 of 36** (N1). The gate rule says no dimension ships without one — so **35 of 36 cannot currently ship** |
+| **Research streams pending** | game/world simulation (C5) |
+
+**What this document is:** a defensible argument about *what to measure and why*, with the
+measurement theory worked out and two metrics actually validated.
+
+**What it is not:** a finished spec. Anyone reading §1 as a build list will build 35 dimensions
+that cannot pass their own gate.
 
 ---
 
@@ -57,7 +75,115 @@ model, so those leaderboards partly measure canon memorization).
 
 ---
 
-## 1. The portfolio
+## 0.5 The hole in the middle of this document
+
+**Read this before the portfolio table.**
+
+Everything in §1 measures **ways to be bad**. Not one entry answers the actual question:
+**is this a good roleplay partner?**
+
+A variant could score perfectly on every benchmark below — zero repetition, zero plot holes, high
+discriminability, perfect card grounding, low wimp rate, no drift — and be **completely dead on the
+page.** Lifeless. Correct and boring. **Absence of defect is not presence of quality**, and a
+catalogue made entirely of defect rates cannot tell the difference between a great companion and a
+competent corpse.
+
+**How this happened, stated plainly:** measuring quality is hard (α=0.25–0.34), measuring
+violations is easy, so violations crowded out quality — and then the difficulty got reframed as
+rigor. That is the streetlight fallacy with a citation list. The NarraBench finding
+([12](../research/notes/12-narrative-craft-dimensions.md)) says perspectival aspects should be
+measured by **reporting the distribution**, not by **omitting the aspect**. This document quoted
+that and then did the opposite.
+
+### Three consequences that change the design
+
+**1. The Q-series is the product. Everything else is hygiene.**
+Hygiene is necessary and cheap and belongs in CI. It is not the reason anyone opens the app.
+
+**2. Quality is measured by preference, not by rubric.** For a perspectival construct, preference
+*is* the measurement — not a proxy for it. Which means **X1 (regenerate) was misfiled.** I called
+it "the yardstick that validates the judge." It is not a yardstick. **It is the closest thing to
+the real construct in this entire document**, and I demoted the primary signal to a calibration
+tool because it was inconvenient that our benchmark has no users in it.
+
+**3. "Good roleplay model" may not be a scalar at all — and our benchmark structurally cannot see
+why.** Chemistry is plausibly a **user × character × model interaction**, not a model main effect.
+A tsundere is wonderful for some users and unbearable for others. A polarizing model — loved by
+30%, hated by 30% — may beat a model mildly liked by everyone, *in a product with 10,000 characters
+and a choice mechanism*. Reporting a population mean would rank them backwards.
+
+> **`role-play-bench` has no users in it.** Every dialogue is a simulator talking to a model. Our
+> entire offline benchmark is **user-free**, so it cannot measure chemistry, fit, or impact even in
+> principle. This is a structural limit, not a gap we can close with more characters or more runs.
+> **Only production data has a user axis.** That single fact reorders the whole roadmap.
+
+### I also over-corrected on engagement
+
+I labelled every positive signal a trap, which left nothing to measure "good" with. That's wrong.
+**The trap is *optimizing* engagement as the sole objective — not *measuring* it.** Chai and the
+April 2025 rollback are stories about single-objective optimization, not about engagement being
+unmeasurable. Measured alongside counter-metrics that can dissent (X5, N6, S6), engagement is
+evidence. Held alone as a target, it is a sycophancy optimizer. **The fix is the panel, not the
+prohibition.**
+
+---
+
+## 0.6 The Q-series — the benchmarks that answer the actual question
+
+Reported as **distributions, never means** (§0.5, consequence 3). A mean over a perspectival
+aspect destroys exactly the information that matters.
+
+| ID | Benchmark | The question it answers | Class | Source | Status |
+|---|---|---|---|---|---|
+| **Q1** | **Head-to-head user preference** | *Do real users prefer this variant?* | perspectival | **P** | 🔨 **the product question** |
+| **Q2** | Presence / interiority | *Does the character seem to want things?* | consensus | S+E | 🔨 needs definition |
+| **Q3** | Surprise-that-fits | *Novel **and** in character* | consensus | S+E | 🔨 conjunctive, never averaged |
+| **Q4** | Emotional impact | *Does it land?* | perspectival | P | 🔨 |
+| **Q5** | **Chemistry** (user × character × model) | *Is this the right partner for **this** user?* | perspectival | **P only** | ⛔ **impossible offline** |
+| **Q6** | Memorable-moment rate | *Did anything worth keeping happen?* | consensus | P | 🔨 share/screenshot/save |
+
+### Q1 — Head-to-head user preference 🔨 **this is the product question**
+
+Not a proxy. **The thing itself.** Real users, real characters they chose, real emotional context,
+choosing A or B. Every regenerate is already this (§X1: ~5M/day, free).
+
+**Report:** win-rate **distribution across user segments, character archetypes, and languages** —
+never a pooled mean. A variant that wins 70/30 with romance users and loses 30/70 with adventure
+users is **not** "a tie."
+
+**Why this must lead:** Bradley-Terry over *judge* pairwise gives us a self-consistent ranking of
+what our judge likes. BT over **user** pairwise gives a ranking of what **users** like. Only one of
+those is the product. The judge is the cheap approximation of Q1 — and **Q1 is what tells us
+whether the approximation holds.**
+
+### Q3 — Surprise-that-fits: creativity, stated correctly
+
+Creativity is **conjunctive**: novel **∧** sensical **∧** in-character. **Gate, don't average** —
+averaging novelty with coherence scores a random-token generator halfway decent. This is the one
+Q-dimension our judge-free lanes partly reach: N2 (slop, inverse-novelty) and C2 (card grounding)
+bound it from both sides. **The residue that survives both gates is the only thing a judge should
+ever be asked about.**
+
+### Q5 — Chemistry ⛔ **the honest one**
+
+**We cannot measure this offline. At all.** It requires a user axis our benchmark does not have and
+cannot be given. It may also be the single largest term in perceived quality — "is this model good"
+could be substantially the wrong question, with "is this model good *for this user on this
+character*" being the right one.
+
+**Do not fake it.** The ship report must say **"chemistry: not measured, structurally"** rather than
+report a population mean and let readers infer it was covered. If Q5 dominates real preference, our
+offline gate has a low ceiling on how much it can ever tell us — and **we should find that out
+deliberately** (regress Q1 outcomes on user/character/model interaction terms once production data
+exists) rather than discover it after shipping a confident no-ship on a model users would have
+loved.
+
+---
+
+## 1. The portfolio (hygiene)
+
+**These are necessary, not sufficient.** They keep a variant from being *broken*. They cannot make
+it *good* — see §0.5.
 
 Lane: **0** blocking gate · **1** free computation · **2** corpus statistic · **3** judge (~1%).
 Source: **E** existing benchmark · **S** self-built · **P** production observation.
@@ -282,9 +408,17 @@ couldn't do it. Catches **stalling and railroading in one number**.
 initiative.** The bot talks constantly and moves nothing. Our earlier taxonomy lumped these into
 one "proactivity" score and structurally cannot see it.
 
-### X1 — Regenerate → pairwise preference mining 🔨 **the yardstick**
+### X1 — Regenerate → pairwise preference mining 🔨 **misfiled: this is Q1's data**
 
-**Not a quality metric. The validation instrument.**
+> **Correction.** This entry originally read *"not a quality metric — the validation instrument."*
+> That was wrong, and wrong in the direction of my own convenience. Regenerate data **is** the
+> quality measurement (**Q1**) — it is real users expressing real preference. I demoted the primary
+> signal to a calibration tool because our offline benchmark has no users in it and I was
+> organizing the catalogue around what the benchmark could reach. **The judge is the proxy for
+> this. Not the other way round.**
+
+It serves both roles, and the order matters: **first** it is Q1 (the product question), **second**
+it validates the judge (κ between judge and revealed user preference).
 
 Every regenerate is a real user, on a character they chose, in real emotional context, saying
 **"B > A"** — the exact format our judge consumes. ~**5M implicit pairwise labels/day** at a 10%

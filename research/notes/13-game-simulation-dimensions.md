@@ -19,9 +19,11 @@ The premise — that world-state consistency is more objectively measurable than
 |---|---|---|
 | Roleplay aesthetic quality | 5 human annotators (PingPong) | **Krippendorff α = 0.25–0.34** |
 | Character consistency | LLM judge vs human (PingPong) | **Spearman 0.435–0.460** |
-| **Factual memory correctness** | **LLM judge vs human experts** (LongMemEval) | **>97% agreement** |
+| **Grading a factual memory answer** | **LLM judge vs human experts** (LongMemEval) | **>97% agreement** |
 
-**The instability was never in the LLM. It is in the question.** Ask "is this good?" → α≈0.3. Ask "does this contradict that?" → 97%. That is ICLR 2025's number, not ours, and it is the strongest external validation the platform's thesis has received.
+**The instability was never in the LLM. It is in the question.** Ask "is this good?" → α≈0.3. Ask "is this answer correct, given the gold answer?" → 97%. That is ICLR 2025's number, not ours, and it is the strongest external validation the platform's thesis has received.
+
+⚠️ **But read that third row precisely, because it is the most over-claimable number in this note.** LongMemEval's 97% is agreement on **grading answers to closed questions where the gold answer is supplied**. It is *not* contradiction detection, and it is *not* our task — ours has no gold answer and requires *finding* the conflicting pair. **97% is the ceiling of a much easier question than the one we're asking.** Transfer the *direction*, never the magnitude. (Also: raw agreement, not chance-corrected; n=97, giving a 95% CI of roughly [91%, 99%].) The gradient below is the honest version of this table.
 
 ### ⭐⭐⭐ The agreement gradient — the organizing principle of this note
 
@@ -72,6 +74,7 @@ Their conclusion, verbatim: *"objective scores offer a stable foundation for com
 1. **Contradiction is not an oracle.** DECODE: only **65.28%** of *deliberately authored* contradictions won unanimous assent from 3 verifiers; **15.5%** were rejected by 2 of 3. Humans on state prediction with a *code oracle available*: **80%**, not 100%. Humans detecting plot holes: **0.76** accuracy (random = 0.50). **The ceiling is ~65–85%, not ~100%.** Anyone selling "objective, therefore exact" hasn't read the tables.
 2. **⭐ Per-instance flags do not work.** DECODE's best detector on natural dialogue: **precision 23.94%** at **4.27%** prevalence — **~3.2 false alarms per true catch** — while achieving **AUC 87.16** and **r=0.81** against human judgment *at the bot level*. Both are true at once. **The auditor is a cell-mean instrument, not a transcript-annotation instrument.** This is [note 10](10-noise-floor.md)'s conclusion reached from a different direction, and it is the single most important design constraint in this note.
 3. **⭐ Every objective world-state result in this literature buys its objectivity with a representational constraint we cannot impose on user-authored roleplay.** ByteSized32-SP gets a free oracle because the games *are Python*. The Twine work gets a 100%-precision checker by *encoding state in passage names*. FIREBALL gets gold state because *Avrae emitted it*. We have prose. **We do not inherit their precision — we inherit their methodology.** The escape hatch is §4.
+   - **And the whole literature disclaims our domain.** FactScore explicitly excludes text with "intentional or implicit deception" and mutually conflicting sources — i.e. **fiction**. In roleplay, a mismatch against the record is sometimes *correct* (a character lied, it was a dream, the user asked for a retcon). **No paper in this source set handles it.** See §4.2b — this is both our biggest unmeasured error term and our most defensible contribution.
 4. **The auditor decays exactly when it matters.** DECODE Table 3: after re-ranking against the detector, the detector reports **2.6%** contradiction where humans report **39.5%** — a **15× gap**, up from 1.2× before optimization. **Goodhart is measured, not hypothetical.**
 5. **⭐ Scenes are over budget before turn 1.** FollowBench ([src](../sources/game-followbench.md)): **CSL = 3.3** — GPT-4 reliably holds only **~3 simultaneous constraints** (HSR **84.7% at L1 → 61.9% at L5**). SysBench ([src](../sources/game-sysbench.md)): best **SSR 54.4%**; GPT-4o session stability decays **84.8 → 68.5 → 53.1 → 43.3 → 33.7%** across 5 turns; Qwen2-7B reaches **1.1%**. **A real character card + scene setup carries far more than 3 constraints.** So rule violation is not an edge case to be caught — it is the *expected* operating regime, and the interesting question is *which* constraints get dropped first, not whether. This reframes dimension 1 from a defect counter into a capacity measurement.
 
@@ -122,7 +125,11 @@ Cost tiers follow [note 11](11-evaluation-method-design.md): **L1** = determinis
 
 **Build 1 → 2 → 3 first.** They are Lane 1, they need no judge, their IAA is undefined-by-construction, and **they have demonstrated discriminative range** (Multi-IF spreads 7 models over 17–27%; Skill Check's best total is 6/15). Dimensions 4–7 are where the interesting science is and where the cost lives. **Dimension 9 is research.**
 
-> ⚠️ **Countability is necessary, not sufficient — screen for range.** A sibling finding worth promoting to a rule: Story Shaping's win rate (100 vs 100) and game score (5.00 vs 5.00) are **identical across conditions**; Static-vs-Agentic's task completion is **100% vs 100%**. Perfectly objective, perfectly useless. **Every candidate dimension must clear a demonstrated-range gate before it ships**, alongside note 10's noise-floor gate.
+> ⚠️ **Countability is necessary, not sufficient — screen for range.** A sibling finding worth promoting to a rule: Story Shaping's win rate (100 vs 100) and game score (5.00 vs 5.00) are **identical across conditions**; Static-vs-Agentic's task completion is **100% vs 100%**. Perfectly objective, perfectly useless. **Every candidate dimension must clear a demonstrated-range gate before it ships**, alongside note 10's noise-floor gate. RPGBench quantifies the payoff: objective metrics discriminated **~9×** better than subjective ones (range 0.652 vs 0.015).
+
+> ⭐ **Prefer fine-grained progress to binary pass/fail.** BALROG's stated design goal is a metric *"that still allows us to observe fine-grained progress"* — because binary completion on hard tasks is all zeros and yields no gradient. Its NetHack numbers make the case: **o1-preview's 1.57%** would be **0%** under binary scoring, and its genuine **3×** advantage over Claude 3.5 Sonnet would be invisible. Applied to us: **Skill Check's GM-P-GM at "max 1/5 for every model" is exactly this failure** — a binary metric saturated at the floor, which cannot rank the models it is scoring. Dimension 3 must be scored on partial credit (did it refuse? did it explain? did it offer an alternative?), not pass/fail, or it will have range zero on arrival.
+
+> ⚠️ **Refusals must be a separate reported category, never folded into a score.** BALROG's Gemini-1.5-Pro scored **0% on TextWorld** because of a **safety-filter false positive** — and that zero propagated into its headline rank. **Objectivity does not protect against infrastructure artifacts, and a refusal is indistinguishable from incapacity inside an aggregate.** Given [note 01](01-roleplay-benchmarks.md) §5.7 (judges refuse to score intimate content — a sixth of real traffic), this is a live hazard for us, not a hypothetical one.
 
 > ⚠️ **Do not average these into a "world consistency" score.** SCORE's own taxonomy spans Item Status (deterministic, free) to Emotional Consistency (pure aesthetics, α≈0.3 territory). ByteSized32-SP's ℱ_act/ℱ_env differ by **27 points**. Averaging them destroys the only property that makes any of them worth having.
 
@@ -230,11 +237,22 @@ turn ──> [1] extract candidate facts (closed schema + open triples)
 
 | Source | Precision | Recall | F1 | Setting |
 |---|---|---|---|---|
-| **DECODE** best (RoBERTa, utterance-based, in-domain-trained) | **23.94** | 74.28 | 36.21 | **natural** human-bot dialogue, **4.27% prevalence** |
-| **ConStory-Checker** overall | **0.884** | 0.550 | 0.678 | **synthetic injected** errors in long stories |
+| **DECODE** best (RoBERTa, utterance-based, in-domain-trained) | **23.94** | 74.28 | **36.21** | **natural** human-bot dialogue, **4.27% prevalence** |
+| DECODE, same model, balanced benchmark | — | — | (93–94% acc) | **balanced** — the number people quote |
+| **ConStory-Checker** overall | 0.884 | 0.550 | **0.678** | **synthetic injected** errors, long stories |
 | ConStory — **human experts** (2 pro novelists, 200 stories) | 0.660 | **0.139** | **0.229** | same |
+| **FactScore** per-fact F1_MICRO | — | — | **53.3–83.2** | *oracle* atomic facts, clean source, undebatable domain |
+| Neural Path Hunter critic | — | — | **70.35** | KG-grounded dialogue |
+| — same, intrinsic/relational errors only | — | — | **37.73** | the hard subset |
+| ContractNLI — **contradiction class** | — | — | **0.405** | (headline *accuracy* reads **0.892**) |
+
+⭐ **Read the last row twice.** ContractNLI's headline accuracy is **.892**; its contradiction-class F1 is **.405**. FactScore's headline is "<2% error"; its per-fact F1 is **53.3**. DECODE's headline is 93–94% accuracy; its natural-setting F1 is **36.21**. **Three papers, three headline numbers, three collapses on the minority class that is the only class we care about.** This is one failure mode — *aggregate metrics hide minority-class performance* — and it is the same shape as §3's static/dynamic and trivial/non-trivial traps. **Whenever a consistency paper leads with accuracy, find the contradiction-class F1; it is roughly half.**
 
 **The 24% vs 88% gap is prevalence, not method.** DECODE runs at natural 4.27% base rate on every utterance; ConStory adjudicates injected errors in a bounded task with a checker built for it. **Precision is a function of prevalence, and ours is low.** Anyone quoting 0.88 at us is quoting a balanced-set number.
+
+⚠️ **FactScore's "<2% error rate" must never be cited as evidence this works.** It is an *aggregate-cancellation artifact*: false positives and false negatives cancel in a difference of means. The paper's own Appendix B.2 + Figure 4 show ER and per-fact F1 **rank evaluators in opposite orders**; **a coin flip scores ER 7.5%**; and no single configuration is <2% on all three subject models — the claim is assembled by picking the best variant *per model*, which requires the human annotations you were trying to avoid. **Our product makes per-fact decisions, so F1_MICRO is our metric and ER is irrelevant to us.** A design doc that says "FactScore shows atomic verification is 98% accurate" is wrong by 30–45 points.
+
+⚠️ **And no paper here publishes a chance-corrected coefficient for contradiction** (DECODE, DialogueNLI, ContractNLI, ConStory-Bench: no κ). **So the "65.28% unanimity vs α=0.25–0.34" comparison in §0 is raw-agreement vs chance-corrected — apples to oranges, and someone will catch it.** The gradient's *direction* is well-supported (FactScore's κ ≈ 0.78–0.94 is a genuine κ); the middle rung is not measured in comparable units. **Running our own α on contradiction labels in our own data is a cheap, high-value experiment, and this is the argument for funding it.**
 
 ### 5.2 ⭐ The complementarity nobody has exploited
 
@@ -362,7 +380,9 @@ The tension has a name and a 15-year literature the LLM-roleplay field is not re
 
 ## 8. Priority recommendations
 
+0. **⭐⭐ Test record fidelity vs turn depth BEFORE building the record (§5.2b).** There is a published negative result against incrementally-maintained records ("accumulating inconsistency"; worst *and* most expensive). Reconstruct the record at turns 10/50/90, score against raw transcript. **If it rots faster than the signal it buys, §4.2 is dead.** Cheap, decisive, and it gates items 3–7.
 1. **⭐ Measure our own contradiction prevalence first.** Everything in §5 hinges on it; 4.27% is Blenderbot-era assistant chat. **Blocks everything else.**
+   - While you're there: **run our own α on contradiction labels** (§5.2), and **re-annotate at atomic-claim granularity** to test whether our α=0.25–0.34 is partly a unit-of-judgment artifact (§0). Both are cheap and both could move the platform's headline claim.
 2. **⭐ Ship Rule Adherence (IFR) first.** Lane 1, no judge, proven range across four benchmarks, and the long-horizon version is a genuine contribution — **nobody has run verifiable-constraint checking past 5 turns** (Multi-IF: 3; SysBench: 5). Ours is 100. **Copy Multi-IF's "conflict removal" stage**: if scene rules can contradict each other, a violation is ambiguous between decay and impossibility and the metric silently dies. **Any scene-rule authoring tool needs a satisfiability check.**
    - ⭐ **Report the constraint budget, not just the violation count.** FollowBench's **CSL = 3.3** says ~3 simultaneous constraints is the reliable ceiling; our character cards carry many more. **Measure our cards' constraint count first** — if the median card is at 10+, then rule violation is structurally guaranteed and the actionable product output is *"your card is over budget, and here is which constraint gets dropped first,"* not *"the model failed."* That reframes the deliverable from a scoreboard into a **diagnostic customers can act on**, and it is the most commercially useful idea in this note.
 3. **⭐ Author a schema-slice scenario set.** Small typed state block per scenario. Gets a Lane-1 checker *and* the labeled set that lets us measure the prose auditor's precision without a big human spend (§4.2). **This is how we escape the α=0.3 trap without pretending.**
@@ -435,11 +455,16 @@ Two further errors were caught by primary verification in this note:
 [game-kg-dialogue-consistency](../sources/game-kg-dialogue-consistency.md) ·
 [game-long-document-nli](../sources/game-long-document-nli.md)
 
-**Player-seat (limited transfer):**
-[game-tales](../sources/game-tales.md) (TextWorld / Jericho / ScienceWorld / ALFWorld suite) ·
+**Player-seat (limited transfer — but see note on ground-truth engines below):**
+[game-balrog](../sources/game-balrog.md) ·
+[game-tales](../sources/game-tales.md) (suite) ·
+[game-textworld](../sources/game-textworld.md) ·
+[game-jericho](../sources/game-jericho.md) ·
 [game-alfworld](../sources/game-alfworld.md) ·
 [game-scienceworld](../sources/game-scienceworld.md) ·
 [game-gamebench](../sources/game-gamebench.md) ·
 [game-lmrl-gym](../sources/game-lmrl-gym.md) ·
 [game-social-deduction](../sources/game-social-deduction.md) ·
 [game-cicero-diplomacy](../sources/game-cicero-diplomacy.md)
+
+> **Why the player-seat cluster is still worth keeping.** These evaluate a capability we don't sell (LLM as *player*), so their headline scores don't transfer. But **TextWorld and Jericho are generative engines with ground-truth state**, which is the property §4 says we can't get from prose — they are the reference implementations of "the simulator *is* the label." If we ever build the schema-slice scenario set (§8.3), their state representation is the prior art to copy.
