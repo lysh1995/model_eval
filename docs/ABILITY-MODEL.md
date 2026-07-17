@@ -257,11 +257,72 @@ correction:** model this as `f(distance_to_anchor)`, **not** `f(turn_index)` —
 mechanism (six distractors at the front cost nothing; the same six *between* card and query cost
 −1.13).
 
-### L2.2 — Steerability ★★ **the property this platform assumes and never tests**
+### L2.2 — Steerability ★★
 
 > **A variant *is* a prompt. If the model isn't steerable, the entire variant lifecycle is a
 > ritual.** We would be shipping prompt changes to a model that ignores prompts, measuring the
 > noise, and calling it a decision.
+
+> #### ⚠️ RETRACTED: "the property this platform assumes and never tests"
+>
+> **I claimed nobody measures steerability. That is false, and it is refuted four times**
+> ([17](../research/notes/17-bigtech-practice-crosscheck.md)):
+>
+> - **Oxford / UK AISI** (arXiv 2512.01991, Dec 2025) fit a **mixed-effects regression reporting a
+>   prompt-space slope** — **GPT-4o 0.78, Claude 1.83 points per prompt level, p<0.001** — on
+>   **relationship-seeking**, our exact companion trait. That is this section's elasticity, fitted,
+>   published, in our domain.
+> - **PsySET** (USC) runs **our exact lexical ladder** ("slightly/intensely") on traits in free-form output.
+> - **IBM** (2411.12405) plots **"steerability curves"** against a system-prompt dose across **32
+>   persona dimensions × 6 models**.
+> - **Course Correction** (AAAI) decomposes steering error into **miscalibration** ("too much/too
+>   little change along the requested direction") **⊕ orthogonality** ("unintended shifts in
+>   dimensions orthogonal to user goals") — **our gain and our crosstalk, already formalized.**
+>
+> **The fair reading:** four independent groups converged on exactly the two quantities this section
+> names. That is **convergent validity for the construct** — the framework picked right, it just
+> wasn't first. We now have a **citable prior** instead of a claim, which is a better position.
+>
+> **What actually survives, and it's author-endorsed** — IBM's own Limitations disclaim *joint
+> steerability* and *multi-turn*:
+>
+> 1. fitted elasticity across a **trait battery** (not one trait at a time)
+> 2. the prompt-space **trait×trait matrix on *character* traits**
+> 3. **multi-turn decay** of steerability
+> 4. **a noise floor — nobody reports one.**
+>
+> **(4) is our cheapest real contribution, and it's just our own gate rule applied to their null.**
+> FormatSpread measures a **76-point** spread from formatting alone. So when PsySET reports a flat
+> result, **it cannot distinguish DEAD from DROWNED** — a model that ignores the prompt looks
+> identical to a model whose signal is buried in format noise. Every steerability paper here reports
+> an effect with no σ_within. **We know how to fix that**, and it costs one experiment.
+
+#### The three findings that matter more than the novelty question
+
+**1. Same word, opposite sign — the labs are optimizing *against* our product.** Their character work
+is **prescriptive self-characterization**: make *one assistant* stable **against** pressure.
+Anthropic: *"we hope the network can continue to return to… its self-identity as Claude."* **Roleplay
+is listed as a destabilization vector.** The Model Spec's only mention of `persona` is **an attack**.
+*"Susceptible to nudging"* is a **defect**. IBM measured the consequence: *"rigidity limits a model's
+behavior to a constrained region around the base profile."*
+
+> **They are making models hard to steer. We need them easy to steer.**
+
+Anthropic names our exact fork as **open**: *"whether AI models should have unique and coherent
+characters or should be more customizable."* So we aren't reinventing their solution — **we're
+working the problem they set aside, against their headwind.** Steerability may be *actively trained
+out* of the models we buy, which makes measuring it a supplier-selection tool, not an academic
+exercise.
+
+**2. Specs without instruments fail — and OpenAI published the receipt.** The **Model Spec is ~250k
+characters with zero metrics**; Anthropic's **Constitution ~192k characters, zero.** Both labs adjust
+character **by eyeball** ("vibe checks"; "human researchers closely checking"). Then OpenAI wrote:
+*"stating our goals isn't enough on its own. They need to be backed by strong evals."* **The Spec
+forbade sycophancy. There was no test. It shipped.** That is the strongest external argument for this
+platform's existence, and it comes from the lab that got burned.
+
+**3. The DEAD hypothesis is now the prior, not the tail risk.** Four sources say prompt-space gain is
+weak and prompt engineering doesn't fix it. **Spend the API key here first.**
 
 **Method — dose-response, the classic design.** Perturb one trait in the character sheet by a
 controlled amount; measure the behavioral shift:

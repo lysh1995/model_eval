@@ -326,6 +326,26 @@ features as an ablation.
 against author labels (X6).** Tics raise discriminability while lowering fidelity — the pair
 catches it.
 
+### Retraction: "nobody publishes a character eval"
+
+**False** ([17](../research/notes/17-bigtech-practice-crosscheck.md)). Anthropic's **Sonnet 5 system
+card §6.4.6 ships nine character metrics, n≈2,900, with 95% CIs — including character drift.**
+
+**What survives as our edge:** their drift is drift **from Claude**, modelled as **f(length)**. Ours
+is drift **from an authored character**, modelled as **f(anchor-distance)** — and MT-Eval isolated
+that mechanism (six distractors at the *front* cost nothing; the same six *between* card and query
+cost −1.13). The refinement holds; the novelty claim doesn't.
+
+**Entanglement is confirmed four ways** — most damningly by **xAI's own model card: personality
+tuning tripled sycophancy (0.07 → 0.19/0.23).** That is the L2.2 crosstalk failure, measured and
+published by the vendor, on a companion product. It is not a hypothetical.
+
+**And on creativity we are stricter than the labs:** Anthropic scores *"creative mastery"*
+**absolutely, with no κ reported** — exactly what [03](../research/notes/03-creativity-measurement.md)
+says is invalid (r=0.159 absolute vs 73–78% pairwise). Being stricter than a frontier lab is a
+position that needs defending, not assuming. It is defensible here; it should still be flagged as a
+place we could simply be wrong.
+
 ### K3 — The fidelity↔diversity tradeoff
 
 **The finding that forces this:** per-character fidelity and cross-character diversity are

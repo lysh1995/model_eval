@@ -169,3 +169,39 @@ Note the paper's own caveat: "The two models are not directly comparable" (Table
    is precisely where persona lives.
 4. **Creative writing pairwise or absolute?** **Neither** — it is per-constraint binary accuracy,
    deliberately designed to avoid both human and LLM-judge quality assessment.
+
+## METHOD NOTE — this file's counts were WRONG on the first pass. Read this.
+
+An earlier version of this file reported **`tone` = 0, `style` = 0** for IFEval. **Both were false.**
+True values, Python-verified: **`tone` = 11, `style` = 28.**
+
+**Root cause:** pypdf's extraction of this PDF contains **NUL bytes**. macOS/BSD `grep` silently
+classifies such a file as *binary* and suppresses `-o`/`-c` output — **returning 0 with no error,
+no warning, and no "Binary file matches" line when `-o` is used.** Demonstration on a sibling file:
+
+```
+$ grep -oi "intent" cicero.norm | wc -l
+       0
+$ python3 -c "import re; print(len(re.findall('intent', open('cicero.norm',errors='replace').read(), re.I)))"
+197
+```
+
+Two of the 14 documents in this research pass had NUL bytes (`ifeval`, `cicero`) — and those two
+are precisely the ones where the false zeros landed. Had I not cross-checked, this file would have
+claimed **"IFEval contains no tone or style instructions"** — a clean, plausible, quotable, and
+completely **fabricated absence** that would have *inverted the actual finding* (IFEval is full of
+style/tone prompts and deliberately declines to score them).
+
+**Rule going forward: an absence claim derived from `grep` over a PDF extraction is not evidence.**
+Re-derive every zero with:
+
+```python
+t = open(f,'rb').read().replace(b'\x00', b' ').decode('utf-8', errors='replace')
+len(re.findall(pattern, t, re.I))
+```
+
+All counts in every `bigtech-*` file from this pass were re-run under this method and re-verified.
+Also verified across all 14 documents: **`kappa` / `Fleiss` / `Krippendorff` / `inter-rater` /
+`inter-annotator` / `Cohen's` = 0 in every single one.** Neither Google nor Meta reports **any**
+inter-rater reliability statistic in **any** document surveyed — so **any kappa attributed to these
+papers is fabricated.**
