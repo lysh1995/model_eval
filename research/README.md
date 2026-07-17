@@ -22,6 +22,7 @@
 | [09 — Judge-free probes](notes/09-offline-probes.md) | Which failure modes are present and separable. **Includes the metric we broke, twice** |
 | [10 — Noise floor](notes/10-noise-floor.md) | Variance decomposition from the 3 runs/cell. **What the platform can and cannot detect** |
 | [15 — L1 convergent reading](notes/15-l1-convergent-reading.md) | Do models agree on how to read a character? Characters vary 4–5x in readability |
+| [21 — Card-awareness audit](notes/21-card-awareness-audit.md) | **Did the user simulator see the character card?** Suggestive yes — which would mean our drift numbers are a lower bound |
 
 ### Design
 | | |

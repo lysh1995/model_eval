@@ -69,10 +69,14 @@ data**. Until these run, Lane 3 is a plan, not a result:
 
 ### Not blocked — should be run now
 
-6. **User-turn card-awareness audit.** Were the dataset's user turns generated *seeing* the
-   character card? If so they're **collaborative** and systematically **under-detect drift** —
-   a friendly user simulator won't probe the seams. Flagged as a bigger threat to validity than
-   off-policyness itself. **Checkable offline today.**
+6. ~~**User-turn card-awareness audit.**~~ **RUN** — [21](../research/notes/21-card-awareness-audit.md).
+   Verdict: **suggestive of card access, not conclusive.** Own-card term leak beats a
+   topic-matched control by **1.59× (en) / 1.48× (zh), p<0.0001**, surviving a precedence test and
+   exclusion of the scripted first turn — but the topic control is weak (Jaccard 0.058), so topic
+   cannot be ruled out. **Decisive follow-up not yet run: restrict to proper nouns** — topic cannot
+   explain the user knowing the character's sister's name before the AI says it. Until then, treat
+   this corpus's drift numbers as a **lower bound**, and make our own simulator **card-blind by
+   construction**.
 7. **Self-recovery check.** Same character, replayed history vs self-generated history. Closes
    the off-policy question empirically rather than by citation. Needs generation, not judging.
 8. **Classifier latency benchmark.** Cost is a non-issue (OpenAI Moderation free; Llama Guard 4
