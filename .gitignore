@@ -1,0 +1,12 @@
+# Dataset — 171MB, redownloadable from HuggingFace. See README.
+data/
+
+# Secrets — never commit. API keys go in the environment.
+.env
+*.key
+secrets/
+
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
