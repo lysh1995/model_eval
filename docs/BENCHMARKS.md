@@ -118,6 +118,24 @@ with far more resources than we have.
 character are *anti-correlated* — worse than chance. So even "character fidelity," the dimension
 this whole field is built on, is **perspectival, not consensus**, when humans are asked directly.
 
+### The fix: [ABILITY-MODEL.md](ABILITY-MODEL.md)
+
+The positive construct now lives in its own document. **A roleplay model is doing three separable
+jobs, in causal order:**
+
+**L1 comprehension** (can it understand the character?) → **L2 application & steerability** (can it
+hold the character — and can its focus be *moved* by prompt words?) → **L3 creativity** (can it make
+something worth reading?).
+
+Failures cascade **downward, never upward**, which turns a score into a **diagnosis**. And the
+payoff is that **L1 and L2 are *bound*** — L1's referent is the character sheet, L2's is the prompt
+delta we introduced ourselves — so the two layers that gate everything are exactly the two
+measurable at **κ up to ~0.9**, while the intractable one (L3) is isolated at the end instead of
+smeared across all 36 metrics.
+
+**Most of §1's catalogue turns out to be L2/L3 symptoms of L1 defects, measured downstream at 10×
+the cost.**
+
 ### Three consequences that change the design
 
 **1. The Q-series is the product. Everything else is hygiene.**

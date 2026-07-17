@@ -16,6 +16,8 @@ started.
 | | |
 |---|---|
 | **[PROJECT.md](PROJECT.md)** | Mission, requirements, acceptance criteria, open decisions, risks |
+| **[docs/ABILITY-MODEL.md](docs/ABILITY-MODEL.md)** | **What makes a roleplay model good**: comprehension -> application & steerability -> creativity |
+| **[docs/BENCHMARKS.md](docs/BENCHMARKS.md)** | The benchmark catalogue, and an honest account of what it does not measure |
 | **[docs/FLOWS.md](docs/FLOWS.md)** | System flows: dry-run → benchmark gate → online collection → eval loop → ship decision |
 | **[docs/RESEARCH-PLAN.md](docs/RESEARCH-PLAN.md)** | What we researched, what's missing, what needs investigation |
 | **[research/notes/11-evaluation-method-design.md](research/notes/11-evaluation-method-design.md)** | **The core design**: which fields, how to grade, how to normalize |
