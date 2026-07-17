@@ -1,6 +1,6 @@
 # Companion Variant Evaluation Platform
 
-**Status:** Research complete (11 streams), design in review, implementation not started.
+**Status:** Research complete (11 streams, 271 sources, 15 notes). Design in review. Implementation not started — **35 of 36 named benchmarks cannot yet pass our own noise-floor gate** ([BENCHMARKS.md](docs/BENCHMARKS.md)).
 **Last updated:** 2026-07-16
 
 ---
@@ -142,10 +142,13 @@ These are the load-bearing local findings. All judge-free, all reproducible from
 ## 5. Plan
 
 ### Phase 0 — Research ✅ complete
-11 streams, 210 raw sources, 12 synthesis notes. See [RESEARCH-PLAN.md](docs/RESEARCH-PLAN.md)
+11 streams, 271 raw sources, 15 synthesis notes. All streams complete. See [RESEARCH-PLAN.md](docs/RESEARCH-PLAN.md)
 for status, gaps, and what still needs investigation.
 
 ### Phase 1 — Design (in review)
+- **[ABILITY-MODEL.md](docs/ABILITY-MODEL.md): what "good" decomposes into — L1 comprehension →
+  L2 application & steerability → L3 creativity. The positive construct. **Awaiting review.**
+- [BENCHMARKS.md](docs/BENCHMARKS.md): the catalogue, and §0.5 on what it does not measure.
 - [11 — evaluation method](research/notes/11-evaluation-method-design.md): which fields, how to
   grade, how to normalize. **Awaiting review.**
 - [FLOWS.md](docs/FLOWS.md): system flows end to end.

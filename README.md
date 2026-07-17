@@ -8,8 +8,7 @@ in production. Built around one claim:
 > "creativity" or "character fitting" is the hard part, and if the instrument is bad the platform
 > is an expensive random number generator that produces confident, well-formatted, wrong answers.
 
-**Status:** research complete (11 streams, 210 sources), design in review, implementation not
-started.
+**Status:** research complete (11 streams, 271 sources, 15 notes). Design in review. **Implementation not started** — see [BENCHMARKS.md](docs/BENCHMARKS.md) completion status: 36 benchmarks named, 2 validated, 1 of 36 has a noise floor.
 
 ## Start here
 
@@ -21,7 +20,7 @@ started.
 | **[docs/FLOWS.md](docs/FLOWS.md)** | System flows: dry-run → benchmark gate → online collection → eval loop → ship decision |
 | **[docs/RESEARCH-PLAN.md](docs/RESEARCH-PLAN.md)** | What we researched, what's missing, what needs investigation |
 | **[research/notes/11-evaluation-method-design.md](research/notes/11-evaluation-method-design.md)** | **The core design**: which fields, how to grade, how to normalize |
-| **[research/](research/)** | The knowledge base — 210 raw sources + synthesis notes |
+| **[research/](research/)** | The knowledge base — 271 raw sources + 15 synthesis notes |
 
 ## The five findings that drive the design
 

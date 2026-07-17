@@ -4,7 +4,7 @@ Last updated 2026-07-16.
 
 **Method:** 11 parallel research streams, each instructed to save raw sources verbatim (not thin
 summaries) so we never need to refetch, and to report numbers with their provenance. Output:
-**210 raw sources**, 12+ synthesis notes, ~2 MB. Streams were told to flag fabricated or
+**271 raw sources**, 15 synthesis notes, ~2 MB. Streams were told to flag fabricated or
 unverifiable numbers rather than pass them through — two streams caught invented figures from web
 summarizers and corrected three citation errors against source PDFs. Given the design rests on
 numbers like κ≈0.53 and ρ=−0.082, that discipline is the point.
@@ -21,9 +21,9 @@ numbers like κ≈0.53 and ρ=−0.082, that discipline is the point.
 | 6 | Production scale & monitoring | 35 | [06](../research/notes/06-production-scale-monitoring.md) | ✅ |
 | 7 | Roleplay safety | 54 | [07](../research/notes/07-roleplay-safety.md) | ✅ |
 | 8 | Multi-turn / long-horizon eval | 28 | [08](../research/notes/08-multiturn-conversation-eval.md) | ✅ |
-| 9 | **Narrative craft dimensions** | 2+ | [12](../research/notes/12-narrative-craft-dimensions.md) | 🔄 running |
-| 10 | **Game / world simulation dimensions** | 11+ | [13](../research/notes/13-game-simulation-dimensions.md) | 🔄 running |
-| 11 | **Eval lifecycle & collection schema** | 1+ | [14](../research/notes/14-eval-lifecycle-system.md) | 🔄 running |
+| 9 | Narrative craft dimensions | 18 | [12](../research/notes/12-narrative-craft-dimensions.md) | ✅ |
+| 10 | Game / world simulation dimensions | 42 | [13](../research/notes/13-game-simulation-dimensions.md) | ✅ |
+| 11 | Eval lifecycle & collection schema | 15 | [14](../research/notes/14-eval-lifecycle-system.md) | ✅ |
 
 Local, first-party (not literature):
 
@@ -33,6 +33,8 @@ Local, first-party (not literature):
 | Judge-free probes | [09](../research/notes/09-offline-probes.md) | ✅ measured |
 | Noise floor / variance decomposition | [10](../research/notes/10-noise-floor.md) | ✅ measured |
 | Evaluation method design | [11](../research/notes/11-evaluation-method-design.md) | 📋 awaiting review |
+| L1 convergent reading | [15](../research/notes/15-l1-convergent-reading.md) | ✅ measured — **suggestive, not established** |
+| **Ability model** (L1→L2→L3) | [ABILITY-MODEL.md](ABILITY-MODEL.md) | 📋 awaiting review |
 
 ## Why streams 9–11 were added mid-flight
 
