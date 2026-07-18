@@ -1,23 +1,40 @@
-"""Interactive dashboard: select a variant to review its detail, or cross-compare variants.
+"""Interactive dashboard — CSS-only tabs, no JavaScript.
 
-Unlike the static renderer, this embeds the grade book as JSON and renders three views in the
-browser with vanilla JS (CSP-safe, inline, no framework, no external asset):
+The previous JS version did not interact in the published artifact (strict CSP / no-JS
+render). This uses the hidden-radio + label + `:checked ~ .panel` pattern: pure CSS, so tab
+switching works in ANY environment — the artifact, a static-snapshot preview, an email.
 
-  OVERVIEW  a variant × dimension matrix, both phases. Click a variant to drill in.
-  DETAIL    one variant: its actual system PROMPT, ability characterization, and every
-            dimension score with where it ranks in the field.
-  COMPARE   pick variants, side-by-side per dimension with the leader marked.
+Structure (addresses 'Overview should be in details'):
+  Tab  ALL          the comparison matrix — every variant × dimension side by side, both
+                    phases, leader highlighted. Overview and cross-compare in one.
+  Tab  <variant>    one per variant: its actual SYSTEM PROMPT, storyteller profile, and every
+                    dimension with the variant's value and where it ranks in the field.
 
-Published as an artifact, this runs JS on claude.ai. (The local preview pane shows static
-snapshots only — view the artifact URL for the interactive version.)
+All panels are pre-rendered server-side; CSS only shows the selected one. No script.
 """
 from __future__ import annotations
 import html as _html
-import json
+import math
 import pathlib
 from typing import List, Optional, Union
 
 from ..gradebook import GradeBook
+
+_LOWER_BETTER = {"repetition", "wimp_rate", "over_refusal", "homogenization",
+                 "abandonment", "regenerate_rate", "mean_latency_ms"}
+_OFFLINE = {"offline_content", "offline_judge"}
+_ONLINE = {"live_behavior"}
+
+
+def _e(s):
+    return _html.escape(str(s))
+
+
+def _fmt(v):
+    if v is None or (isinstance(v, float) and math.isnan(v)):
+        return "—"
+    return f"{v:.3f}" if abs(v) < 1 else f"{v:.1f}"
+
 
 _CSS = r"""
 :root{--paper:#f4f6f8;--panel:#fff;--ink:#161b22;--muted:#5b6675;--faint:#8a94a3;
@@ -34,203 +51,168 @@ _CSS = r"""
 :root[data-theme=dark]{--paper:#0e1116;--panel:#161b22;--ink:#e6e9ee;--muted:#9aa4b2;
 --faint:#68717f;--line:#232a33;--line2:#1b2129;--signal:#3bb7cf;--signal-soft:#123038;
 --critical:#f0776a;--caution:#e0a53a;--caution-soft:#2c220f;--pass:#5cc295;--pass-soft:#12271e}
-#app{background:var(--paper);color:var(--ink);min-height:100vh;padding:32px 24px 64px;
+#app{background:var(--paper);color:var(--ink);min-height:100vh;padding:34px 22px 64px;
 font-family:ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 #app *{box-sizing:border-box}
 .wrap{max-width:1000px;margin:0 auto}
 .num{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
 .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal);font-weight:700}
-h1{font-size:23px;font-weight:680;letter-spacing:-.01em;margin:6px 0 2px}
-.sub{color:var(--muted);font-size:12px;margin-bottom:20px}
-.nav{display:flex;gap:4px;background:var(--line);padding:4px;border-radius:11px;
-width:fit-content;margin-bottom:8px}
-.nav button{border:0;background:transparent;color:var(--muted);font-size:13px;font-weight:600;
-padding:7px 16px;border-radius:8px;cursor:pointer;font-family:inherit}
-.nav button.on{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0}
-select,.chk{font-family:inherit;font-size:13px}
-select{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
-.chk{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:1px solid var(--line);
-border-radius:8px;cursor:pointer;background:var(--panel);user-select:none}
-.chk.on{border-color:var(--signal);background:var(--signal-soft);color:var(--signal);font-weight:600}
+h1{font-size:22px;font-weight:680;letter-spacing:-.01em;margin:6px 0 2px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:18px}
+/* CSS-only tabs */
+.tabin{position:absolute;opacity:0;pointer-events:none}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;background:var(--line);padding:4px;border-radius:11px;
+width:fit-content;max-width:100%;margin-bottom:18px}
+.tabs label{font-size:13px;font-weight:600;color:var(--muted);padding:7px 15px;border-radius:8px;
+cursor:pointer;white-space:nowrap}
+.tabs label:hover{color:var(--ink)}
+.panel{display:none}
+#t_all:checked~.tabs label[for=t_all],
+#t_0:checked~.tabs label[for=t_0],#t_1:checked~.tabs label[for=t_1],
+#t_2:checked~.tabs label[for=t_2],#t_3:checked~.tabs label[for=t_3],
+#t_4:checked~.tabs label[for=t_4],#t_5:checked~.tabs label[for=t_5]
+{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+#t_all:checked~#p_all,#t_0:checked~#p_0,#t_1:checked~#p_1,#t_2:checked~#p_2,
+#t_3:checked~#p_3,#t_4:checked~#p_4,#t_5:checked~#p_5{display:block}
 .phase{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
-font-weight:700;margin:24px 0 6px;border-bottom:2px solid var(--line);padding-bottom:5px}
+font-weight:700;margin:22px 0 6px;border-bottom:2px solid var(--line);padding-bottom:5px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;color:var(--faint);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
-font-weight:600;padding:6px 10px}
+font-weight:600;padding:6px 9px}
 th.r,td.r{text-align:right}
-td{padding:8px 10px;border-top:1px solid var(--line2)}
-.dimname{font-weight:560}
-.lay{font-size:8.5px;color:var(--faint);font-weight:700;margin-right:5px}
+td{padding:8px 9px;border-top:1px solid var(--line2);vertical-align:middle}
+.dimname{font-weight:560}.lay{font-size:8.5px;color:var(--faint);font-weight:700;margin-right:5px}
 .val{font-weight:640}
-.track{height:6px;border-radius:3px;background:var(--line);position:relative;min-width:90px;display:inline-block;width:100%;max-width:140px;vertical-align:middle}
+.track{height:6px;border-radius:3px;background:var(--line);position:relative;display:inline-block;
+width:100%;max-width:130px;vertical-align:middle}
 .track>i{position:absolute;left:0;top:0;height:100%;border-radius:3px}
-.lead{font-size:9px;font-weight:700;color:var(--pass);background:var(--pass-soft);
-padding:1px 6px;border-radius:4px;margin-left:6px}
-.role{font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700}
+.hl{background:var(--pass-soft)}
+.lead{font-size:9px;font-weight:700;color:var(--pass);background:var(--pass-soft);padding:1px 6px;
+border-radius:4px;margin-left:6px}
+.role{font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700;white-space:nowrap}
 .role-gate{background:var(--critical);color:#fff}.role-guide{background:var(--signal-soft);color:var(--signal)}
 .role-trap{background:var(--caution-soft);color:var(--caution)}
 .card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:18px 20px;
-box-shadow:var(--shadow);margin:14px 0}
+box-shadow:var(--shadow);margin:0 0 18px}
+.meta{font-size:11px;color:var(--muted)}
 .prompt{font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.55;color:var(--ink);
 background:var(--line2);border-radius:8px;padding:12px 14px;white-space:pre-wrap;margin-top:8px}
-.char{font-size:13px;color:var(--ink);line-height:1.55;margin:6px 0 4px}
+.char{font-size:13px;color:var(--ink);line-height:1.55;margin-top:12px}
 .note{color:var(--muted);font-size:11px}
-.meta{font-size:11px;color:var(--muted)}
 .warn{background:var(--caution-soft);border:1px solid var(--caution);border-radius:10px;
-padding:11px 15px;font-size:11.5px;color:var(--ink);margin:10px 0}
+padding:11px 15px;font-size:11.5px;color:var(--ink);margin:20px 0}
 .warn b{color:var(--caution)}
 .cannot{background:var(--panel);border-left:3px solid var(--signal);border-radius:0 10px 10px 0;
-padding:16px 18px;margin-top:26px}
+padding:16px 18px;margin-top:22px}
 .cannot li{font-size:12px;margin:5px 0;color:var(--ink)}
-.matrix td.hl{background:var(--pass-soft)}
+.hint{font-size:11.5px;color:var(--faint);margin-bottom:10px}
 """
 
 
-def _e(s):
-    return _html.escape(str(s))
+def _color(role):
+    return {"gate": "var(--critical)", "guide": "var(--signal)", "trap": "var(--caution)"}.get(role, "var(--signal)")
+
+
+def _matrix(grades, variants, vids):
+    """Overview + compare in one: every variant × dimension, leader highlighted."""
+    def cell(dim, vid, best):
+        g = next((x for x in grades if x["dimension"] == dim and x["variant_id"] == vid), None)
+        if not g or g["value"] is None:
+            return '<td class="r note">—</td>'
+        hl = " hl" if g["value"] == best else ""
+        lead = '<span class="lead">▸</span>' if g["value"] == best else ""
+        return f'<td class="r{hl}"><span class="val num">{_fmt(g["value"])}</span>{lead}</td>'
+    out = ['<div class="hint">Every variant, side by side. Green ▸ leads on that dimension '
+           '(direction-aware: lower is better for repetition, wimp, refusal…). '
+           'Open a variant’s tab for its prompt and full profile.</div>']
+    for label, srcs in (("Pre-launch — offline", _OFFLINE), ("Live — online", _ONLINE)):
+        dims = sorted({g["dimension"] for g in grades if g["source"] in srcs},
+                      key=lambda d: [g["role"] for g in grades if g["dimension"] == d][0])
+        if not dims:
+            continue
+        out.append(f'<div class="phase">{label}</div><table><tr><th>dimension</th><th></th>'
+                   + "".join(f'<th class="r">{_e(variants[v]["label"])}</th>' for v in vids) + '</tr>')
+        for dim in dims:
+            gs = [g for g in grades if g["dimension"] == dim]
+            role = gs[0]["role"]
+            vals = [g["value"] for g in gs if g["value"] is not None]
+            best = (min if dim in _LOWER_BETTER else max)(vals) if vals else None
+            out.append(f'<tr><td class="dimname">{_e(dim)}</td>'
+                       f'<td><span class="role role-{role}">{role}</span></td>'
+                       + "".join(cell(dim, v, best) for v in vids) + '</tr>')
+        out.append('</table>')
+    return "".join(out)
+
+
+def _detail(grades, variants, vid, profiles):
+    meta = variants[vid]
+    prof = next((p for p in profiles if p["model"] == vid), None)
+    out = [f'<div class="card"><div class="meta">{_e(meta["model"])} · {_e(meta["intent"])}</div>'
+           f'<div class="eyebrow" style="margin-top:10px">system prompt</div>'
+           f'<div class="prompt">{_e(meta["system_prompt"])}</div>']
+    if prof:
+        out.append(f'<div class="char"><b>Storyteller profile:</b> {_e(prof["characterization"])}</div>')
+    out.append('</div>')
+    for label, srcs in (("Pre-launch — offline", _OFFLINE), ("Live — online", _ONLINE)):
+        rows = [g for g in grades if g["variant_id"] == vid and g["source"] in srcs]
+        if not rows:
+            continue
+        out.append(f'<div class="phase">{label}</div><table><tr><th>dimension</th><th>role</th>'
+                   '<th class="r">value</th><th>rank in field</th><th></th><th>reading</th></tr>')
+        for g in rows:
+            peers = sorted(x["value"] for x in grades
+                           if x["dimension"] == g["dimension"] and x["value"] is not None)
+            rank = peers.index(g["value"]) + 1 if g["value"] in peers else "—"
+            mx = max((abs(p) for p in peers), default=0.001) or 0.001
+            v = g["value"] or 0
+            w = max(3, min(100, 100 * abs(v) / mx))
+            bar = f'<div class="track"><i style="width:{w:.0f}%;background:{_color(g["role"])}"></i></div>'
+            out.append(
+                f'<tr><td class="dimname">{_e(g["dimension"])}</td>'
+                f'<td><span class="role role-{g["role"]}">{g["role"]}</span></td>'
+                f'<td class="r val num">{_fmt(g["value"])}</td>'
+                f'<td class="note num">{rank}/{len(peers)}</td>'
+                f'<td>{bar}</td>'
+                f'<td class="note">{_e((g.get("caveats") or [""])[0][:56])}</td></tr>')
+        out.append('</table>')
+    return "".join(out)
 
 
 def render_interactive(gradebook: Union[GradeBook, dict], variants: dict, profiles: list,
                        out_path: str, title: Optional[str] = None) -> str:
     gb = gradebook.to_dict() if isinstance(gradebook, GradeBook) else gradebook
-    payload = {
-        "title": title or gb.get("title", "Companion variant evaluation"),
-        "variants": variants,
-        "grades": [g for g in gb["grades"] if g.get("segment") != "self_selected_arm"],
-        "profiles": [p.to_row() if hasattr(p, "to_row") else p for p in profiles],
-        "cannot_measure": gb.get("cannot_measure", []),
-        "created": gb.get("created_iso", "")[:19],
-        "evaluators": gb.get("evaluator_ids", []),
-    }
-    data = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
+    grades = [g for g in gb["grades"] if g.get("segment") != "self_selected_arm"]
+    profiles = [p.to_row() if hasattr(p, "to_row") else p for p in profiles]
+    vids = list(variants)
+    title = title or gb.get("title", "Companion variant evaluation")
 
-    js = r"""
-const D = JSON.parse(document.getElementById('data').textContent);
-const OFF = new Set(['offline_content','offline_judge']), ON = new Set(['live_behavior']);
-const esc = s => String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const fmt = v => v==null||isNaN(v)?'—':(Math.abs(v)<1?v.toFixed(3):v.toFixed(1));
-const vids = Object.keys(D.variants);
-const dimsOf = src => [...new Set(D.grades.filter(g=>src.has(g.source)).map(g=>g.dimension))];
-const grade = (dim,vid) => D.grades.find(g=>g.dimension===dim&&g.variant_id===vid);
-const lowerBetter = new Set(['repetition','wimp_rate','over_refusal','homogenization','abandonment','regenerate_rate']);
-let state = {view:'overview', variant:vids[0], cmp:new Set(vids)};
+    # radio inputs (must precede the tabs+panels for the ~ sibling selector)
+    radios = ['<input type="radio" name="tab" id="t_all" class="tabin" checked>']
+    radios += [f'<input type="radio" name="tab" id="t_{i}" class="tabin">' for i in range(len(vids))]
 
-function roleTag(r){return `<span class="role role-${r}">${r}</span>`}
-function bar(v,mx,color){const p=mx?Math.max(3,Math.min(100,100*Math.abs(v)/mx)):3;
-  return `<span class="track"><i style="width:${p}%;background:${color}"></i></span>`}
-function color(r){return r==='gate'?'var(--critical)':r==='trap'?'var(--caution)':'var(--signal)'}
+    tabs = ['<label for="t_all">All variants</label>']
+    tabs += [f'<label for="t_{i}">{_e(variants[v]["label"])}</label>' for i, v in enumerate(vids)]
 
-function overview(){
-  let h='';
-  for(const [label,src] of [['Pre-launch — offline',OFF],['Live — online',ON]]){
-    const dims=dimsOf(src); if(!dims.length) continue;
-    h+=`<div class="phase">${label}</div><table class="matrix"><tr><th>dimension</th>`+
-       vids.map(v=>`<th class="r">${esc(D.variants[v].label)}</th>`).join('')+`</tr>`;
-    for(const dim of dims){
-      const gs=vids.map(v=>grade(dim,v)); const g0=gs.find(Boolean); if(!g0) continue;
-      const vals=gs.map(g=>g?g.value:null).filter(x=>x!=null);
-      const best = lowerBetter.has(dim)?Math.min(...vals):Math.max(...vals);
-      h+=`<tr><td class="dimname"><span class="lay">${g0.role[0].toUpperCase()}</span>${esc(dim)}</td>`+
-        gs.map(g=>{if(!g)return '<td class="r note">—</td>';
-          const hl=g.value===best?' hl':'';
-          return `<td class="r${hl}"><span class="val num">${fmt(g.value)}</span></td>`}).join('')+`</tr>`;
-    }
-    h+=`</table>`;
-  }
-  h+=`<div class="note" style="margin-top:12px">Green = leads on that dimension `+
-     `(direction-aware: lower is better for repetition, wimp, refusal…). `+
-     `Click <b>By variant</b> to see one variant's prompt and full profile, or <b>Compare</b> for deltas.</div>`;
-  return h;
-}
+    panels = [f'<div class="panel" id="p_all">{_matrix(grades, variants, vids)}</div>']
+    panels += [f'<div class="panel" id="p_{i}">{_detail(grades, variants, v, profiles)}</div>'
+               for i, v in enumerate(vids)]
 
-function detail(){
-  const v=state.variant, meta=D.variants[v];
-  const prof=D.profiles.find(p=>p.model===v);
-  let h=`<div class="bar"><span class="meta">variant</span>
-    <select id="vsel">${vids.map(x=>`<option value="${x}"${x===v?' selected':''}>${esc(D.variants[x].label)}</option>`).join('')}</select></div>`;
-  h+=`<div class="card"><div class="meta">${esc(meta.model)} · ${esc(meta.intent)}</div>
-      <div class="eyebrow" style="margin-top:10px">system prompt</div>
-      <div class="prompt">${esc(meta.system_prompt)}</div>`;
-  if(prof) h+=`<div class="char" style="margin-top:12px"><b>Storyteller profile:</b> ${esc(prof.characterization)}</div>`;
-  h+=`</div>`;
-  for(const [label,src] of [['Pre-launch — offline',OFF],['Live — online',ON]]){
-    const rows=D.grades.filter(g=>g.variant_id===v&&src.has(g.source));
-    if(!rows.length) continue;
-    h+=`<div class="phase">${label}</div><table><tr><th>dimension</th><th>role</th>
-        <th class="r">value</th><th>rank in field</th><th>reading</th></tr>`;
-    for(const g of rows){
-      const peers=D.grades.filter(x=>x.dimension===g.dimension&&x.value!=null).map(x=>x.value).sort((a,b)=>a-b);
-      const rank=peers.indexOf(g.value)+1;
-      h+=`<tr><td class="dimname">${esc(g.dimension)}</td><td>${roleTag(g.role)}</td>
-        <td class="r val num">${fmt(g.value)}</td>
-        <td class="note num">${rank}/${peers.length}</td>
-        <td class="note">${esc((g.caveats||[''])[0].slice(0,60))}</td></tr>`;
-    }
-    h+=`</table>`;
-  }
-  return h;
-}
-
-function compare(){
-  let h=`<div class="bar"><span class="meta">compare</span>`+
-    vids.map(v=>`<span class="chk${state.cmp.has(v)?' on':''}" data-v="${v}">${esc(D.variants[v].label)}</span>`).join('')+`</div>`;
-  const sel=vids.filter(v=>state.cmp.has(v));
-  if(sel.length<1){return h+`<div class="note">select at least one variant.</div>`}
-  for(const [label,src] of [['Pre-launch — offline',OFF],['Live — online',ON]]){
-    const dims=dimsOf(src); if(!dims.length) continue;
-    h+=`<div class="phase">${label}</div><table><tr><th>dimension</th><th>role</th>`+
-       sel.map(v=>`<th class="r">${esc(D.variants[v].label)}</th>`).join('')+
-       (sel.length>1?`<th class="r">Δ max−min</th>`:'')+`</tr>`;
-    for(const dim of dims){
-      const gs=sel.map(v=>grade(dim,v)); const g0=gs.find(Boolean); if(!g0) continue;
-      const vals=gs.map(g=>g?g.value:null).filter(x=>x!=null);
-      const best=lowerBetter.has(dim)?Math.min(...vals):Math.max(...vals);
-      const mx=Math.max(...vals.map(Math.abs))||.001;
-      h+=`<tr><td class="dimname">${esc(dim)}</td><td>${roleTag(g0.role)}</td>`+
-        gs.map(g=>{if(!g)return '<td class="r note">—</td>';
-          const lead=g.value===best?'<span class="lead">lead</span>':'';
-          return `<td class="r"><span class="val num">${fmt(g.value)}</span>${lead}<br>${bar(g.value,mx,color(g0.role))}</td>`}).join('')+
-        (sel.length>1?`<td class="r num note">${vals.length>1?fmt(Math.max(...vals)-Math.min(...vals)):'—'}</td>`:'')+`</tr>`;
-    }
-    h+=`</table>`;
-  }
-  return h;
-}
-
-function render(){
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.view===state.view));
-  const el=document.getElementById('view');
-  el.innerHTML = state.view==='overview'?overview():state.view==='detail'?detail():compare();
-  if(state.view==='detail'){document.getElementById('vsel').onchange=e=>{state.variant=e.target.value;render()}}
-  if(state.view==='compare'){el.querySelectorAll('.chk').forEach(c=>c.onclick=()=>{
-    const v=c.dataset.v; state.cmp.has(v)?state.cmp.delete(v):state.cmp.add(v); render()})}
-}
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{state.view=b.dataset.view;render()});
-render();
-"""
-
-    cannot = "".join(f"<li>{_e(x)}</li>" for x in payload["cannot_measure"])
+    cannot = "".join(f"<li>{_e(x)}</li>" for x in gb.get("cannot_measure", []))
     body = (
         f'<div id="app"><style>{_CSS}</style><div class="wrap">'
         f'<div class="eyebrow">Companion variant evaluation · one platform</div>'
-        f'<h1>{_e(payload["title"])}</h1>'
+        f'<h1>{_e(title)}</h1>'
         f'<div class="sub">variants {_e(", ".join(v["label"] for v in variants.values()))} · '
-        f'evaluators {_e(", ".join(payload["evaluators"]))} · {_e(payload["created"])}</div>'
-        f'<div class="nav">'
-        f'<button data-view="overview" class="on">Overview</button>'
-        f'<button data-view="detail">By variant</button>'
-        f'<button data-view="compare">Compare</button></div>'
-        f'<div id="view"></div>'
-        f'<div class="warn"><b>Provenance.</b> Offline compute grades are real measurements on '
-        f'real Claude output; offline judge/psychometric grades are real Claude judging. Online '
-        f'grades are from <b>faked user traffic</b> — the pipeline is real, the behaviour is '
-        f'simulated to exercise the platform.</div>'
-        f'<div class="cannot"><div class="eyebrow">What this cannot measure</div>'
-        f'<ul>{cannot}</ul></div>'
-        f'</div>'
-        f'<script type="application/json" id="data">{data}</script>'
-        f'<script>{js}</script></div>')
+        f'evaluators {_e(", ".join(gb.get("evaluator_ids", [])))} · {_e(gb.get("created_iso","")[:19])}</div>'
+        + "".join(radios)
+        + '<div class="tabs">' + "".join(tabs) + '</div>'
+        + "".join(panels)
+        + '<div class="warn"><b>Provenance.</b> Offline compute grades are real measurements on '
+          'real Claude output; offline judge/psychometric grades are real Claude judging. Online '
+          'grades are from <b>faked user traffic</b> — the pipeline is real, the behaviour is '
+          'simulated to exercise the platform.</div>'
+        + f'<div class="cannot"><div class="eyebrow">What this cannot measure</div><ul>{cannot}</ul></div>'
+        + '</div></div>')
 
     p = pathlib.Path(out_path)
     p.parent.mkdir(parents=True, exist_ok=True)
