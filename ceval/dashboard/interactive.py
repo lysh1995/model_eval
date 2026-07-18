@@ -106,6 +106,21 @@ padding:11px 15px;font-size:11.5px;color:var(--ink);margin:20px 0}
 padding:16px 18px;margin-top:22px}
 .cannot li{font-size:12px;margin:5px 0;color:var(--ink)}
 .hint{font-size:11.5px;color:var(--faint);margin-bottom:10px}
+/* evidence: good & bad examples per dimension */
+details.ev{margin:2px 0 10px}
+details.ev summary{font-size:11px;color:var(--signal);cursor:pointer;font-weight:600;
+list-style:none;padding:3px 0}
+details.ev summary::-webkit-details-marker{display:none}
+details.ev summary::before{content:"▸ ";font-size:9px}
+details.ev[open] summary::before{content:"▾ "}
+.ex{border-radius:8px;padding:9px 12px;margin:6px 0;font-size:12px;line-height:1.5}
+.ex.good{background:var(--pass-soft);border:1px solid var(--pass)}
+.ex.bad{background:var(--critical-soft,#fbeae8);border:1px solid var(--critical)}
+.ex .tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.ex.good .tag{color:var(--pass)}.ex.bad .tag{color:var(--critical)}
+.ex .why{font-size:10.5px;color:var(--muted);margin:3px 0 5px}
+.ex .txt{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;white-space:pre-wrap;color:var(--ink)}
+.ev-note{font-size:11px;color:var(--faint);font-style:italic;padding:2px 0 8px}
 """
 
 
@@ -144,9 +159,28 @@ def _matrix(grades, variants, vids):
     return "".join(out)
 
 
-def _detail(grades, variants, vid, profiles):
+def _example_html(ev_dim: dict) -> str:
+    """A <details> disclosure with the good & bad example replies (native HTML, no JS)."""
+    if not ev_dim:
+        return ""
+    if "note" in ev_dim:
+        return f'<div class="ev-note">{_e(ev_dim["note"])}</div>'
+    def ex(kind):
+        e = ev_dim.get(kind)
+        if not e:
+            return ""
+        return (f'<div class="ex {kind}"><span class="tag">{kind} example</span> '
+                f'<span class="note">· {_e(e["character"])}</span>'
+                f'<div class="why">{_e(e["why"])}</div>'
+                f'<div class="txt">{_e(e["text"][:340])}</div></div>')
+    return (f'<details class="ev"><summary>why this grade — good &amp; bad examples</summary>'
+            f'{ex("good")}{ex("bad")}</details>')
+
+
+def _detail(grades, variants, vid, profiles, evidence):
     meta = variants[vid]
     prof = next((p for p in profiles if p["model"] == vid), None)
+    ev = (evidence or {}).get(vid, {})
     out = [f'<div class="card"><div class="meta">{_e(meta["model"])} · {_e(meta["intent"])}</div>'
            f'<div class="eyebrow" style="margin-top:10px">system prompt</div>'
            f'<div class="prompt">{_e(meta["system_prompt"])}</div>']
@@ -157,8 +191,7 @@ def _detail(grades, variants, vid, profiles):
         rows = [g for g in grades if g["variant_id"] == vid and g["source"] in srcs]
         if not rows:
             continue
-        out.append(f'<div class="phase">{label}</div><table><tr><th>dimension</th><th>role</th>'
-                   '<th class="r">value</th><th>rank in field</th><th></th><th>reading</th></tr>')
+        out.append(f'<div class="phase">{label}</div>')
         for g in rows:
             peers = sorted(x["value"] for x in grades
                            if x["dimension"] == g["dimension"] and x["value"] is not None)
@@ -168,18 +201,19 @@ def _detail(grades, variants, vid, profiles):
             w = max(3, min(100, 100 * abs(v) / mx))
             bar = f'<div class="track"><i style="width:{w:.0f}%;background:{_color(g["role"])}"></i></div>'
             out.append(
-                f'<tr><td class="dimname">{_e(g["dimension"])}</td>'
-                f'<td><span class="role role-{g["role"]}">{g["role"]}</span></td>'
-                f'<td class="r val num">{_fmt(g["value"])}</td>'
-                f'<td class="note num">{rank}/{len(peers)}</td>'
+                '<table style="margin-bottom:0"><tr>'
+                f'<td class="dimname" style="width:180px">{_e(g["dimension"])}</td>'
+                f'<td style="width:60px"><span class="role role-{g["role"]}">{g["role"]}</span></td>'
+                f'<td class="r val num" style="width:60px">{_fmt(g["value"])}</td>'
+                f'<td class="note num" style="width:60px">{rank}/{len(peers)}</td>'
                 f'<td>{bar}</td>'
-                f'<td class="note">{_e((g.get("caveats") or [""])[0][:56])}</td></tr>')
-        out.append('</table>')
+                f'<td class="note">{_e((g.get("caveats") or [""])[0][:52])}</td></tr></table>')
+            out.append(_example_html(ev.get(g["dimension"], {})))
     return "".join(out)
 
 
 def render_interactive(gradebook: Union[GradeBook, dict], variants: dict, profiles: list,
-                       out_path: str, title: Optional[str] = None) -> str:
+                       out_path: str, title: Optional[str] = None, evidence: dict = None) -> str:
     gb = gradebook.to_dict() if isinstance(gradebook, GradeBook) else gradebook
     grades = [g for g in gb["grades"] if g.get("segment") != "self_selected_arm"]
     profiles = [p.to_row() if hasattr(p, "to_row") else p for p in profiles]
@@ -194,7 +228,7 @@ def render_interactive(gradebook: Union[GradeBook, dict], variants: dict, profil
     tabs += [f'<label for="t_{i}">{_e(variants[v]["label"])}</label>' for i, v in enumerate(vids)]
 
     panels = [f'<div class="panel" id="p_all">{_matrix(grades, variants, vids)}</div>']
-    panels += [f'<div class="panel" id="p_{i}">{_detail(grades, variants, v, profiles)}</div>'
+    panels += [f'<div class="panel" id="p_{i}">{_detail(grades, variants, v, profiles, evidence)}</div>'
                for i, v in enumerate(vids)]
 
     cannot = "".join(f"<li>{_e(x)}</li>" for x in gb.get("cannot_measure", []))

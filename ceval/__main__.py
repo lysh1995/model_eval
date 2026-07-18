@@ -15,6 +15,7 @@ from .dashboard import render
 from .dashboard.interactive import render_interactive
 from .offline import SCHEME
 from .offline.variants import as_dict as variants_manifest
+from .offline.evidence import extract as extract_evidence
 
 
 def main(argv=None):
@@ -56,9 +57,10 @@ def main(argv=None):
     p = pathlib.Path(path)
     if "<title>" not in p.read_text():
         p.write_text("<title>Companion Variant Evaluation</title>\n" + p.read_text())
+    evidence = extract_evidence(a.gen_dir, 'out/judge')
     ipath = render_interactive(merged, variants_manifest(), profiles,
                                a.out.replace(".html", "_interactive.html"),
-                               title=merged.title)
+                               title=merged.title, evidence=evidence)
     ip = pathlib.Path(ipath)
     if "<title>" not in ip.read_text():
         ip.write_text("<title>Companion Variant Evaluation</title>\n" + ip.read_text())
