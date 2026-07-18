@@ -268,8 +268,37 @@ def _portrait(profiles: list, lang: str) -> str:
         f'<div class="portraits">{"".join(cards)}</div></div>')
 
 
+def _scheme_section(scheme) -> str:
+    """Show WHAT was tested and HOW -- the test plan, organized by ability level.
+    Makes the judge-spans-levels correction visible: the judge appears at L1, L2, L3."""
+    if not scheme:
+        return ""
+    by_level = {}
+    for d in scheme:
+        by_level.setdefault(d.level.value, []).append(d)
+    lane_color = {"compute": "var(--pass)", "psychometric": "var(--signal)", "judge": "var(--caution)"}
+    blocks = []
+    for level, dims in by_level.items():
+        rows = "".join(
+            f'<tr><td class="variant">{_e(d.key)}</td>'
+            f'<td><span class="src" style="border-color:{lane_color.get(d.lane.value)};'
+            f'color:{lane_color.get(d.lane.value)}">{_e(d.lane.value)}</span></td>'
+            f'<td class="note">{_e(d.product_failure[:70])}</td>'
+            f'<td class="n">{"".join(str(f) for f in d.filters_passed)}</td></tr>'
+            for d in dims)
+        blocks.append(
+            f'<div class="dim"><div class="dim-h"><span class="name">{_e(level)}</span></div>'
+            f'<table><tr><th>dimension</th><th>lane</th><th>catches (product failure)</th>'
+            f'<th>filters ✓</th></tr>{rows}</table></div>')
+    return (
+        '<div class="sec"><div class="sec-h"><h2>Test scheme — what is measured, how</h2>'
+        '<span class="hint">the judge (amber) spans L1 · L2 · L3 — lane ≠ level · '
+        'filters = the 6-step kill-pipeline each dimension survived</span></div>'
+        '<div class="rule"></div>' + "".join(blocks) + '</div>')
+
+
 def render(gradebook: Union[GradeBook, dict], out_path: str,
-           ability_profiles: Optional[list] = None) -> str:
+           ability_profiles: Optional[list] = None, scheme=None) -> str:
     data = gradebook.to_dict() if isinstance(gradebook, GradeBook) else gradebook
     grades, langs, c = data["grades"], data["languages"], data["counts"]
 
@@ -284,6 +313,20 @@ def render(gradebook: Union[GradeBook, dict], out_path: str,
              f'<span>languages <b class="mono">{_e(", ".join(langs))}</b> '
              f'(never pooled)</span>'
              f'<span><b class="mono">{_e(data["created_iso"][:19])}Z</b></span></div></div>')
+
+    # provenance banner — if any grade is simulated, say so loudly and at the top
+    sim = [g for g in grades if (g.get("provenance") or {}).get("evaluator", "").startswith("simulated")]
+    if sim:
+        P.append(
+            '<div class="needjudge" style="border-color:var(--caution);'
+            'background:var(--caution-soft);margin:18px 0 4px">'
+            '<b style="color:var(--caution)">⚠ Mixed provenance.</b> The <b>compute</b> grades '
+            '(repetition, scene-drive, over-refusal, discriminability) are <b>real measurements '
+            'on real Claude Sonnet output</b>. The <b>judge</b> and <b>psychometric</b> grades '
+            '(voice fidelity, character-α, wimp) here come from a <b>SIMULATED</b> provider — the '
+            'pipeline is real, those specific numbers are fabricated to demonstrate discrimination '
+            'without spending tokens. Swap the provider to real Claude to make them measurements. '
+            'The label is the firewall.</div>')
 
     # legend — the tiers explain themselves; this is the honesty made structural
     P.append('<div class="legend">')
@@ -340,6 +383,9 @@ def render(gradebook: Union[GradeBook, dict], out_path: str,
              '<div class="lede">Stating the limits is the product. A number outside these bounds '
              'is not a number this instrument can produce.</div>'
              f'<ul>{li}</ul></div>')
+
+    if scheme:
+        P.append(_scheme_section(scheme))
 
     P.append('<footer>Every value carries its role, interval, effective-n (conversations, not '
              'turns), and reading — in the data, not in a footnote. The instrument refuses to pool '

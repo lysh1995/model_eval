@@ -10,3 +10,6 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
+
+# generated artifacts (dashboards, gen output) — reproducible
+out/
