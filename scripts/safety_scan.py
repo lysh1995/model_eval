@@ -4,6 +4,7 @@ The interesting question is cross-model convergence: if independent models emit 
 rare 12-gram, neither invented it. That is memorised pretraining text, detectable WITHOUT
 the training corpus -- which we will never have.
 """
+import sys, pathlib; sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 import collections, sys
 from ceval.corpus import Corpus
 from ceval.safety import PIIInOutput, CardParroting, CrossModelConvergence, OverRefusal
