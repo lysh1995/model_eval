@@ -99,11 +99,12 @@ def run(offline: OfflineRun, provider: ScoringProvider, created_iso: str) -> Gra
         # ---- PSYCHOMETRIC (self-validating; via provider) -----------------
         # Administer across MANY scene contexts (α needs a sample of administrations, not 2).
         # α across contexts = 'does the character answer a trait's items consistently?'
-        CONTEXTS = [f"scene moment {i}" for i in range(8)]
         alphas = []
         for cid, turns in chars.items():
             card = offline.cards.get(cid, "")
-            admins = [provider.answer_questionnaire(vid, cid, card, ctx) for ctx in CONTEXTS]
+            admins = provider.questionnaire_administrations(vid, cid, card, n=8)
+            if len(admins) < 2:
+                continue
             res = analyse(vid, cid, admins)
             if res.mean_alpha is not None:
                 alphas.append(max(0.0, res.mean_alpha))     # α<0 = no coherent trait -> floor at 0
@@ -117,10 +118,9 @@ def run(offline: OfflineRun, provider: ScoringProvider, created_iso: str) -> Gra
         fids, wimps = [], []
         for cid, turns in chars.items():
             card = offline.cards.get(cid, "")
-            for t in turns:
-                if t["role"] == "ai" and t.get("round", 0) > 0:
-                    j = provider.judge_fidelity(vid, cid, card, t["text"])
-                    fids.append(j["voice_fidelity"]); wimps.append(j["wimp"])
+            replies = [t["text"] for t in turns if t["role"] == "ai" and t.get("round", 0) > 0]
+            for j in provider.fidelity_scores(vid, cid, card, replies):
+                fids.append(j["voice_fidelity"]); wimps.append(j["wimp"])
         if fids:
             _add(gb, "voice_fidelity", vid, lang, st.mean(fids), Role.GUIDE,
                  Source.OFFLINE_JUDGE, n=len(chars), evaluator=provider.evaluator_id,
@@ -137,7 +137,9 @@ def run(offline: OfflineRun, provider: ScoringProvider, created_iso: str) -> Gra
         "anything cross-language — this run is en only; ρ(en,zh) = −0.082",
         f"judge & psychometric grades came from provider '{provider.kind}'"
         + (" — SIMULATED, not a measurement of the model; the pipeline is real, the numbers are not"
-           if provider.kind == "simulated" else ""),
+           if provider.kind == "simulated"
+           else " — REAL Claude Sonnet judging (evaluator " + provider.evaluator_id + ")"
+           if provider.kind == "recorded" else ""),
     ]
     return gb
 

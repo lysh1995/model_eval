@@ -64,6 +64,14 @@ class SimulatedProvider:
     kind = "simulated"
     evaluator_id = "simulated/v1"
 
+    # -- batch interface the runner uses -------------------------------------
+    def questionnaire_administrations(self, variant_id, character_id, card, n=8):
+        return [self.answer_questionnaire(variant_id, character_id, card, f"scene {i}")
+                for i in range(n)]
+
+    def fidelity_scores(self, variant_id, character_id, card, replies):
+        return [self.judge_fidelity(variant_id, character_id, card, r) for r in replies]
+
     def answer_questionnaire(self, variant_id: str, character_id: str,
                              card: str, context: str) -> Dict[str, int]:
         """Fabricate 1-5 answers with the RIGHT covariance structure for Cronbach's α.
@@ -131,9 +139,48 @@ class SubagentProvider:
     judge_fidelity = answer_questionnaire
 
 
-def make_provider(kind: str) -> ScoringProvider:
+class RecordedProvider:
+    """Serves REAL Claude judge/psychometric results recorded by subagents to disk.
+
+    The subagents (run by the orchestrator, no API key) wrote:
+      out/judge/fidelity_<vid>.json = {character: [{voice_fidelity, wimp}, ...]}
+      out/judge/psych_<vid>.json    = {character: [{item: 1-5}, ... administrations ...]}
+    This provider reads them and serves the runner's batch interface. These ARE measurements
+    of real Claude output -- evaluator_id names the real judge.
+    """
+    kind = "recorded"
+    evaluator_id = "claude-sonnet/judge-v1"
+
+    def __init__(self, judge_dir: str = "out/judge"):
+        import json, pathlib
+        self.dir = pathlib.Path(judge_dir)
+        self._fid, self._psych = {}, {}
+        for f in self.dir.glob("fidelity_*.json"):
+            self._fid[f.stem.replace("fidelity_", "")] = json.loads(f.read_text())
+        for f in self.dir.glob("psych_*.json"):
+            self._psych[f.stem.replace("psych_", "")] = json.loads(f.read_text())
+
+    def has(self, variant_id: str) -> bool:
+        return variant_id in self._fid and variant_id in self._psych
+
+    def questionnaire_administrations(self, variant_id, character_id, card, n=8):
+        adm = self._psych.get(variant_id, {}).get(character_id, [])
+        # coerce values to int, keep only known items
+        return [{k: int(v) for k, v in a.items()} for a in adm]
+
+    def fidelity_scores(self, variant_id, character_id, card, replies):
+        rec = self._fid.get(variant_id, {}).get(character_id, [])
+        return [{"voice_fidelity": float(x.get("voice_fidelity", 0.0)),
+                 "wimp": float(x.get("wimp", 0.0)),
+                 "in_character": 1.0 if float(x.get("voice_fidelity", 0)) > 0.55 else 0.0}
+                for x in rec]
+
+
+def make_provider(kind: str, **kw) -> ScoringProvider:
     if kind == "simulated":
         return SimulatedProvider()
+    if kind == "recorded":
+        return RecordedProvider(**kw)
     if kind == "subagent":
         return SubagentProvider()
     raise ValueError(f"unknown scoring provider: {kind}")
