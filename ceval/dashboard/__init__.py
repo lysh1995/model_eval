@@ -15,7 +15,7 @@ from __future__ import annotations
 import html as _html
 import math
 import pathlib
-from typing import List, Union
+from typing import List, Optional, Union
 
 from ..gradebook import GradeBook
 
@@ -146,6 +146,30 @@ tr:first-child td{border-top:1px solid var(--line)}
 
 footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
   font-size:11px;color:var(--faint);line-height:1.6;max-width:70ch}
+
+/* ability portrait -- the lede: what KIND of storyteller is this? */
+.portraits{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0 8px}
+@media(max-width:720px){.portraits{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  padding:16px 18px;box-shadow:var(--shadow)}
+.card .m{font-size:14px;font-weight:660;letter-spacing:-.01em}
+.card .char{font-size:12.5px;color:var(--ink);line-height:1.5;margin:7px 0 12px;
+  min-height:38px;text-wrap:pretty}
+.spine{display:flex;flex-direction:column;gap:7px}
+.ax{display:grid;grid-template-columns:82px 1fr 34px;align-items:center;gap:9px}
+.ax .lab{font-size:10px;color:var(--muted);text-align:right;line-height:1.2}
+.ax .lay{font-size:8.5px;color:var(--faint);font-weight:700}
+.ax .rail{height:5px;border-radius:3px;background:var(--line);position:relative}
+.ax .rail>i{position:absolute;top:-2px;width:9px;height:9px;border-radius:50%;
+  background:var(--signal);transform:translateX(-50%)}
+.ax .rail.na{background:repeating-linear-gradient(90deg,var(--line),var(--line) 4px,
+  transparent 4px,transparent 8px)}
+.ax .v{font-size:10px;color:var(--muted);text-align:right}
+.ax .v.na{color:var(--faint);font-style:italic}
+.needjudge{margin:10px 0 24px;padding:11px 16px;border-radius:10px;
+  background:var(--signal-soft);border:1px solid var(--signal);font-size:11.5px;
+  color:var(--ink);line-height:1.5}
+.needjudge b{color:var(--signal)}
 """
 
 
@@ -204,7 +228,48 @@ def _tables(grades, role, langs, lower_is_better=True):
     return "".join(out) or '<p class="note" style="padding:8px 10px">none in this book</p>'
 
 
-def render(gradebook: Union[GradeBook, dict], out_path: str) -> str:
+def _portrait(profiles: list, lang: str) -> str:
+    if not profiles:
+        return ""
+    cards = []
+    for pr in profiles:
+        spine = []
+        for s in pr["signals"]:
+            na = not s["measured"]
+            pos = s["position"]
+            dot = "" if (na or pos != pos) else \
+                f'<i style="left:{max(3,min(97,100*pos)):.0f}%"></i>'
+            rail = '<div class="rail na"></div>' if na else f'<div class="rail">{dot}</div>'
+            if na:
+                v = f'<span class="v na">judge</span>'
+            elif s["value"] != s["value"]:
+                v = '<span class="v na">n/a</span>'
+            else:
+                val = s["value"]
+                v = f'<span class="v">{val:.2f}</span>' if abs(val) < 1 else \
+                    f'<span class="v">{val:.0f}</span>'
+            spine.append(
+                f'<div class="ax"><span class="lab"><span class="lay">{s["layer"]}</span> '
+                f'{_e(s["label"])}</span>{rail}{v}</div>')
+        cards.append(
+            f'<div class="card"><div class="m">{_e(pr["model"])}</div>'
+            f'<div class="char">{_e(pr["characterization"])}</div>'
+            f'<div class="spine">{"".join(spine)}</div></div>')
+    return (
+        f'<div class="sec"><div class="sec-h"><h2>What kind of storyteller is this?</h2>'
+        f'<span class="hint">judge-free craft correlates · a portrait, not a ranking</span>'
+        f'</div><div class="rule"></div>'
+        f'<div class="needjudge"><b>Read this first.</b> These are the observable '
+        f'<b>correlates</b> of storytelling craft — pacing, scene-driving, distinct voices, '
+        f'freshness. They are not the aesthetic verdict. Whether the writing is actually '
+        f'<b>intriguing</b> is perspectival (human agreement α = 0.25–0.34) and cannot be '
+        f'settled judge-free; <b>L1 character comprehension</b> needs out-of-character probes. '
+        f'Both need a judge, and ultimately real users. Bars show rank within the field.</div>'
+        f'<div class="portraits">{"".join(cards)}</div></div>')
+
+
+def render(gradebook: Union[GradeBook, dict], out_path: str,
+           ability_profiles: Optional[list] = None) -> str:
     data = gradebook.to_dict() if isinstance(gradebook, GradeBook) else gradebook
     grades, langs, c = data["grades"], data["languages"], data["counts"]
 
@@ -229,6 +294,11 @@ def render(gradebook: Union[GradeBook, dict], out_path: str) -> str:
         P.append(f'<div class="tier"><div class="k k-{cls}"><span class="dot dot-{cls}"></span>'
                  f'{role}</div><div class="n num">{n}</div><div class="d">{desc}</div></div>')
     P.append('</div>')
+
+    # ability portrait — the lede: WHAT KIND of storyteller, before the defect tables
+    if ability_profiles:
+        P.append(_portrait([pr.to_row() if hasattr(pr, 'to_row') else pr
+                            for pr in ability_profiles], langs[0] if langs else 'en'))
 
     # gates
     P.append('<div class="sec"><div class="sec-h"><h2>Gates</h2>'

@@ -22,6 +22,7 @@ from ceval.online.simulator import TrafficSimulator, GOOD, ENGAGING
 from ceval.online.live_grade import LiveGrader
 from ceval.online.events import AssignmentArm
 from ceval.dashboard import render
+from ceval.ability import measure_field, build_profiles
 
 NOW = datetime.now(timezone.utc).isoformat()
 BAR = "─" * 70
@@ -99,10 +100,19 @@ for g in live.grades:
 gb.variant_ids += ["v_good", "v_engaging"]
 gb.cannot_measure += live.cannot_measure
 
+# ═══ ABILITY PORTRAIT: what KIND of storyteller is each model? ═══════════════
+print(f"\n{BAR}\nABILITY PORTRAIT: measuring craft correlates over the full field\n{BAR}")
+full = Corpus("data", "en").load(runs=["run_1"])
+field = measure_field(full, "en")
+profiles = build_profiles(field, "en")
+for pr in profiles[:4]:
+    print(f"  {pr.model:28s} {pr.characterization}")
+print(f"  … {len(profiles)} portraits (a portrait, not a ranking)")
+
 # ═══ RENDER ══════════════════════════════════════════════════════════════════
 pathlib.Path("out").mkdir(exist_ok=True)
 pathlib.Path("out/gradebook.json").write_text(gb.to_json())
-path = render(gb, "out/dashboard.html")
+path = render(gb, "out/dashboard.html", ability_profiles=profiles)
 print(f"\n{BAR}")
 print(f"  grade book: {gb.to_dict()['counts']}")
 print(f"  wrote out/gradebook.json  and  {path}")
