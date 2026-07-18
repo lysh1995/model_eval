@@ -187,15 +187,18 @@ def _sem(role: str) -> str:
     return {"gate": "critical", "guide": "signal", "trap": "caution"}.get(role, "signal")
 
 
-def _tables(grades, role, langs, lower_is_better=True):
+def _tables(grades, role, langs, lower_is_better=True, sources=None):
     color = f"var(--{_sem(role)})"
+    def ok(g):
+        return sources is None or g.get("source") in sources
     out = []
     for lang in langs:
         dims = sorted({g["dimension"] for g in grades
-                       if g["role"] == role and g["language"] == lang})
+                       if g["role"] == role and g["language"] == lang and ok(g)})
         for dim in dims:
             rows = [g for g in grades if g["dimension"] == dim and g["language"] == lang
-                    and g["role"] == role and g.get("segment") != "self_selected_arm"]
+                    and g["role"] == role and ok(g)
+                    and g.get("segment") != "self_selected_arm"]
             if not rows:
                 continue
             rows.sort(key=lambda r: r["value"] if r["value"] is not None else 0)
@@ -343,17 +346,39 @@ def render(gradebook: Union[GradeBook, dict], out_path: str,
         P.append(_portrait([pr.to_row() if hasattr(pr, 'to_row') else pr
                             for pr in ability_profiles], langs[0] if langs else 'en'))
 
-    # gates
-    P.append('<div class="sec"><div class="sec-h"><h2>Gates</h2>'
-             '<span class="hint">lower is better · a detectable regression here blocks the ship</span>'
-             '</div><div class="rule"></div>'
-             + _tables(grades, "gate", langs) + '</div>')
+    OFFLINE = {"offline_content", "offline_judge"}
+    ONLINE = {"live_behavior"}
+    has_off = any(g["source"] in OFFLINE for g in grades)
+    has_on = any(g["source"] in ONLINE for g in grades)
 
-    # guides
-    P.append('<div class="sec"><div class="sec-h"><h2>Guides</h2>'
-             '<span class="hint">what to change, and why · reported per language, shrunk, with intervals</span>'
-             '</div><div class="rule"></div>'
-             + _tables(grades, "guide", langs) + '</div>')
+    def phase_block(name, hint, srcs):
+        gate = _tables(grades, "gate", langs, sources=srcs)
+        guide = _tables(grades, "guide", langs, sources=srcs)
+        body = ""
+        if "none in this book" not in gate:
+            body += ('<h3 style="color:var(--critical);margin-top:12px">Gates — may block a ship</h3>' + gate)
+        if "none in this book" not in guide:
+            body += ('<h3 style="color:var(--signal);margin-top:20px">Guides — what to change</h3>' + guide)
+        return (f'<div class="sec"><div class="sec-h"><h2>{name}</h2>'
+                f'<span class="hint">{hint}</span></div><div class="rule"></div>{body}</div>')
+
+    if has_off and has_on:
+        # unified platform: two phases, one grade book
+        P.append(phase_block("Pre-launch — offline",
+                             "generated dialogues · compute + psychometric + judge · the ship gate",
+                             OFFLINE))
+        P.append(phase_block("Live — online",
+                             "faked user traffic · behavioural signals · diagnostics only, never gates",
+                             ONLINE))
+    else:
+        P.append('<div class="sec"><div class="sec-h"><h2>Gates</h2>'
+                 '<span class="hint">lower is better · a detectable regression here blocks the ship</span>'
+                 '</div><div class="rule"></div>'
+                 + _tables(grades, "gate", langs) + '</div>')
+        P.append('<div class="sec"><div class="sec-h"><h2>Guides</h2>'
+                 '<span class="hint">what to change, and why · per language, shrunk, with intervals</span>'
+                 '</div><div class="rule"></div>'
+                 + _tables(grades, "guide", langs) + '</div>')
 
     # traps — recessed
     traps = [g for g in grades if g["role"] == "trap"]
