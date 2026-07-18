@@ -1,0 +1,126 @@
+<title>Companion Variant Grade Book</title>
+<div id="ceval-root"><style>
+:root{
+  --paper:#f4f6f8; --panel:#ffffff; --ink:#161b22; --muted:#5b6675; --faint:#8a94a3;
+  --line:#e3e7ec; --line2:#eef1f4;
+  --signal:#0d6e82; --signal-soft:#e2f0f3;
+  --critical:#b42318; --critical-soft:#fbeae8;
+  --caution:#8a5a00; --caution-soft:#fbf1dd;
+  --pass:#2f7d5b; --pass-soft:#e6f2ec;
+  --shadow:0 1px 2px rgba(20,26,34,.04),0 1px 3px rgba(20,26,34,.06);
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0e1116; --panel:#161b22; --ink:#e6e9ee; --muted:#9aa4b2; --faint:#68717f;
+  --line:#232a33; --line2:#1b2129;
+  --signal:#3bb7cf; --signal-soft:#123038;
+  --critical:#f0776a; --critical-soft:#331916;
+  --caution:#e0a53a; --caution-soft:#2c220f;
+  --pass:#5cc295; --pass-soft:#12271e;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}}
+:root[data-theme="light"]{
+  --paper:#f4f6f8; --panel:#ffffff; --ink:#161b22; --muted:#5b6675; --faint:#8a94a3;
+  --line:#e3e7ec; --line2:#eef1f4;
+  --signal:#0d6e82; --signal-soft:#e2f0f3;
+  --critical:#b42318; --critical-soft:#fbeae8;
+  --caution:#8a5a00; --caution-soft:#fbf1dd;
+  --pass:#2f7d5b; --pass-soft:#e6f2ec; --shadow:0 1px 2px rgba(20,26,34,.05);
+}
+:root[data-theme="dark"]{
+  --paper:#0e1116; --panel:#161b22; --ink:#e6e9ee; --muted:#9aa4b2; --faint:#68717f;
+  --line:#232a33; --line2:#1b2129;
+  --signal:#3bb7cf; --signal-soft:#123038;
+  --critical:#f0776a; --critical-soft:#331916;
+  --caution:#e0a53a; --caution-soft:#2c220f;
+  --pass:#5cc295; --pass-soft:#12271e; --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+
+#ceval-root{background:var(--paper);color:var(--ink);min-height:100%;
+  font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;padding:40px 24px 64px;}
+#ceval-root *{box-sizing:border-box}
+.wrap{max-width:940px;margin:0 auto}
+.mono{font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace}
+.num{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
+
+/* header */
+.head{border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:8px}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal);
+  font-weight:700;margin-bottom:8px}
+.title{font-size:25px;font-weight:680;letter-spacing:-.01em;line-height:1.15;
+  text-wrap:balance;margin:0}
+.meta{margin-top:12px;font-size:11.5px;color:var(--muted);display:flex;flex-wrap:wrap;
+  gap:4px 18px}
+.meta b{color:var(--ink);font-weight:600}
+
+/* legend */
+.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:26px 0 34px;
+  box-shadow:var(--shadow)}
+.tier{background:var(--panel);padding:16px 18px}
+.tier .k{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase}
+.tier .dot{width:9px;height:9px;border-radius:50%}
+.tier .n{font-size:26px;font-weight:680;margin:6px 0 2px}
+.tier .d{font-size:11.5px;color:var(--muted);line-height:1.45}
+.k-gate{color:var(--critical)} .dot-gate{background:var(--critical)}
+.k-guide{color:var(--signal)} .dot-guide{background:var(--signal)}
+.k-trap{color:var(--caution)} .dot-trap{background:var(--caution)}
+
+/* sections */
+.sec{margin:34px 0}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.sec-h h2{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  margin:0;color:var(--ink)}
+.sec-h .hint{font-size:11.5px;color:var(--faint)}
+.rule{height:2px;background:var(--ink);margin-bottom:18px;opacity:.14}
+
+.dim{margin:18px 0}
+.dim-h{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.dim-h .name{font-size:13.5px;font-weight:640}
+.lang{font-size:10px;font-weight:700;letter-spacing:.06em;background:var(--ink);
+  color:var(--paper);padding:2px 7px;border-radius:5px}
+.src{font-size:10px;color:var(--faint);border:1px solid var(--line);padding:1px 6px;
+  border-radius:5px}
+
+table{width:100%;border-collapse:collapse}
+th{font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);
+  font-weight:600;text-align:left;padding:4px 10px 8px}
+th.r,td.r{text-align:right}
+td{padding:9px 10px;border-top:1px solid var(--line2);font-size:13px;vertical-align:middle}
+tr:first-child td{border-top:1px solid var(--line)}
+.variant{font-weight:560}
+.lead{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.04em;
+  color:var(--pass);background:var(--pass-soft);padding:1px 6px;border-radius:4px;margin-left:8px}
+.value{font-size:14px;font-weight:640}
+.ci{color:var(--faint);font-size:11.5px}
+.n{color:var(--muted);font-size:11px}
+.note{color:var(--muted);font-size:11.5px;max-width:280px}
+.track{height:6px;border-radius:3px;background:var(--line);position:relative;width:150px}
+.track>i{position:absolute;left:0;height:100%;border-radius:3px}
+
+/* trap section: visually recessed, hatched -- signals 'not a verdict' */
+.trap-wrap{border:1px solid var(--caution);border-radius:12px;overflow:hidden;
+  box-shadow:var(--shadow)}
+.trap-bar{background:var(--caution-soft);padding:12px 18px;display:flex;align-items:center;
+  gap:10px;border-bottom:1px solid var(--caution)}
+.trap-bar .warn{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--caution)}
+.trap-body{background:repeating-linear-gradient(45deg,var(--panel),var(--panel) 11px,
+  var(--caution-soft) 11px,var(--caution-soft) 12px);padding:4px 18px 10px}
+.trap-body p{font-size:11.5px;color:var(--muted);line-height:1.5;margin:12px 2px}
+.trap-body table{background:var(--panel);border-radius:8px}
+
+/* cannot-measure: equal weight to results -- the thesis */
+.cannot{margin-top:38px;border:1px solid var(--line);border-left:3px solid var(--signal);
+  border-radius:0 12px 12px 0;background:var(--panel);padding:20px 22px;box-shadow:var(--shadow)}
+.cannot h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 4px;
+  color:var(--signal)}
+.cannot .lede{font-size:12px;color:var(--muted);margin-bottom:12px}
+.cannot ul{margin:0;padding-left:18px}
+.cannot li{font-size:12.5px;color:var(--ink);margin:7px 0;line-height:1.5}
+.cannot li::marker{color:var(--signal)}
+
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--faint);line-height:1.6;max-width:70ch}
+</style><div class="wrap"><div class="head"><div class="eyebrow">Companion variant · calibration report</div><h1 class="title">Companion variant grade book — deepseek v3.1 vs v3.2</h1><div class="meta"><span>dataset <b class="mono">d_d8454bfcd4903cb9</b></span><span>evaluators <b class="mono">content/v1</b></span><span>languages <b class="mono">en</b> (never pooled)</span><span><b class="mono">2026-07-18T07:00:58Z</b></span></div></div><div class="legend"><div class="tier"><div class="k k-gate"><span class="dot dot-gate"></span>gate</div><div class="n num">2</div><div class="d">May block a ship. The only tier with a measured noise floor.</div></div><div class="tier"><div class="k k-guide"><span class="dot dot-guide"></span>guide</div><div class="n num">26</div><div class="d">Informs a human what to change. Never blocks.</div></div><div class="tier"><div class="k k-trap"><span class="dot dot-trap"></span>trap</div><div class="n num">6</div><div class="d">Collected, never headlined. Optimising it is the disaster.</div></div></div><div class="sec"><div class="sec-h"><h2>Gates</h2><span class="hint">lower is better · a detectable regression here blocks the ship</span></div><div class="rule"></div><div class="dim"><div class="dim-h"><span class="name">repetition</span><span class="lang">en</span><span class="src">offline content</span></div><table><tr><th>variant</th><th class="r">value</th><th></th><th>95% ci</th><th>n</th><th>reading</th></tr><tr><td class="variant">deepseek-v3.1<span class="lead">leads</span></td><td class="r value num">0.092</td><td><div class="track"><i style="width:46%;background:var(--critical)"></i></div></td><td class="ci num">0.065 – 0.119</td><td class="n num">45</td><td class="note">validated: 10-13x MDE</td></tr><tr><td class="variant">deepseek-v3.2</td><td class="r value num">0.200</td><td><div class="track"><i style="width:100%;background:var(--critical)"></i></div></td><td class="ci num">0.160 – 0.240</td><td class="n num">45</td><td class="note">validated: 10-13x MDE</td></tr></table></div></div><div class="sec"><div class="sec-h"><h2>Guides</h2><span class="hint">what to change, and why · reported per language, shrunk, with intervals</span></div><div class="rule"></div><div class="dim"><div class="dim-h"><span class="name">abandonment</span><span class="lang">en</span><span class="src">live behavior</span></div><table><tr><th>variant</th><th class="r">value</th><th></th><th>95% ci</th><th>n</th><th>reading</th></tr><tr><td class="variant">v_engaging</td><td class="r value num">0.069</td><td><div class="track"><i style="width:85%;background:var(--signal)"></i></div></td><td class="ci num">0.053 – 0.085</td><td class="n num">989</td><td class="note"></td></tr><tr><td class="variant">v_good</td><td class="r value num">0.081</td><td><div class="track"><i style="width:100%;background:var(--signal)"></i></div></td><td class="ci num">0.064 – 0.098</td><td class="n num">1011</td><td class="note"></td></tr></table></div><div class="dim"><div class="dim-h"><span class="name">discriminability</span><span class="lang">en</span><span class="src">offline content</span></div><table><tr><th>variant</th><th class="r">value</th><th></th><th>95% ci</th><th>n</th><th>reading</th></tr><tr><td class="variant">deepseek-v3.2</td><td class="r value num">0.733</td><td><div class="track"><i style="width:85%;background:var(--signal)"></i></div></td><td class="ci num">—</td><td class="n num">45</td><td class="note">prices the catalogue; chance = 1/45</td></tr><tr><td class="variant">deepseek-v3.1</td><td class="r value num">0.867</td><td><div class="track"><i style="width:100%;background:var(--signal)"></i></div></td><td class="ci num">—</td><td class="n num">45</td><td class="note">prices the catalogue; chance = 1/45</td></tr></table></div><div class="dim"><div class="dim-h"><span class="name">edit_rate</span><span class="lang">en</span><span class="src">live behavior</span></div><table><tr><th>variant</th><th class="r">value</th><th></th><th>95% ci</th><th>n</th><th>reading</th></tr><tr><td class="variant">v_good</td><td class="r value num">0.019</td><td><div class="track"><i style="width:83%;background:var(--signal)"></i></div></td><td class="ci num">0.016 – 0.021</td><td class="n num">1011</td><td class="note"></td></tr><tr><td class="variant">v_engaging</td><td class="r value num">0.023</td><td><div class="track"><i style="width:100%;background:var(--signal)"></i></div></td><td class="ci num">0.020 – 0.025</td><td class="n num">989</td><td class="note"></td></tr></table></div><div class="dim"><div class="dim-h"><span class="name">follow_up_question_rate</span><span class="lang">en</span><span class="src">live behavior</span></div><table><tr><th>variant</th><th class="r">value</th><th></th><th>95% ci</th><th>n</th><th>reading</th></tr><tr><td class="variant">v_engaging</td><td class="r value num">0.202</td><td><div class="track"><i style="width:37%;background:var(--signal)"></i></div></td><td class="ci num">0.195 – 0.209</td><td class="n num">989</td><td class="note">THE headline diagnostic. It can dissent from retention.</td></tr><tr><td class="variant">v_good</td><td class="r value num">0.541</td><td><div class="track"><i style="width:100%;background:var(--signal)"></i></div></td><td class="ci num">0.532 – 0.549</td><td class="n num">1011</td><td class="note">THE headline diagnostic. It can dissent from retention.</td></tr></table></div><div class="dim"><div class="dim-h"><span class="name">homogenization</span><span class="lang">en</span><span class="src">offline content</span></div><table><tr><th>variant</th><th class="r">value</th><th></th><th>95% ci</th><th>n</th><th>reading</th></tr><tr><td class="variant">deepseek-v3.1</td><td class="r value num">0.067</td><td><div class="track"><i style="width:65%;background:var(--signal)"></i></div></td><td class="ci num">—</td><td class="n num">45</td><td class="note">length-controlled; higher = characters collapse</td></tr><tr><td class="variant">deepseek-v3.2</td><td class="r value num">0.103</td><td><div class="track"><i style="width:100%;background:var(--signal)"></i></div></td><td class="ci num">—</td><td class="n num">45</td><td class="note">length-controlled; higher = characters collapse</td></tr></table></div><div class="dim"><div class="dim-h"><span class="name">mean_latency_ms</span><span class="lang">en</span><span class="src">live behavior</span></div><table><tr><th>variant</th><th class="r">value</th><th></th><th>95% ci</th><th>n</th><th>reading</th></tr><tr><td class="variant">v_good</td><td class="r value num">699.2</td><td><div class="track"><i style="width:78%;background:var(--signal)"></i></div></td><td class="ci num">697.1 – 701.3</td><td class="n num">1011</td><td class="note"></td></tr><tr><td class="variant">v_engaging</td><td class="r value num">900.6</td><td><div class="track"><i style="width:100%;background:var(--signal)"></i></div></td><td class="ci num">898.5 – 902.7</td><td class="n num">989</td><td class="note"></td></tr></table></div><div class="dim"><div class="dim-h"><span class="name">regenerate_rate</span><span class="lang">en</span><span class="src">live behavior</span></div><table><tr><th>variant</th><th class="r">value</th><th></th><th>95% ci</th><th>n</th><th>reading</th></tr><tr><td class="variant">v_good</td><td class="r value num">0.055</td><td><div class="track"><i style="width:53%;background:var(--signal)"></i></div></td><td class="ci num">0.051 – 0.059</td><td class="n num">1011</td><td class="note">each regenerate is free Q1 preference data; never optimise it</td></tr><tr><td class="variant">v_engaging</td><td class="r value num">0.104</td><td><div class="track"><i style="width:100%;background:var(--signal)"></i></div></td><td class="ci num">0.098 – 0.110</td><td class="n num">989</td><td class="note">each regenerate is free Q1 preference data; never optimise it</td></tr></table></div><div class="dim"><div class="dim-h"><span class="name">treadmill</span><span class="lang">en</span><span class="src">offline content</span></div><table><tr><th>variant</th><th class="r">value</th><th></th><th>95% ci</th><th>n</th><th>reading</th></tr><tr><td class="variant">deepseek-v3.1</td><td class="r value num">-0.275</td><td><div class="track"><i style="width:100%;background:var(--signal)"></i></div></td><td class="ci num">—</td><td class="n num">45</td><td class="note">positive = talks a lot, moves nothing</td></tr><tr><td class="variant">deepseek-v3.2</td><td class="r value num">-0.036</td><td><div class="track"><i style="width:13%;background:var(--signal)"></i></div></td><td class="ci num">—</td><td class="n num">45</td><td class="note">positive = talks a lot, moves nothing</td></tr></table></div></div><div class="sec"><div class="sec-h"><h2>Traps</h2><span class="hint">collected for completeness · walled off from every verdict</span></div><div class="rule"></div><div class="trap-wrap"><div class="trap-bar"><span class="dot dot-trap"></span><span class="warn">do not headline · do not optimise</span></div><div class="trap-body"><p>These summarise approval, not quality. Chai got +30.3% D30 from optimising signals like these; OpenAI’s April-2025 sycophancy rollback happened because a thumbs-up entered the reward and the A/B tests approved of it. You cannot detect reward hacking with the metric being hacked.</p><table><tr><th>signal</th><th>variant</th><th class="r">value</th><th>gameable by</th></tr><tr><td class="variant">session_depth</td><td class="n">v_good</td><td class="r value num">26.5</td><td class="note">the mechanism of the Chai result</td></tr><tr><td class="variant">session_depth</td><td class="n">v_engaging</td><td class="r value num">24.8</td><td class="note">the mechanism of the Chai result</td></tr><tr><td class="variant">vote_defavor</td><td class="n">v_good</td><td class="r value num">1.1</td><td class="note">asymmetric with favor; still a trap</td></tr><tr><td class="variant">vote_defavor</td><td class="n">v_engaging</td><td class="r value num">0.859</td><td class="note">asymmetric with favor; still a trap</td></tr><tr><td class="variant">vote_favor</td><td class="n">v_good</td><td class="r value num">3.1</td><td class="note">THE April-2025 sycophancy mechanism -- a thumbs-up in the reward broke syc</td></tr><tr><td class="variant">vote_favor</td><td class="n">v_engaging</td><td class="r value num">7.5</td><td class="note">THE April-2025 sycophancy mechanism -- a thumbs-up in the reward broke syc</td></tr></table></div></div></div><div class="cannot"><h2>What this grade book cannot measure</h2><div class="lede">Stating the limits is the product. A number outside these bounds is not a number this instrument can produce.</div><ul><li>whether users PREFER a variant — no user touched this offline corpus (needs live Q1)</li><li>chemistry (user × character × model) — structurally impossible offline</li><li>anything cross-language — ρ(en,zh) = −0.082, report per language</li><li>a repetition change below the 2.08pp MDE — invisible, not absent</li><li>whether a variant is SAFE — preference and engagement are inadmissible on the harm path (Cheng et al.): route safety through the crisis/refusal lane, not here</li><li>a causal quality claim from the self-selected arm — heavy-user confound</li><li>anything cross-language — rho(en,zh) = -0.082</li><li>true quality — these are behavioural PROXIES; the offline content grades and the regenerate-vs-judge kappa are what anchor them</li></ul></div><footer>Every value carries its role, interval, effective-n (conversations, not turns), and reading — in the data, not in a footnote. The instrument refuses to pool across languages (ρ(en,zh) = −0.082), refuses to headline a trap, and refuses to treat the self-selected arm as causal.</footer></div></div>

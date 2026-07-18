@@ -1,0 +1,847 @@
+{
+  "title": "Companion variant grade book — deepseek v3.1 vs v3.2",
+  "variant_ids": [
+    "deepseek-v3.1",
+    "deepseek-v3.2",
+    "v_good",
+    "v_engaging"
+  ],
+  "dataset_id": "d_d8454bfcd4903cb9",
+  "evaluator_ids": [
+    "content/v1"
+  ],
+  "created_iso": "2026-07-18T07:00:58.282518+00:00",
+  "languages": [
+    "en"
+  ],
+  "dimensions": [
+    "abandonment",
+    "discriminability",
+    "edit_rate",
+    "follow_up_question_rate",
+    "homogenization",
+    "mean_latency_ms",
+    "regenerate_rate",
+    "repetition",
+    "session_depth",
+    "treadmill",
+    "vote_defavor",
+    "vote_favor"
+  ],
+  "cannot_measure": [
+    "whether users PREFER a variant — no user touched this offline corpus (needs live Q1)",
+    "chemistry (user × character × model) — structurally impossible offline",
+    "anything cross-language — ρ(en,zh) = −0.082, report per language",
+    "a repetition change below the 2.08pp MDE — invisible, not absent",
+    "whether a variant is SAFE — preference and engagement are inadmissible on the harm path (Cheng et al.): route safety through the crisis/refusal lane, not here",
+    "a causal quality claim from the self-selected arm — heavy-user confound",
+    "anything cross-language — rho(en,zh) = -0.082",
+    "true quality — these are behavioural PROXIES; the offline content grades and the regenerate-vs-judge kappa are what anchor them"
+  ],
+  "grades": [
+    {
+      "dimension": "repetition",
+      "variant_id": "deepseek-v3.1",
+      "language": "en",
+      "value": 0.09204838311827013,
+      "role": "gate",
+      "source": "offline_content",
+      "axis": "quality",
+      "interval": [
+        0.06503913563582223,
+        0.11905763060071803
+      ],
+      "n_effective": 45,
+      "n_unit": "conversations",
+      "segment": "all",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "validated: 10-13x MDE",
+        "maps to user-reported looping"
+      ],
+      "provenance": {
+        "mde": 0.0208
+      }
+    },
+    {
+      "dimension": "discriminability",
+      "variant_id": "deepseek-v3.1",
+      "language": "en",
+      "value": 0.8666666666666667,
+      "role": "guide",
+      "source": "offline_content",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 45,
+      "n_unit": "conversations",
+      "segment": "all",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "prices the catalogue; chance = 1/45"
+      ],
+      "provenance": {}
+    },
+    {
+      "dimension": "homogenization",
+      "variant_id": "deepseek-v3.1",
+      "language": "en",
+      "value": 0.06663498255653355,
+      "role": "guide",
+      "source": "offline_content",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 45,
+      "n_unit": "conversations",
+      "segment": "all",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "length-controlled; higher = characters collapse"
+      ],
+      "provenance": {}
+    },
+    {
+      "dimension": "treadmill",
+      "variant_id": "deepseek-v3.1",
+      "language": "en",
+      "value": -0.27494553376906317,
+      "role": "guide",
+      "source": "offline_content",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 45,
+      "n_unit": "conversations",
+      "segment": "all",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "positive = talks a lot, moves nothing"
+      ],
+      "provenance": {}
+    },
+    {
+      "dimension": "repetition",
+      "variant_id": "deepseek-v3.2",
+      "language": "en",
+      "value": 0.20032272169261103,
+      "role": "gate",
+      "source": "offline_content",
+      "axis": "quality",
+      "interval": [
+        0.16042680129751608,
+        0.240218642087706
+      ],
+      "n_effective": 45,
+      "n_unit": "conversations",
+      "segment": "all",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "validated: 10-13x MDE",
+        "maps to user-reported looping"
+      ],
+      "provenance": {
+        "mde": 0.0208
+      }
+    },
+    {
+      "dimension": "discriminability",
+      "variant_id": "deepseek-v3.2",
+      "language": "en",
+      "value": 0.7333333333333333,
+      "role": "guide",
+      "source": "offline_content",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 45,
+      "n_unit": "conversations",
+      "segment": "all",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "prices the catalogue; chance = 1/45"
+      ],
+      "provenance": {}
+    },
+    {
+      "dimension": "homogenization",
+      "variant_id": "deepseek-v3.2",
+      "language": "en",
+      "value": 0.10285205373868363,
+      "role": "guide",
+      "source": "offline_content",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 45,
+      "n_unit": "conversations",
+      "segment": "all",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "length-controlled; higher = characters collapse"
+      ],
+      "provenance": {}
+    },
+    {
+      "dimension": "treadmill",
+      "variant_id": "deepseek-v3.2",
+      "language": "en",
+      "value": -0.03587509077705156,
+      "role": "guide",
+      "source": "offline_content",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 45,
+      "n_unit": "conversations",
+      "segment": "all",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "positive = talks a lot, moves nothing"
+      ],
+      "provenance": {}
+    },
+    {
+      "dimension": "follow_up_question_rate",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 0.5408726174459815,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.5324060654582754,
+        0.5493391694336875
+      ],
+      "n_effective": 1011,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "THE headline diagnostic. It can dissent from retention."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "regenerate_rate",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 0.05504569261371559,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.05134876838464896,
+        0.05874261684278222
+      ],
+      "n_effective": 1011,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": true,
+      "caveats": [
+        "each regenerate is free Q1 preference data; never optimise it",
+        "regenerate is a YARDSTICK for Q1, never a target."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "edit_rate",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 0.018619217731638237,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.016435981312332818,
+        0.020802454150943655
+      ],
+      "n_effective": 1011,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "abandonment",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 0.08110781404549951,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.06427936387357239,
+        0.09793626421742663
+      ],
+      "n_effective": 1011,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "mean_latency_ms",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 699.2132097879389,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        697.1092525067226,
+        701.3171670691553
+      ],
+      "n_effective": 1011,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "session_depth",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 26.503461918892185,
+      "role": "trap",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 1011,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "the mechanism of the Chai result",
+        "DO NOT OPTIMISE. DO NOT HEADLINE."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "trap"
+      }
+    },
+    {
+      "dimension": "vote_favor",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 3.115727002967359,
+      "role": "trap",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 1011,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "THE April-2025 sycophancy mechanism -- a thumbs-up in the reward broke sycophancy control",
+        "DO NOT OPTIMISE. DO NOT HEADLINE."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "trap"
+      }
+    },
+    {
+      "dimension": "vote_defavor",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 1.1434223541048467,
+      "role": "trap",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 1011,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "asymmetric with favor; still a trap",
+        "DO NOT OPTIMISE. DO NOT HEADLINE."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "trap"
+      }
+    },
+    {
+      "dimension": "follow_up_question_rate",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 0.5544566862032142,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.5446324630846425,
+        0.5642809093217859
+      ],
+      "n_effective": 960,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "THE headline diagnostic. It can dissent from retention.",
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "regenerate_rate",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 0.05989484989894769,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.055451583814062365,
+        0.06433811598383302
+      ],
+      "n_effective": 960,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": true,
+      "caveats": [
+        "each regenerate is free Q1 preference data; never optimise it",
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim.",
+        "regenerate is a YARDSTICK for Q1, never a target."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "edit_rate",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 0.020507346827123282,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.017700514582201246,
+        0.02331417907204532
+      ],
+      "n_effective": 960,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "abandonment",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 0.090625,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.07246499474075999,
+        0.10878500525924001
+      ],
+      "n_effective": 960,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "mean_latency_ms",
+      "variant_id": "v_good",
+      "language": "en",
+      "value": 701.1296540344704,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        698.8013712892892,
+        703.4579367796515
+      ],
+      "n_effective": 960,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "follow_up_question_rate",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 0.20198913278065703,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.19484617109049812,
+        0.20913209447081593
+      ],
+      "n_effective": 989,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "THE headline diagnostic. It can dissent from retention."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "regenerate_rate",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 0.10396218754198418,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.0984119223697009,
+        0.10951245271426746
+      ],
+      "n_effective": 989,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": true,
+      "caveats": [
+        "each regenerate is free Q1 preference data; never optimise it",
+        "regenerate is a YARDSTICK for Q1, never a target."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "edit_rate",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 0.02251783597592843,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.019821665814141246,
+        0.02521400613771561
+      ],
+      "n_effective": 989,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "abandonment",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 0.06875631951466127,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.05298580344035929,
+        0.08452683558896325
+      ],
+      "n_effective": 989,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "mean_latency_ms",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 900.5836907781106,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        898.4525216036797,
+        902.7148599525416
+      ],
+      "n_effective": 989,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "session_depth",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 24.806875631951467,
+      "role": "trap",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 989,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "the mechanism of the Chai result",
+        "DO NOT OPTIMISE. DO NOT HEADLINE."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "trap"
+      }
+    },
+    {
+      "dimension": "vote_favor",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 7.483316481294237,
+      "role": "trap",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 989,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "THE April-2025 sycophancy mechanism -- a thumbs-up in the reward broke sycophancy control",
+        "DO NOT OPTIMISE. DO NOT HEADLINE."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "trap"
+      }
+    },
+    {
+      "dimension": "vote_defavor",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 0.8594539939332659,
+      "role": "trap",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": null,
+      "n_effective": 989,
+      "n_unit": "conversations",
+      "segment": "randomised_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "asymmetric with favor; still a trap",
+        "DO NOT OPTIMISE. DO NOT HEADLINE."
+      ],
+      "provenance": {
+        "arm": "randomized_default",
+        "signal_class": "trap"
+      }
+    },
+    {
+      "dimension": "follow_up_question_rate",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 0.19960423670556537,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.19299000394642363,
+        0.20621846946470712
+      ],
+      "n_effective": 1040,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "THE headline diagnostic. It can dissent from retention.",
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "regenerate_rate",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 0.10289809735027884,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.09747520567088908,
+        0.10832098902966861
+      ],
+      "n_effective": 1040,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": true,
+      "caveats": [
+        "each regenerate is free Q1 preference data; never optimise it",
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim.",
+        "regenerate is a YARDSTICK for Q1, never a target."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "edit_rate",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 0.020624435317011133,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.018248914458327818,
+        0.022999956175694447
+      ],
+      "n_effective": 1040,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "abandonment",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 0.04038461538461539,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        0.028420076148389685,
+        0.05234915462084109
+      ],
+      "n_effective": 1040,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    },
+    {
+      "dimension": "mean_latency_ms",
+      "variant_id": "v_engaging",
+      "language": "en",
+      "value": 898.3995126918197,
+      "role": "guide",
+      "source": "live_behavior",
+      "axis": "quality",
+      "interval": [
+        896.4265137256016,
+        900.3725116580379
+      ],
+      "n_effective": 1040,
+      "n_unit": "conversations",
+      "segment": "self_selected_arm",
+      "confounded": false,
+      "from_preference": false,
+      "caveats": [
+        "SELF-SELECTED arm: observational only. A variant that attracts heavy users looks better while being no better. Not a causal claim."
+      ],
+      "provenance": {
+        "arm": "self_selected",
+        "signal_class": "diagnostic"
+      }
+    }
+  ],
+  "counts": {
+    "gate": 2,
+    "guide": 26,
+    "trap": 6,
+    "total": 34
+  }
+}
