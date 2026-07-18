@@ -12,7 +12,9 @@ from datetime import datetime, timezone
 
 from .service import EvalService
 from .dashboard import render
+from .dashboard.interactive import render_interactive
 from .offline import SCHEME
+from .offline.variants import as_dict as variants_manifest
 
 
 def main(argv=None):
@@ -48,12 +50,22 @@ def main(argv=None):
 
     merged = svc.merge(offline_gb, online_gb, now)
     merged.title = "Companion variant evaluation — one platform, offline + online"
+
+    # static (renders anywhere) + interactive (select / compare; runs JS in the artifact)
     path = render(merged, a.out, ability_profiles=profiles, scheme=SCHEME)
     p = pathlib.Path(path)
     if "<title>" not in p.read_text():
         p.write_text("<title>Companion Variant Evaluation</title>\n" + p.read_text())
+    ipath = render_interactive(merged, variants_manifest(), profiles,
+                               a.out.replace(".html", "_interactive.html"),
+                               title=merged.title)
+    ip = pathlib.Path(ipath)
+    if "<title>" not in ip.read_text():
+        ip.write_text("<title>Companion Variant Evaluation</title>\n" + ip.read_text())
     print("─" * 68)
-    print(f"  {merged.to_dict()['counts']}  ->  {path}")
+    print(f"  {merged.to_dict()['counts']}")
+    print(f"  static      -> {path}")
+    print(f"  interactive -> {ipath}  (select / compare)")
     print("─" * 68)
     return 0
 
