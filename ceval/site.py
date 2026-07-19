@@ -15,7 +15,8 @@ from .store import Store
 from .dashboard.interactive import _CSS, _matrix, _detail, _e, _fmt
 from .report import _prep
 
-NAV = [("/", "① Data"), ("/run", "② Run eval"), ("/compare", "③ Compare"), ("/variant", "④ Detail")]
+NAV = [("/", "① Data"), ("/run", "② Run eval"), ("/compare", "③ Compare"),
+       ("/variant", "④ Detail"), ("/design", "⑤ Design")]
 
 _SITE_CSS = """
 .nav{display:flex;gap:4px;background:var(--line);padding:4px;border-radius:11px;width:fit-content;
@@ -61,6 +62,22 @@ details.dlg[open] summary::before{content:"▾ "}
 .turn.u{background:var(--line2);margin-left:14%}
 .turn.a{background:var(--signal-soft)}
 .turn.a .who{color:var(--signal)}
+h2{font-size:16px;font-weight:680;margin:32px 0 6px;padding-top:6px;border-bottom:2px solid var(--line);padding-bottom:6px}
+.lead{font-size:13px;color:var(--muted);line-height:1.55;margin:6px 0 4px}
+.toc{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 8px}
+.toc a{font-size:12px;font-weight:600;color:var(--signal);background:var(--signal-soft);padding:6px 12px;border-radius:8px;text-decoration:none}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:12px 0}
+.fbox{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 15px;box-shadow:var(--shadow)}
+.fbox .k{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--signal);margin-bottom:5px}
+.fbox .d{font-size:12px;color:var(--ink);line-height:1.45}
+.farrow{display:flex;align-items:center;padding:0 9px;color:var(--faint);font-size:19px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+.cat{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px;box-shadow:var(--shadow)}
+.cat h4{margin:0;font-size:14px}.cat .lvl{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.dim{font-size:12px;padding:6px 0;border-top:1px solid var(--line2);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.step{display:flex;gap:13px;padding:13px 0;border-top:1px solid var(--line2)}
+.step .n{flex:0 0 27px;height:27px;border-radius:50%;background:var(--signal);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.step .b{font-size:12.5px;line-height:1.5;color:var(--muted)}.step .b b{color:var(--ink)}
 """
 
 
@@ -279,3 +296,151 @@ def page_variant(store: Store, vid: str) -> str:
             + _detail(grades, variants, vid, profiles, evidence, sessions))
     return shell("/variant", f"④ {variants[vid]['label']} — detail",
                  "the headline storytelling score, the system prompt, good/bad examples, and the online drill-down", body)
+
+
+# ── ⑤ DESIGN / KNOWLEDGE ─────────────────────────────────────────────────────
+_LANE_BADGE = {"compute": "role-guide", "psychometric": "role-headline", "judge": "role-trap"}
+_CLASS_BADGE = {"diagnostic": "role-guide", "monitor": "role-headline",
+                "trap": "role-trap", "confound": "role-gate"}
+
+
+def _fbox(k, d):
+    return f'<div class="fbox"><div class="k">{_e(k)}</div><div class="d">{d}</div></div>'
+
+
+def _flow(*boxes):
+    inner = '<div class="farrow">→</div>'.join(boxes)
+    return f'<div class="flow">{inner}</div>'
+
+
+def page_design(store: Store) -> str:
+    from .offline.scheme import SCHEME, FILTERS
+    from .online.signals import SIGNALS
+    from collections import OrderedDict
+
+    toc = ('<div class="toc">'
+           '<a href="#svc">Service design</a><a href="#flow">Data flows</a>'
+           '<a href="#cat">Categories</a><a href="#grade">Grading criteria</a>'
+           '<a href="#online">Online data points</a><a href="#prod">→ Production</a></div>')
+
+    # ── service design ──
+    svc = ('<h2 id="svc">Service design</h2>'
+           '<div class="lead">Scale is plumbing; the hard part is a <b>trustworthy number</b>. So the '
+           '<b>grade book</b> is the core artifact — one row per (variant × dimension × phase) carrying '
+           'its value, role, interval, evaluator, and what it <i>refuses</i> to claim. Offline (pre-launch) '
+           'and online (production-like) emit the <b>same grade book</b>, joined by one registry, one '
+           'stats engine, one DB. The whole loop runs headless from one CLI.</div>'
+           + _flow(
+               _fbox("Input", "model + params + system prompt = a <b>variant</b> "
+                              "(content-addressed). Injected by CLI or the ② Run form."),
+               _fbox("Domain — the grade book", "the dimension catalogue × the scoring lanes → "
+                                                "<b>grades + evidence</b>, persisted in the DB with full lineage."),
+               _fbox("Output", "the 4-page site + JSON API — cross-compare, drill-down, ship view.")))
+
+    # ── data flows ──
+    flow = ('<h2 id="flow">Data flows</h2>'
+            '<div class="lead"><b>Offline</b> — the pre-launch benchmark gate:</div>'
+            + _flow(
+                _fbox("variant", "model × prompt"),
+                _fbox("generate", "play the characters turn-by-turn → dialogues"),
+                _fbox("store", "dialogues → DB"),
+                _fbox("score", "compute · psychometric · <b>judge</b> lanes"),
+                _fbox("grade book", "grades + evidence"))
+            + '<div class="lead" style="margin-top:14px"><b>Online</b> — production-like monitoring:</div>'
+            + _flow(
+                _fbox("variant", "served to traffic"),
+                _fbox("collect", "sessions: votes, latency, follow-up, regenerate, co-creation…"),
+                _fbox("store", "sessions → DB"),
+                _fbox("grade", "diagnostics (act on) · traps (walled off) · per-arm"),
+                _fbox("grade book", "same shape as offline")))
+
+    # ── categories (from SCHEME, grouped by ability level) ──
+    levels = OrderedDict()
+    for d in SCHEME:
+        levels.setdefault(d.level.value, []).append(d)
+    cards = []
+    for lvl, dims in levels.items():
+        rows = "".join(
+            f'<div class="dim"><span class="dimname">{_e(d.key)}</span>'
+            f'<span><span class="role {_LANE_BADGE.get(d.lane.value,"role-guide")}">{_e(d.lane.value)}</span> '
+            f'<span class="role {"role-gate" if d.gates else "role-guide"}">{"gate" if d.gates else "guide"}</span></span></div>'
+            for d in dims)
+        cards.append(f'<div class="cat"><div class="lvl">{_e(lvl)}</div>{rows}</div>')
+    cat = ('<h2 id="cat">Categories</h2>'
+           '<div class="lead">Every dimension is placed on two axes. <b>Ability level</b> — what it tests: '
+           'L1 comprehension → L2 application &amp; steerability → L3 craft (the product core) → safety. '
+           '<b>Lane</b> — the mechanism: <span class="role role-guide">compute</span> (deterministic, no '
+           'model call) · <span class="role role-headline">psychometric</span> (self-validating, no ground '
+           'truth) · <span class="role role-trap">judge</span> (LLM, bounded question). Lane ≠ Level — the '
+           'judge spans every level. <b>Role</b> — <span class="role role-gate">gate</span> can block a ship, '
+           '<span class="role role-guide">guide</span> informs a human, <span class="role role-trap">trap</span> '
+           'is collected but never a grade.</div>'
+           f'<div class="grid">{"".join(cards)}</div>')
+
+    # ── grading criteria (the 6-filter kill-pipeline + per-dim validate/score) ──
+    filt = "".join(f'<div class="step"><div class="n">{i+1}</div><div class="b">{_e(f)}</div></div>'
+                   for i, f in enumerate(FILTERS))
+    grows = [(f'<span class="dimname">{_e(d.key)}</span>', _e(d.validate), _e(d.score),
+              " ".join(str(x) for x in d.filters_passed)) for d in SCHEME]
+    grade = ('<h2 id="grade">Grading criteria</h2>'
+             '<div class="lead">A candidate dimension must survive a <b>6-filter kill-pipeline</b> (cheapest '
+             'kill first) before any measurement is built — this is a method, not a brainstorm:</div>'
+             + filt
+             + '<div class="lead" style="margin-top:14px">And each surviving dimension declares exactly how it '
+             'is validated and scored (filters it passed shown at right):</div>'
+             + _table(["dimension", "how it's validated", "how it's scored", "filters"], grows))
+
+    # ── online user data points (from SIGNALS) ──
+    orows = []
+    for s in SIGNALS.values():
+        orows.append((
+            f'<span class="dimname">{_e(s.name)}</span>',
+            f'<span class="role {"role-guide" if s.feedback.value=="direct" else "role-headline" if s.feedback.value=="indirect" else "role-trap"}">{_e(s.feedback.value)}</span>',
+            f'<span class="role {_CLASS_BADGE.get(s.signal_class.value,"role-guide")}">{_e(s.signal_class.value)}</span>',
+            _e(s.proxies_for), _e(s.gameable_by[:70])))
+    online = ('<h2 id="online">Online user data points we designed</h2>'
+              '<div class="lead">The online half estimates the <b>user\'s opinion</b> of a variant from behaviour. '
+              'Each signal is tagged by <b>how the feedback reaches us</b> — '
+              '<span class="role role-guide">direct</span> (explicit: votes, regenerate, edit) vs '
+              '<span class="role role-headline">indirect</span> (implicit: follow-up, abandonment, co-creation) — '
+              'and whether it is safe to act on: <span class="role role-guide">diagnostic</span> · '
+              '<span class="role role-headline">monitor</span> · <span class="role role-trap">trap</span> '
+              '(collect, never optimise) · <span class="role role-gate">confound</span>. '
+              'The load-bearing rule: <b>direct approval (votes) is a trap</b> — optimising thumbs-up is exactly '
+              'how sycophancy shipped. We infer opinion from indirect health + direct <i>rejection</i> instead.</div>'
+              + _table(["signal", "feedback", "class", "proxies for", "gameable by"], orows))
+
+    # ── wiring into production ──
+    steps = [
+        ("<b>Collection contract</b> — there is no app behind the demo, so the product must emit it: a "
+         "per-turn <span class='mono'>GenerationEvent</span> + per-session <span class='mono'>SessionEvent</span> "
+         "(OpenTelemetry <span class='mono'>gen_ai.*</span> + our <span class='mono'>eval.*</span> fields — "
+         "variant_id, distance_to_anchor, assignment_arm, finish_reason). A refusal is a <i>missing</i> "
+         "observation, not a zero; the assignment arm can't be reconstructed later."),
+        ("<b>Tier the lanes for 50M generations/day</b> — Lane 0 safety inline (5–50ms, 100%); Lanes 1–2 "
+         "compute at 100% (free, async); the <b>judge (Lane 3) on a ~1% stratified sample</b>. Measured: "
+         "$283k/yr tiered vs $26.9M/yr judging everything — a 95× reduction, and latency (not cost) is what "
+         "forces it."),
+        ("<b>Anchor the online proxies to the judge</b> — behavioural signals (e.g. story-cocreation for craft) "
+         "are cheap proxies at 100%; they only <i>earn their place</i> once validated against the judge sample "
+         "and past the sycophancy acid test (must rank the vote-gamer low). Re-fit on drift."),
+        ("<b>Swap SQLite → MySQL</b> — one schema, two drivers; the DDL is written. Content-addressed ids and a "
+         "versioned evaluator make a judge-version bump a breaking change, never a silent rescale."),
+        ("<b>Wire safety to escalation, not a counter</b> — crisis detection routes to a human with an audit "
+         "trail; over-refusal is a first-class defect measured alongside harm, never averaged into quality."),
+        ("<b>Ship on evidence, with a human veto</b> — shadow → canary → live; the gate compares intervals "
+         "(not point estimates) against the measured MDE, and a qualitative signal can block a green ship."),
+    ]
+    prod = ('<h2 id="prod">Wiring this into real production</h2>'
+            '<div class="lead">Everything here runs locally on simulated traffic. The path to production is '
+            'specified, not hand-wavy — the design already encodes it:</div>'
+            + "".join(f'<div class="step"><div class="n">{i+1}</div><div class="b">{b}</div></div>'
+                      for i, b in enumerate(steps))
+            + '<div class="note" style="margin-top:12px">Deeper: '
+            '<span class="mono">docs/GRADEBOOK.md</span> · <span class="mono">docs/SERVICE.md</span> · '
+            '<span class="mono">docs/ONLINE.md</span> · <span class="mono">docs/PLATFORM.md</span></div>')
+
+    return shell("/design", "⑤ Design & knowledge",
+                 "the service design, data flows, dimension categories, grading criteria, the online "
+                 "data points we designed, and how to wire this into real production",
+                 toc + svc + flow + cat + grade + online + prod)

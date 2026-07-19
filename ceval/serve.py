@@ -50,6 +50,8 @@ def _make_handler(db_url: str):
                 elif path == "/variant":
                     vid = parse_qs(u.query).get("id", [""])[0]
                     self._send(site.page_variant(store, vid).encode())
+                elif path == "/design":
+                    self._send(site.page_design(store).encode())
                 elif path == "/static":                 # the single-page dashboard
                     static, _ = build_html(store)
                     self._send(static.encode())
