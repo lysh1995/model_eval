@@ -13,3 +13,6 @@ __pycache__/
 
 # generated artifacts (dashboards, gen output) — reproducible
 out/
+
+# local service DB (generated)
+*.db

@@ -1,108 +1,234 @@
-"""The platform CLI. One entry point for the whole evaluation service.
+"""ceval — the evaluation service CLI. DB-backed, end to end, local.
 
-    python3 -m ceval                 # run the full service: offline + online -> dashboard
-    python3 -m ceval --offline-only  # pre-launch only
-    python3 -m ceval --sim           # use the simulated judge (no real Claude recordings)
+Storage as a service (MySQL designed, SQLite runnable). Inject models, prompts, and data;
+trigger offline + online eval; render the dashboard. Everything has an id and persists.
 
-INPUT  (mock variants)  ->  DOMAIN (dimensions + scoring)  ->  OUTPUT (dashboard)
+  ceval init                                   create the DB schema
+  ceval seed                                   migrate existing files -> DB
+  ceval schema                                 print the MySQL DDL
+
+  ceval model add   --name --provider          register a model            -> model_id
+  ceval model list
+  ceval prompt add  --name --prompt --intent   register a system prompt     -> prompt_id
+  ceval prompt list
+  ceval variant add --model-id --prompt-id     bind model+prompt -> variant -> variant_id
+  ceval variant list
+
+  ceval data add    --variant --character --turns-file   inject a dialogue (offline data point)
+  ceval data gen    --variant                            generate dialogues (needs key / subagent)
+
+  ceval eval run    [--offline] [--online]     score from DB, persist grades + evidence
+  ceval dashboard   [--out]                    render from DB (original design; static + interactive)
+
+  --db sqlite:///out/ceval.db (default) | mysql://user:pass@host/db
 """
 from __future__ import annotations
-import argparse, pathlib, sys
+import argparse, json, pathlib, sys
 from datetime import datetime, timezone
 
-from .service import EvalService
-from .dashboard import render
-from .dashboard.interactive import render_interactive
-from .offline import SCHEME
-from .offline.variants import as_dict as variants_manifest
-from .offline.evidence import extract as extract_evidence
+from .store import Store
+from .store.seed import seed as seed_db
+from .store.adapt import (offline_run_from_store, persist_gradebook, gradebook_from_store,
+                          evidence_from_store)
 
 
-def cmd_add(a):
-    """Trigger evaluation of a NEW variant (system prompt / model)."""
+def _now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _store(a):
+    return Store(a.db)
+
+
+# ── data / schema ───────────────────────────────────────────────────────────
+def cmd_init(a):
+    s = _store(a); s.init()
+    print(f"initialised {a.db}\n  tables: {', '.join(t for t, _ in __import__('ceval.store.db', fromlist=['TABLES']).TABLES)}")
+    return 0
+
+def cmd_schema(a):
+    from .store.db import ddl
+    print(ddl("mysql" if a.mysql else "sqlite"))
+    return 0
+
+def cmd_seed(a):
+    s = _store(a); s.init()
+    r = seed_db(s, a.gen_dir)
+    print(f"seeded {a.db}: {r}")
+    return 0
+
+
+# ── model / prompt / variant ────────────────────────────────────────────────
+def cmd_model_add(a):
+    s = _store(a); s.init()
+    mid = s.add_model(a.name, a.provider, json.loads(a.params) if a.params else {})
+    print(mid); return 0
+
+def cmd_model_list(a):
+    for m in _store(a).list_models():
+        print(f"{m['id']}  {m['name']:24s} {m['provider']}")
+    return 0
+
+def cmd_prompt_add(a):
+    s = _store(a); s.init()
+    pid = s.add_prompt(a.name, a.prompt, a.intent or "")
+    print(pid); return 0
+
+def cmd_prompt_list(a):
+    for p in _store(a).list_prompts():
+        print(f"{p['id']}  {p['name']:20s} {p['system_prompt'][:60]}")
+    return 0
+
+def cmd_variant_add(a):
+    s = _store(a); s.init()
+    vid = s.add_variant(a.model_id, a.prompt_id, label=a.label or "", vid=a.id)
+    print(vid); return 0
+
+def cmd_variant_list(a):
+    for v in _store(a).list_variants():
+        print(f"{v['id']:16s} {v.get('label',''):18s} model={v.get('model_name','')} "
+              f"prompt={v.get('prompt_name','')}")
+    return 0
+
+
+# ── data injection ──────────────────────────────────────────────────────────
+def cmd_data_add(a):
+    """Inject a dialogue (offline data point) for a variant+character, or add to existing."""
+    s = _store(a); s.init()
+    turns = json.loads(pathlib.Path(a.turns_file).read_text())
+    n = s.add_dialogue(a.variant, a.character, turns, run_id=a.run, source=a.source)
+    print(f"added dialogue #{n} ({len(turns)} turns) for {a.variant}/{a.character}")
+    return 0
+
+def cmd_data_gen(a):
+    """Generate dialogues for a variant (needs a model provider or a subagent)."""
     from .generate import trigger
     from .offline.variants import VariantSpec
-    spec = VariantSpec(id=a.id, label=a.label or a.id, model=a.model,
-                       system_prompt=a.prompt, intent=a.intent or "")
-    print("─" * 68)
-    print(f"TRIGGER  variant '{a.id}'  model={a.model}")
-    print(f"  prompt: {a.prompt[:80]}…")
+    v = _store(a).variant(a.variant)
+    if not v:
+        print(f"unknown variant {a.variant} — add it first (variant add)"); return 1
+    spec = VariantSpec(a.variant, v.get("label", a.variant), v.get("model_name", "claude-sonnet-4.5"),
+                       v.get("system_prompt", ""), v.get("intent", ""))
     r = trigger(spec, gen_dir=a.gen_dir)
-    print("─" * 68)
+    print(r)
     if r["status"] == "generated":
-        print(f"  ✓ generated {r['n_replies']} replies via {r['provider']} -> {r['path']}")
-        print(f"  now score + visualize:  python3 -m ceval")
-    else:
-        print(f"  ⚠ no live model provider. Wrote a generation request:")
-        print(f"    {r['request']}")
-        print(f"  {r['hint']}")
+        # fold the generated file into the DB
+        s = _store(a); s.init(); seed_db(s, a.gen_dir)
+        print("  -> folded into DB. run: ceval eval run")
+    return 0
+
+
+# ── eval + dashboard ────────────────────────────────────────────────────────
+def cmd_eval(a):
+    from .service import EvalService
+    from .offline.runner import run as run_offline
+    from .offline.provider import make_provider
+    from .offline.evidence import extract as extract_evidence
+    s = _store(a); s.init()
+    now = _now()
+    svc = EvalService("en")
+    run = offline_run_from_store(s, "en")
+    if not run.variant_ids:
+        print("no dialogues in the DB — run: ceval seed  (or ceval data add)"); return 1
+
+    do_off = a.offline or not a.online
+    do_on = a.online or not a.offline
+    s.clear_grades(run.variant_ids)
+
+    if do_off:
+        prov = make_provider("simulated") if a.sim else make_provider("recorded", judge_dir="out/judge")
+        gb = run_offline(run, prov, now)
+        ev = extract_evidence(a.gen_dir, "out/judge")
+        persist_gradebook(s, gb, "offline", evidence=ev)
+        print(f"offline: {len(gb.grades)} grades persisted (provider={prov.kind})")
+    if do_on:
+        gb = svc.evaluate_online(run.variant_ids, now, n_sessions=a.sessions)
+        persist_gradebook(s, gb, "online")
+        print(f"online : {len(gb.grades)} grades persisted ({2*a.sessions} faked sessions)")
+    print(f"DB now: {s.counts()}")
+    return 0
+
+def cmd_dashboard(a):
+    from .dashboard import render
+    from .dashboard.interactive import render_interactive
+    from .offline import SCHEME
+    from .ability import build_profiles, measure_field
+    from .service import _VariantShim
+    s = _store(a)
+    gb = gradebook_from_store(s, "Companion variant evaluation — one platform, offline + online")
+    variants = {v["id"]: {"label": v.get("label") or v["id"], "model": v.get("model_name", ""),
+                          "system_prompt": v.get("system_prompt", ""), "intent": v.get("intent", "")}
+                for v in s.list_variants()}
+    if not gb.grades:
+        print("no grades in the DB — run: ceval eval run"); return 1
+    # ability portraits from the stored dialogues
+    run = offline_run_from_store(s, "en")
+    field = {}
+    for vid, chars in run.dialogues.items():
+        field.update(measure_field(_VariantShim(vid, chars), "en", budget=200))
+    profiles = build_profiles(field, "en")
+    evidence = evidence_from_store(s)
+
+    render(gb, a.out, ability_profiles=profiles, scheme=SCHEME)
+    p = pathlib.Path(a.out)
+    if "<title>" not in p.read_text():
+        p.write_text("<title>Companion Variant Evaluation</title>\n" + p.read_text())
+    ipath = a.out.replace(".html", "_interactive.html")
+    render_interactive(gb, variants, profiles, ipath,
+                       title=gb.title, evidence=evidence)
+    ip = pathlib.Path(ipath)
+    if "<title>" not in ip.read_text():
+        ip.write_text("<title>Companion Variant Evaluation</title>\n" + ip.read_text())
+    print(f"static      -> {a.out}\ninteractive -> {ipath}")
     return 0
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="ceval", description="companion variant evaluation service")
-    sub = ap.add_subparsers(dest="cmd")
-    add = sub.add_parser("add", help="trigger eval of a new system prompt / model")
-    add.add_argument("--id", required=True, help="variant id, e.g. v_myprompt")
-    add.add_argument("--model", default="claude-sonnet-4.5")
-    add.add_argument("--prompt", required=True, help="the system prompt to test")
-    add.add_argument("--label", default=None)
-    add.add_argument("--intent", default=None)
-    add.add_argument("--gen-dir", default="out/gen")
-    add.set_defaults(fn=cmd_add)
-
+    ap = argparse.ArgumentParser(prog="ceval", description="companion evaluation service")
+    ap.add_argument("--db", default="sqlite:///out/ceval.db")
     ap.add_argument("--gen-dir", default="out/gen")
-    ap.add_argument("--tasks", default="out/gen/tasks.json")
-    ap.add_argument("--out", default="out/platform_dashboard.html")
-    ap.add_argument("--offline-only", action="store_true")
-    ap.add_argument("--sim", action="store_true", help="simulated judge instead of real recordings")
-    ap.add_argument("--sessions", type=int, default=1500)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    sub.add_parser("init").set_defaults(fn=cmd_init)
+    sc = sub.add_parser("schema"); sc.add_argument("--mysql", action="store_true"); sc.set_defaults(fn=cmd_schema)
+    sub.add_parser("seed").set_defaults(fn=cmd_seed)
+
+    m = sub.add_parser("model"); ms = m.add_subparsers(dest="sub", required=True)
+    ma = ms.add_parser("add"); ma.add_argument("--name", required=True)
+    ma.add_argument("--provider", default="anthropic"); ma.add_argument("--params", default=None)
+    ma.set_defaults(fn=cmd_model_add)
+    ms.add_parser("list").set_defaults(fn=cmd_model_list)
+
+    p = sub.add_parser("prompt"); ps = p.add_subparsers(dest="sub", required=True)
+    pa = ps.add_parser("add"); pa.add_argument("--name", required=True)
+    pa.add_argument("--prompt", required=True); pa.add_argument("--intent", default=None)
+    pa.set_defaults(fn=cmd_prompt_add)
+    ps.add_parser("list").set_defaults(fn=cmd_prompt_list)
+
+    v = sub.add_parser("variant"); vs = v.add_subparsers(dest="sub", required=True)
+    va = vs.add_parser("add"); va.add_argument("--model-id", dest="model_id", required=True)
+    va.add_argument("--prompt-id", dest="prompt_id", required=True)
+    va.add_argument("--label", default=None); va.add_argument("--id", default=None)
+    va.set_defaults(fn=cmd_variant_add)
+    vs.add_parser("list").set_defaults(fn=cmd_variant_list)
+
+    d = sub.add_parser("data"); ds = d.add_subparsers(dest="sub", required=True)
+    da = ds.add_parser("add"); da.add_argument("--variant", required=True)
+    da.add_argument("--character", required=True); da.add_argument("--turns-file", dest="turns_file", required=True)
+    da.add_argument("--run", default="run_1"); da.add_argument("--source", default="collected")
+    da.set_defaults(fn=cmd_data_add)
+    dg = ds.add_parser("gen"); dg.add_argument("--variant", required=True); dg.set_defaults(fn=cmd_data_gen)
+
+    e = sub.add_parser("eval"); es = e.add_subparsers(dest="sub", required=True)
+    er = es.add_parser("run"); er.add_argument("--offline", action="store_true")
+    er.add_argument("--online", action="store_true"); er.add_argument("--sim", action="store_true")
+    er.add_argument("--sessions", type=int, default=1500); er.set_defaults(fn=cmd_eval)
+
+    db = sub.add_parser("dashboard"); db.add_argument("--out", default="out/platform_dashboard.html")
+    db.set_defaults(fn=cmd_dashboard)
+
     a = ap.parse_args(argv)
-    if getattr(a, "fn", None):
-        return a.fn(a)
-
-    now = datetime.now(timezone.utc).isoformat()
-    svc = EvalService("en")
-    provider = "simulated" if a.sim else "recorded"
-
-    print("─" * 68)
-    print("EVALUATION SERVICE")
-    print("  INPUT  : variants (prompts + model) exercised offline"
-          + ("" if a.offline_only else " + online (faked traffic)"))
-    print(f"  DOMAIN : {len(SCHEME)} dimensions across L1/L2/L3/safety · judge={provider}")
-    print("  OUTPUT : one dashboard")
-    print("─" * 68)
-
-    offline_gb, offline_run = svc.evaluate_offline(a.gen_dir, a.tasks, now, provider)
-    profiles = svc.ability(offline_run)
-    print(f"  offline: {len(offline_gb.grades)} grades over {offline_gb.variant_ids}")
-
-    online_gb = None
-    if not a.offline_only:
-        online_gb = svc.evaluate_online(offline_run.variant_ids, now, n_sessions=a.sessions)
-        print(f"  online : {len(online_gb.grades)} grades from {2*a.sessions} faked sessions")
-
-    merged = svc.merge(offline_gb, online_gb, now)
-    merged.title = "Companion variant evaluation — one platform, offline + online"
-
-    # static (renders anywhere) + interactive (select / compare; runs JS in the artifact)
-    path = render(merged, a.out, ability_profiles=profiles, scheme=SCHEME)
-    p = pathlib.Path(path)
-    if "<title>" not in p.read_text():
-        p.write_text("<title>Companion Variant Evaluation</title>\n" + p.read_text())
-    evidence = extract_evidence(a.gen_dir, 'out/judge')
-    ipath = render_interactive(merged, variants_manifest(), profiles,
-                               a.out.replace(".html", "_interactive.html"),
-                               title=merged.title, evidence=evidence)
-    ip = pathlib.Path(ipath)
-    if "<title>" not in ip.read_text():
-        ip.write_text("<title>Companion Variant Evaluation</title>\n" + ip.read_text())
-    print("─" * 68)
-    print(f"  {merged.to_dict()['counts']}")
-    print(f"  static      -> {path}")
-    print(f"  interactive -> {ipath}  (select / compare)")
-    print("─" * 68)
-    return 0
+    return a.fn(a)
 
 
 if __name__ == "__main__":
