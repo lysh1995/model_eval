@@ -90,7 +90,7 @@ def _make_handler(db_url: str):
                 # run the exact `ceval eval run` pipeline, capturing its log
                 from . import __main__ as M
                 a = SimpleNamespace(db=db_url, gen_dir="demo/gen", judge_dir="demo/judge",
-                                    sim=False, offline=False, online=False, sessions=800)
+                                    sim=False, offline=False, online=False, sessions=1500)
                 buf = io.StringIO()
                 with contextlib.redirect_stdout(buf):
                     M.cmd_eval(a)

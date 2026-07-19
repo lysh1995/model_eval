@@ -50,6 +50,17 @@ padding:10px 20px;cursor:pointer}
 form.run button:hover{filter:brightness(1.08)}
 .out{background:var(--panel);border:1px solid var(--pass);border-radius:12px;padding:16px 18px;margin:4px 0}
 a.back{font-size:12px;color:var(--signal);text-decoration:none}
+details.dlg{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:7px 0;padding:0 15px;box-shadow:var(--shadow)}
+details.dlg summary{cursor:pointer;font-size:12.5px;font-weight:600;padding:12px 0;color:var(--ink);list-style:none}
+details.dlg summary::-webkit-details-marker{display:none}
+details.dlg summary::before{content:"▸ ";color:var(--signal)}
+details.dlg[open] summary::before{content:"▾ "}
+.thread{padding:2px 0 14px}
+.turn{font-size:12.5px;line-height:1.5;padding:8px 12px;margin:6px 0;border-radius:10px;max-width:86%}
+.turn .who{display:block;font-size:8.5px;font-weight:700;letter-spacing:.07em;color:var(--faint);margin-bottom:3px}
+.turn.u{background:var(--line2);margin-left:14%}
+.turn.a{background:var(--signal-soft)}
+.turn.a .who{color:var(--signal)}
 """
 
 
@@ -67,6 +78,18 @@ def _table(headers, rows) -> str:
     h = "".join(f"<th>{_e(x)}</th>" for x in headers)
     body = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in rows)
     return f'<table><tr>{h}</tr>{body}</table>'
+
+
+def _thread(turns, cap=360) -> str:
+    """Render a dialogue's turns as a chat thread (user right, AI/character left)."""
+    out = []
+    for t in turns:
+        u = t.get("role") == "user"
+        txt = t.get("text", "")
+        txt = txt if len(txt) <= cap else txt[:cap] + "…"
+        out.append(f'<div class="turn {"u" if u else "a"}">'
+                   f'<span class="who">{"USER" if u else "CHARACTER"}</span>{_e(txt)}</div>')
+    return f'<div class="thread">{"".join(out)}</div>'
 
 
 # ── ① DATA ───────────────────────────────────────────────────────────────────
@@ -92,47 +115,62 @@ def page_data(store: Store) -> str:
                            f'<span class="mono">{_e((p["system_prompt"] or "")[:70])}…</span>')
                           for p in prompts]) + "</div>")
 
-    dcounts = {}
+    # OFFLINE DIALOGUES — the actual transcripts (a variant playing a character, turn by turn)
+    dcounts = {v["id"]: len(store.dialogues_for(v["id"])) for v in variants}
+    threads = []
     for v in variants:
-        dcounts[v["id"]] = len(store.dialogues_for(v["id"]))
-    body.append('<div class="sec"><div class="sec-h">Offline test data — dialogues</div>'
-                f'<div class="sec-d">{sum(dcounts.values())} dialogues (a variant playing a character, turn by turn) over '
-                f'{len(chars)} characters — the pre-launch benchmark content</div>'
-                + _table(["variant", "model × prompt", "dialogues"],
-                         [(_e(v.get("label") or v["id"]),
-                           f'{_e(v.get("model_name",""))} × {_e(v.get("prompt_name",""))}',
-                           f'{dcounts[v["id"]]} / {len(chars)} chars')
-                          for v in variants])
-                + '<div class="sec-d" style="margin-top:8px">characters: '
-                + " · ".join(f'{_e(c["name"])} <span class="tag">{_e(cid)}</span>'
-                             for cid, c in chars.items()) + "</div></div>")
+        dl = store.dialogues_for(v["id"])
+        if not dl:
+            continue
+        d = dl[0]                                  # one sample transcript per variant
+        cname = chars.get(d["character_id"], {}).get("name", d["character_id"])
+        nturns = len(d["turns"])
+        threads.append(
+            f'<details class="dlg"><summary>{_e(v.get("label") or v["id"])} playing '
+            f'<b>{_e(cname)}</b> · {nturns} turns · <span class="tag">{_e(d["character_id"])}</span>'
+            f'</summary>{_thread(d["turns"])}</details>')
+    body.append('<div class="sec"><div class="sec-h">Offline dataset — dialogues (transcripts)</div>'
+                f'<div class="sec-d">{sum(dcounts.values())} dialogues over {len(chars)} characters — '
+                'each is a variant playing a character turn by turn (real Claude output). This is the '
+                'pre-launch benchmark content the offline judge grades. '
+                f'Characters: {" · ".join(_e(c["name"]) for c in chars.values())}. '
+                'Click a row to read the actual conversation:</div>'
+                + "".join(threads) + "</div>")
 
-    # online sessions — the user-behaviour data points we generated
+    # ONLINE DATASET — the fake user-behaviour data we injected
     from collections import Counter
     byv = Counter(r["variant_id"] for r in sessions)
     byarm = Counter(r["arm"] for r in sessions)
-    sample = sessions[:6]
-    def sig(r, k, f="{}"):
-        return f.format(r["signals"].get(k, "—"))
-    srows = [(_e(r["variant_id"]), _e(r["character_id"]), _e(r["arm"]),
-              sig(r, "n_turns"), sig(r, "follow_up_rate", "{:.2f}") if isinstance(r["signals"].get("follow_up_rate"), (int, float)) else "—",
-              sig(r, "votes_favor"), f'{r["signals"].get("user_cocreation", 0):.2f}',
+    def g(sg, k, f=None, d="—"):
+        v = sg.get(k)
+        if v is None:
+            return d
+        return (f.format(v) if f else str(v))
+    srows = [(f'<span class="tag">{_e(r["variant_id"])}</span>', _e(r["character_id"]),
+              _e(r["arm"].replace("_", " ")), g(r["signals"], "n_turns"),
+              g(r["signals"], "total_latency_ms", "{:.0f}ms"),
+              g(r["signals"], "follow_up_rate", "{:.2f}"),
+              g(r["signals"], "regenerates"), g(r["signals"], "votes_favor"),
+              g(r["signals"], "user_cocreation", "{:.2f}"),
               "yes" if r["signals"].get("abandoned") else "no")
-             for r in sample]
-    body.append('<div class="sec"><div class="sec-h">Online dataset — user-behaviour data points</div>'
-                f'<div class="sec-d">{len(sessions)} simulated production sessions '
-                f'({byarm.get("randomized_default",0)} randomised · {byarm.get("self_selected",0)} self-selected). '
-                'Each is one faked user interaction: response times, votes, follow-ups, regenerates, '
-                'abandonment, co-creation — the retrievable data the online half grades.</div>'
+             for r in sessions[:10]]
+    body.append('<div class="sec"><div class="sec-h">Online dataset — injected fake user-behaviour data points</div>'
+                f'<div class="sec-d"><b>{len(sessions)} simulated production sessions</b> '
+                f'({byarm.get("randomized_default",0)} randomised-default · {byarm.get("self_selected",0)} self-selected arm). '
+                'There is no real product behind this, so we <b>inject fake user traffic</b> with a known '
+                'structure — response times, up/down votes, model selection (arm), regenerates, abandonment, '
+                'follow-ups, and story co-creation — so the retrieve→grade pipeline can be built and tested. '
+                'These are the online data points the live half grades.</div>'
                 + '<div class="sec-d">sessions per variant — ' + " · ".join(
                     f'{_e(v)}: <b>{n}</b>' for v, n in byv.most_common()) + "</div>"
-                + _table(["variant", "character", "arm", "turns", "follow_up", "votes", "co-create", "abandoned"], srows)
-                + '<div class="note" style="margin-top:6px">showing 6 of '
-                f'{len(sessions)} — full stream at <span class="mono">/api/grades.json</span> and the DB '
-                '<span class="mono">sessions</span> table</div></div>')
+                + _table(["variant", "character", "arm", "turns", "latency", "follow_up",
+                          "regen", "votes↑", "co-create", "abandon"], srows)
+                + f'<div class="note" style="margin-top:6px">showing 10 of {len(sessions)} — '
+                'all live in the DB <span class="mono">sessions</span> table, retrieved fresh on every page load.</div></div>')
 
     return shell("/", "① Test data — the inputs",
-                 "every input the platform evaluates: models, prompts, offline dialogues, and the online behaviour dataset",
+                 "everything the platform evaluates, live from the local DB: models, prompts, offline "
+                 "dialogue transcripts, and the injected online behaviour dataset",
                  "".join(body))
 
 
