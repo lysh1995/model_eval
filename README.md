@@ -157,6 +157,7 @@ our instrument is frozen.
 
 | | |
 |---|---|
+| **[docs/GRADEBOOK.md](docs/GRADEBOOK.md)** | **Read first** — the grade book is the core: product thinking + research + a testable/repeatable/automated platform |
 | **[QUICKSTART.md](QUICKSTART.md)** | Run the service and reproduce the findings — zero deps, no key |
 | **[docs/SERVICE.md](docs/SERVICE.md)** | **The service architecture** — DB, CLI, offline + online, dashboard, serve |
 | **[docs/HONEST-REVIEW.md](docs/HONEST-REVIEW.md)** | **What works, what doesn't, and the six times a plausible number was wrong** |
