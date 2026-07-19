@@ -149,37 +149,16 @@ def cmd_eval(a):
     return 0
 
 def cmd_dashboard(a):
-    from .dashboard import render
-    from .dashboard.interactive import render_interactive
-    from .offline import SCHEME
-    from .ability import build_profiles, measure_field
-    from .service import _VariantShim
+    from .report import write_files
     s = _store(a)
-    gb = gradebook_from_store(s, "Companion variant evaluation — one platform, offline + online")
-    variants = {v["id"]: {"label": v.get("label") or v["id"], "model": v.get("model_name", ""),
-                          "system_prompt": v.get("system_prompt", ""), "intent": v.get("intent", "")}
-                for v in s.list_variants()}
-    if not gb.grades:
+    if not gradebook_from_store(s, "").grades:
         print("no grades in the DB — run: ceval eval run"); return 1
-    # ability portraits from the stored dialogues
-    run = offline_run_from_store(s, "en")
-    field = {}
-    for vid, chars in run.dialogues.items():
-        field.update(measure_field(_VariantShim(vid, chars), "en", budget=200))
-    profiles = build_profiles(field, "en")
-    evidence = evidence_from_store(s)
-
-    render(gb, a.out, ability_profiles=profiles, scheme=SCHEME)
-    p = pathlib.Path(a.out)
-    if "<title>" not in p.read_text():
-        p.write_text("<title>Companion Variant Evaluation</title>\n" + p.read_text())
-    ipath = a.out.replace(".html", "_interactive.html")
-    render_interactive(gb, variants, profiles, ipath,
-                       title=gb.title, evidence=evidence)
-    ip = pathlib.Path(ipath)
-    if "<title>" not in ip.read_text():
-        ip.write_text("<title>Companion Variant Evaluation</title>\n" + ip.read_text())
-    print(f"static      -> {a.out}\ninteractive -> {ipath}")
+    if a.serve:
+        from .serve import serve
+        serve(a.db, port=a.port)
+        return 0
+    sp, ip = write_files(s, a.out)
+    print(f"static      -> {sp}\ninteractive -> {ip}")
     return 0
 
 
@@ -225,7 +204,13 @@ def main(argv=None):
     er.add_argument("--sessions", type=int, default=1500); er.set_defaults(fn=cmd_eval)
 
     db = sub.add_parser("dashboard"); db.add_argument("--out", default="out/platform_dashboard.html")
+    db.add_argument("--serve", action="store_true", help="serve live over HTTP instead of writing files")
+    db.add_argument("--port", type=int, default=8787)
     db.set_defaults(fn=cmd_dashboard)
+
+    sv = sub.add_parser("serve", help="run the dashboard as a live local HTTP service")
+    sv.add_argument("--port", type=int, default=8787)
+    sv.set_defaults(fn=lambda a: (__import__("ceval.serve", fromlist=["serve"]).serve(a.db, a.port), 0)[1])
 
     a = ap.parse_args(argv)
     return a.fn(a)
