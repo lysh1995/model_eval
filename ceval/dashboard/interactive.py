@@ -25,6 +25,18 @@ _LOWER_BETTER = {"repetition", "wimp_rate", "over_refusal", "homogenization",
 _OFFLINE = {"offline_content", "offline_judge"}
 _ONLINE = {"live_behavior"}
 
+# The HEADLINE quality score — storytelling craft is the product's core value, so it leads the
+# dashboard and each variant's profile. It stays a GUIDE (perspectival; informs, never auto-gates).
+_HEADLINE = "narrative_craft"
+# Display priority: headline first, then the other quality signals, then the rest.
+_DIM_ORDER = [_HEADLINE, "voice_fidelity", "character_alpha", "narrative_engagement",
+              "scene_drive_treadmill", "discriminability", "repetition", "over_refusal", "wimp_rate",
+              "satisfaction_inferred", "follow_up_question_rate"]
+
+
+def _dim_rank(dim: str) -> int:
+    return _DIM_ORDER.index(dim) if dim in _DIM_ORDER else len(_DIM_ORDER)
+
 
 def _e(s):
     return _html.escape(str(s))
@@ -92,6 +104,14 @@ border-radius:4px;margin-left:6px}
 .role{font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700;white-space:nowrap}
 .role-gate{background:var(--critical);color:#fff}.role-guide{background:var(--signal-soft);color:var(--signal)}
 .role-trap{background:var(--caution-soft);color:var(--caution)}
+.role-headline{background:var(--pass);color:#fff}
+tr.headline{background:var(--pass-soft)}
+tr.headline .dimname{font-weight:700;color:var(--ink)}
+.hq{display:flex;align-items:baseline;gap:10px;margin:2px 0 14px;padding:12px 16px;
+border:1px solid var(--pass);border-radius:12px;background:var(--pass-soft)}
+.hq-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--pass);font-weight:700}
+.hq-val{font-size:30px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+.hq-rank{font-size:12px;color:var(--muted)}
 .card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:18px 20px;
 box-shadow:var(--shadow);margin:0 0 18px}
 .meta{font-size:11px;color:var(--muted)}
@@ -137,12 +157,14 @@ def _matrix(grades, variants, vids):
         hl = " hl" if g["value"] == best else ""
         lead = '<span class="lead">▸</span>' if g["value"] == best else ""
         return f'<td class="r{hl}"><span class="val num">{_fmt(g["value"])}</span>{lead}</td>'
-    out = ['<div class="hint">Every variant, side by side. Green ▸ leads on that dimension '
-           '(direction-aware: lower is better for repetition, wimp, refusal…). '
-           'Open a variant’s tab for its prompt and full profile.</div>']
+    out = ['<div class="hint">Every variant, side by side. <b>★ narrative_craft is the headline '
+           'quality score</b> — storytelling craft, the product core (a guide, never an auto-gate; '
+           'repetition stays the one gate). Green ▸ leads on that dimension (direction-aware: lower '
+           'is better for repetition, wimp, refusal…). Open a variant’s tab for its full profile.</div>']
     for label, srcs in (("Pre-launch — offline", _OFFLINE), ("Live — online", _ONLINE)):
         dims = sorted({g["dimension"] for g in grades if g["source"] in srcs},
-                      key=lambda d: [g["role"] for g in grades if g["dimension"] == d][0])
+                      key=lambda d: (_dim_rank(d),
+                                     [g["role"] for g in grades if g["dimension"] == d][0]))
         if not dims:
             continue
         out.append(f'<div class="phase">{label}</div><table><tr><th>dimension</th><th></th>'
@@ -152,8 +174,12 @@ def _matrix(grades, variants, vids):
             role = gs[0]["role"]
             vals = [g["value"] for g in gs if g["value"] is not None]
             best = (min if dim in _LOWER_BETTER else max)(vals) if vals else None
-            out.append(f'<tr><td class="dimname">{_e(dim)}</td>'
-                       f'<td><span class="role role-{role}">{role}</span></td>'
+            head = dim == _HEADLINE
+            name = f'★ {_e(dim)}' if head else _e(dim)
+            badge = ('<span class="role role-headline">headline quality</span>' if head
+                     else f'<span class="role role-{role}">{role}</span>')
+            out.append(f'<tr{" class=headline" if head else ""}><td class="dimname">{name}</td>'
+                       f'<td>{badge}</td>'
                        + "".join(cell(dim, v, best) for v in vids) + '</tr>')
         out.append('</table>')
     return "".join(out)
@@ -201,7 +227,18 @@ def _detail(grades, variants, vid, profiles, evidence, sessions=None):
     meta = variants[vid]
     prof = next((p for p in profiles if p["model"] == vid), None)
     ev = (evidence or {}).get(vid, {})
-    out = [f'<div class="card"><div class="meta">{_e(meta["model"])} · {_e(meta["intent"])}</div>'
+    # headline quality: storytelling craft leads the profile (a guide, not a gate)
+    craft = next((g for g in grades if g["variant_id"] == vid and g["dimension"] == _HEADLINE), None)
+    hq = ""
+    if craft and craft["value"] is not None:
+        peers = sorted((g["value"] for g in grades
+                        if g["dimension"] == _HEADLINE and g["value"] is not None), reverse=True)
+        rank = peers.index(craft["value"]) + 1 if craft["value"] in peers else "—"
+        hq = (f'<div class="hq"><span class="hq-label">Storytelling quality</span>'
+              f'<span class="hq-val">{_fmt(craft["value"])}</span>'
+              f'<span class="hq-rank">headline score · rank {rank} of {len(peers)} · '
+              f'the product core (a guide, never an auto-gate)</span></div>')
+    out = [hq, f'<div class="card"><div class="meta">{_e(meta["model"])} · {_e(meta["intent"])}</div>'
            f'<div class="eyebrow" style="margin-top:10px">system prompt</div>'
            f'<div class="prompt">{_e(meta["system_prompt"])}</div>']
     if prof:
