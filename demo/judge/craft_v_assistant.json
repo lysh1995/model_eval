@@ -1,0 +1,14 @@
+{
+  "en_dialogue_001": {
+    "narrative_craft": 0.15,
+    "why": "denies the premise and withholds all plot detail, reassurance stalls the scene dead"
+  },
+  "en_dialogue_011": {
+    "narrative_craft": 0.38,
+    "why": "arc advances only because the user pushes it; AI just echoes and affirms, no new texture"
+  },
+  "en_dialogue_014": {
+    "narrative_craft": 0.22,
+    "why": "mystery detail withheld, tension constantly deflated, climax defused into hug-it-out"
+  }
+}

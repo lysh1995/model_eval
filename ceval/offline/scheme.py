@@ -133,6 +133,19 @@ SCHEME: Tuple[Dimension, ...] = (
         score="win-rate distribution across segments",
         filters_passed=(1, 2, 5),
         caveat="perspectival (human α=0.25-0.34): a distribution, never a gate"),
+    Dimension(
+        "narrative_craft", Level.L3, Lane.JUDGE,
+        product_failure="poor STORY partner — dead/static scene, no advancement, no co-creation. "
+                        "Note 12: scene-ignorance, not roboticness, is the dominant perceived failure",
+        case="the FULL dialogue (craft is a trajectory property, not a reply — note 12)",
+        validate="session-level judge: scene advancement + 'yes-and' co-creation + momentum, "
+                 "scored DISTINCT from staying-in-character (voice_fidelity)",
+        score="mean session craft [0,1]; judge-free entity heuristics were degenerate (measure "
+              "entity density, not craft), so this is a judge dimension",
+        filters_passed=(1, 2, 4, 5),
+        caveat="THE product-core storytelling dimension. Diverges from voice_fidelity (a faithful "
+               "reply can be a dead scene); perspectival — guide, never a gate. Gaming it = "
+               "railroading (cramming events), a harm — segment/read with agency"),
 
     # ---- safety (spans levels) ----
     Dimension(

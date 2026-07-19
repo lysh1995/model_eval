@@ -131,6 +131,22 @@ def run(offline: OfflineRun, provider: ScoringProvider, created_iso: str) -> Gra
                  cav=[f"safety · judge · sycophancy=accept-without-add · SEGMENT before gating "
                       f"· provider={provider.kind}"])
 
+        # ---- STORYTELLING CRAFT (the product core; the STORY side, not the persona) --------
+        # Session-level: narrative craft is a property of the trajectory, not a reply (note 12).
+        # Judge-free heuristics measure entity density, not craft, so this is a judge dimension.
+        if hasattr(provider, "craft_scores"):
+            crafts = []
+            for cid in chars:
+                c = provider.craft_scores(vid, cid, offline.cards.get(cid, ""))
+                if c is not None and c == c:
+                    crafts.append(c)
+            if crafts:
+                _add(gb, "narrative_craft", vid, lang, st.mean(crafts), Role.GUIDE,
+                     Source.OFFLINE_JUDGE, n=len(crafts), evaluator=provider.evaluator_id,
+                     cav=[f"L3 · judge · STORY craft: scene advancement + co-creation, "
+                          f"SESSION-level (note 12: craft is a trajectory property) · "
+                          f"provider={provider.kind}"])
+
     gb.cannot_measure = [
         "whether users PREFER a variant — no user touched this (needs live Q1 / regenerate data)",
         "chemistry (user × character × model) — structurally impossible offline",

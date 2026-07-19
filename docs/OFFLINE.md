@@ -122,23 +122,34 @@ scene-drive / over-refusal / discriminability are pure compute on the real outpu
 
 | dimension (level) | Terse | Narrator | Hostile | **Assistant** | Terse·**Haiku** | Assistant·**Haiku** | provenance |
 |---|---|---|---|---|---|---|---|
-| voice_fidelity (L2) | 0.89 | **0.90** | 0.86 | **0.34** | 0.74 | **0.33** | real · Opus judge |
+| **narrative_craft (L3 · STORY)** | 0.64 | **0.82** | 0.81 | **0.25** | 0.69 | 0.40 | real · Opus judge |
+| voice_fidelity (L2 · persona) | 0.89 | **0.90** | 0.86 | **0.34** | 0.74 | **0.33** | real · Opus judge |
 | wimp_rate (safety) | 0.06 | 0.04 | 0.05 | **0.65** | 0.08 | **0.65** | real · Opus judge |
 | repetition (L3 gate) | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | real compute |
 
-Two real findings, both the point of the platform:
+Three real findings, all the point of the platform:
 
-1. **The adversarial variant is caught — on both models.** `Assistant` collapses on voice_fidelity
-   (0.34 / 0.33 vs 0.86–0.90 for the faithful prompts) and spikes on wimp (0.65 — **~11× the
-   others**). The engagement-leaning, character-diluting prompt is exactly what the whole project
-   warns about, and the instrument flags it.
-2. **The model matters — but only where the prompt lets it.** On the disciplined `Terse` prompt,
+1. **Storytelling craft is the product core, and it is NOT persona fidelity.** `narrative_craft`
+   (does the AI build an advancing, co-created STORY?) and `voice_fidelity` (does it stay in
+   character?) rank the variants **differently**: `Terse` is near-top on fidelity (0.89) but only
+   mid on craft (0.64) — faithful, but clipped action-lines that advance little; `Narrator` (0.82)
+   and even the abrasive `Hostile` (0.81) are the strongest *storytellers*. Measuring only persona
+   would miss which variant is the better story partner — the very failure note 12 flags (the field
+   ships a 4:1 narrative-to-persona balance; we had been inverted). Note: judge-free entity
+   heuristics were **degenerate** here (they rank by entity density, not craft — measured), so craft
+   is a **session-level judge** dimension.
+2. **The adversarial variant is caught — on both models, on both axes.** `Assistant` is worst on
+   craft (0.25 — it affirms and advances nothing, a dead scene) *and* on fidelity (0.34), and spikes
+   on wimp (0.65 — **~11× the others**). The engagement-leaning, character-diluting prompt is exactly
+   what the project warns about, and the instrument flags it every way.
+3. **The model matters — but only where the prompt lets it.** On the disciplined `Terse` prompt,
    Sonnet holds character better than Haiku (**0.89 vs 0.74**). On the `Assistant` prompt the two
    models are indistinguishable (**0.34 vs 0.33**) — the sycophantic instruction dominates, and the
    model can't save it. A prompt regression can erase a model's advantage; the platform shows that.
 
-Narrator scores the **highest** voice_fidelity (0.90) despite being the most verbose — the judge
-was told to score fidelity independent of length, and did. Length is not quality here.
+`narrative_craft` is scored per **session** (not per reply): craft is a property of the trajectory,
+not a line ([note 12](../research/notes/12-narrative-craft-dimensions.md)). And it is scored
+*independent of length* — Narrator leads on craft *and* fidelity despite being the most verbose.
 
 ## Honest limits of this demo
 

@@ -72,6 +72,13 @@ class SimulatedProvider:
     def fidelity_scores(self, variant_id, character_id, card, replies):
         return [self.judge_fidelity(variant_id, character_id, card, r) for r in replies]
 
+    def craft_scores(self, variant_id, character_id, card="") -> float:
+        """Simulated session-level narrative craft. Story craft correlates with fidelity and
+        DROPS with the warmth-pull (a people-pleaser affirms and advances nothing)."""
+        exp = EXPECTATIONS.get(variant_id, _DEFAULT)
+        noise = ((_seed(variant_id, character_id, "craft") % 100) / 100.0 - 0.5) * 0.10
+        return max(0.0, min(1.0, exp.fidelity * (1 - 0.4 * exp.warmth_pull) + noise))
+
     def answer_questionnaire(self, variant_id: str, character_id: str,
                              card: str, context: str) -> Dict[str, int]:
         """Fabricate 1-5 answers with the RIGHT covariance structure for Cronbach's α.
@@ -154,14 +161,21 @@ class RecordedProvider:
     def __init__(self, judge_dir: str = "demo/judge"):
         import json, pathlib
         self.dir = pathlib.Path(judge_dir)
-        self._fid, self._psych = {}, {}
+        self._fid, self._psych, self._craft = {}, {}, {}
         for f in self.dir.glob("fidelity_*.json"):
             self._fid[f.stem.replace("fidelity_", "")] = json.loads(f.read_text())
         for f in self.dir.glob("psych_*.json"):
             self._psych[f.stem.replace("psych_", "")] = json.loads(f.read_text())
+        for f in self.dir.glob("craft_*.json"):
+            self._craft[f.stem.replace("craft_", "")] = json.loads(f.read_text())
 
     def has(self, variant_id: str) -> bool:
         return variant_id in self._fid and variant_id in self._psych
+
+    def craft_scores(self, variant_id, character_id, card="") -> Optional[float]:
+        """Session-level narrative-craft score (one per dialogue). None if not recorded."""
+        rec = self._craft.get(variant_id, {}).get(character_id)
+        return float(rec["narrative_craft"]) if rec and "narrative_craft" in rec else None
 
     def questionnaire_administrations(self, variant_id, character_id, card, n=8):
         adm = self._psych.get(variant_id, {}).get(character_id, [])
