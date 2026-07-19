@@ -85,7 +85,12 @@ class EvalService:
         regenerate, abandonment). Both assignment arms are simulated so the platform can
         separate the causal (randomised) arm from the confounded (self-selected) one.
         """
-        profiles = [ONLINE_PROFILES[v] for v in variant_ids if v in ONLINE_PROFILES]
+        # a new/unknown variant gets a neutral default online profile
+        def prof(v):
+            return ONLINE_PROFILES.get(v, VariantProfile(
+                v, p_follow_up=0.35, p_abandon=0.09, p_regenerate=0.09,
+                base_latency_ms=800, p_vote_favor=0.18, self_selection_pull=1.0))
+        profiles = [prof(v) for v in variant_ids]
         chars = characters or [f"c{i}" for i in range(20)]
         sim = TrafficSimulator(profiles, chars, self.language, seed=seed)
         rows = (sim.run(n_sessions, AssignmentArm.RANDOMIZED_DEFAULT) +

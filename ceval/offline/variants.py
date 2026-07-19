@@ -41,6 +41,22 @@ MANIFEST: Dict[str, VariantSpec] = {
 }
 
 
-def as_dict() -> dict:
+def _seed_dict() -> dict:
     return {v.id: {"label": v.label, "model": v.model, "system_prompt": v.system_prompt,
                    "intent": v.intent} for v in MANIFEST.values()}
+
+
+def as_dict(gen_dir: str = "out/gen") -> dict:
+    """The live manifest: the persisted variants.json (which `ceval add` extends), falling
+    back to the hardcoded seed. So a newly-triggered prompt/model appears automatically."""
+    import json, pathlib
+    p = pathlib.Path(gen_dir) / "variants.json"
+    if p.exists():
+        try:
+            man = json.loads(p.read_text())
+            if man:
+                return man
+        except Exception:
+            pass
+    return _seed_dict()
+

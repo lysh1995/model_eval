@@ -18,8 +18,39 @@ from .offline.variants import as_dict as variants_manifest
 from .offline.evidence import extract as extract_evidence
 
 
+def cmd_add(a):
+    """Trigger evaluation of a NEW variant (system prompt / model)."""
+    from .generate import trigger
+    from .offline.variants import VariantSpec
+    spec = VariantSpec(id=a.id, label=a.label or a.id, model=a.model,
+                       system_prompt=a.prompt, intent=a.intent or "")
+    print("─" * 68)
+    print(f"TRIGGER  variant '{a.id}'  model={a.model}")
+    print(f"  prompt: {a.prompt[:80]}…")
+    r = trigger(spec, gen_dir=a.gen_dir)
+    print("─" * 68)
+    if r["status"] == "generated":
+        print(f"  ✓ generated {r['n_replies']} replies via {r['provider']} -> {r['path']}")
+        print(f"  now score + visualize:  python3 -m ceval")
+    else:
+        print(f"  ⚠ no live model provider. Wrote a generation request:")
+        print(f"    {r['request']}")
+        print(f"  {r['hint']}")
+    return 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="ceval", description="companion variant evaluation service")
+    sub = ap.add_subparsers(dest="cmd")
+    add = sub.add_parser("add", help="trigger eval of a new system prompt / model")
+    add.add_argument("--id", required=True, help="variant id, e.g. v_myprompt")
+    add.add_argument("--model", default="claude-sonnet-4.5")
+    add.add_argument("--prompt", required=True, help="the system prompt to test")
+    add.add_argument("--label", default=None)
+    add.add_argument("--intent", default=None)
+    add.add_argument("--gen-dir", default="out/gen")
+    add.set_defaults(fn=cmd_add)
+
     ap.add_argument("--gen-dir", default="out/gen")
     ap.add_argument("--tasks", default="out/gen/tasks.json")
     ap.add_argument("--out", default="out/platform_dashboard.html")
@@ -27,6 +58,8 @@ def main(argv=None):
     ap.add_argument("--sim", action="store_true", help="simulated judge instead of real recordings")
     ap.add_argument("--sessions", type=int, default=1500)
     a = ap.parse_args(argv)
+    if getattr(a, "fn", None):
+        return a.fn(a)
 
     now = datetime.now(timezone.utc).isoformat()
     svc = EvalService("en")
