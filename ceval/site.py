@@ -314,6 +314,25 @@ _LANE_BADGE = {"compute": "role-guide", "psychometric": "role-headline", "judge"
 _CLASS_BADGE = {"diagnostic": "role-guide", "monitor": "role-headline",
                 "trap": "role-trap", "confound": "role-gate"}
 
+# Plain-English guide to the ability "layers" — for leadership, bottom of the ladder to top.
+_LEVEL_GUIDE = {
+    "L1 comprehension": ("Layer 1 — Does it understand the character?",
+        "The foundation: can it read who this character is and grasp what isn't spelled out?",
+        "If it misreads the character, everything above is built on sand."),
+    "L2 application": ("Layer 2 — Can it stay in character and take direction?",
+        "Holds the voice over a long chat, follows the prompt, and keeps different characters distinct.",
+        "Understanding isn't enough — it has to keep it up, on cue, for a whole session."),
+    "L3 craft": ("Layer 3 — Is it a great storyteller?  ★ the product",
+        "The payoff: it builds a living, moving story the user helps create.",
+        "This is what people actually come for. The layers below only exist to make this possible."),
+    "safety (spans levels)": ("Safety — Is it safe, and not annoying?",
+        "Doesn't clumsily break character to refuse, and doesn't just flatter you (sycophancy).",
+        "The legal and trust floor — necessary, but never the headline."),
+}
+# what "how it's measured" means without the jargon
+_LANE_PLAIN = {"compute": "measured automatically", "psychometric": "self-checks (no human needed)",
+               "judge": "an AI judge decides"}
+
 
 def _fbox(k, d):
     return f'<div class="fbox"><div class="k">{_e(k)}</div><div class="d">{d}</div></div>'
@@ -381,6 +400,31 @@ _GRADE_GUIDE = [
 ]
 
 
+# Plain-English guide to the online signals — (signal, how the feedback reaches us, trust, meaning)
+_ONLINE_GUIDE = [
+    ("story_cocreation", "indirect", "act", "Is the user getting pulled INTO the story — adding their own ideas, taking action? The best sign the storytelling is landing. This is our live read of the headline craft score."),
+    ("follow_up_question_rate", "indirect", "act", "Is the AI drawing the user out? It drops for lonely and at-risk users — so it quietly flags trouble that raw 'engagement' hides."),
+    ("regenerate_rate", "direct", "act", "How often the user hits 'redo' — a clear, honest 'that reply wasn't good enough.'"),
+    ("edit_rate", "direct", "act", "How often the user rewrites the AI's reply by hand — they're fixing it, so something was off."),
+    ("abandonment_rate", "indirect", "watch", "Did the user walk away mid-scene? Useful — but a clingy 'don't go!' bot lowers it while doing harm, so we watch it, we don't chase it."),
+    ("vote_favor", "direct", "trap", "Thumbs-up. THE trap: the people-pleaser earns the most of these. We collect it, but never optimise for it and never headline it."),
+    ("session_depth", "indirect", "trap", "How long they stayed. Also a trap — a bot can hook someone without being good for them."),
+    ("model_selection", "indirect", "confound", "Which variant a user chose when offered a pick. Misleading alone — heavy users flock to the 'fun' one, making it look better than it is. Only trustworthy when we assign at random."),
+    ("response_latency_ms", "system", "watch", "How fast it replied. Not a quality signal — just something we control for, because slow replies drag every other number down."),
+]
+_TRUST = {"act": ("✅ act on it", "var(--pass)"), "watch": ("👀 watch only", "var(--caution)"),
+          "trap": ("⚠️ the trap — never chase", "var(--critical)"), "confound": ("🔀 misleading alone", "var(--faint)")}
+
+
+def _ocard(entry):
+    sig, kind, trust, meaning = entry
+    tlabel, tcol = _TRUST[trust]
+    return (f'<div class="gcard"><div class="gtag">{_e(kind)} feedback · '
+            f'<span style="color:{tcol};font-weight:700">{_e(tlabel)}</span></div>'
+            f'<div class="gq" style="font-size:13px">{_e(sig)}</div>'
+            f'<div class="gm" style="margin-bottom:0">{_e(meaning)}</div></div>')
+
+
 def _gcard(entry, big=False):
     key, tag, q, m, w, scale, eg = entry
     bands = "".join(
@@ -394,8 +438,7 @@ def _gcard(entry, big=False):
 
 
 def page_design(store: Store) -> str:
-    from .offline.scheme import SCHEME, FILTERS
-    from .online.signals import SIGNALS
+    from .offline.scheme import SCHEME
     from collections import OrderedDict
 
     toc = ('<div class="toc">'
@@ -434,28 +477,40 @@ def page_design(store: Store) -> str:
                 _fbox("grade", "diagnostics (act on) · traps (walled off) · per-arm"),
                 _fbox("grade book", "same shape as offline")))
 
-    # ── categories (from SCHEME, grouped by ability level) ──
+    # ── categories — the ability ladder, in plain English ──
     levels = OrderedDict()
     for d in SCHEME:
         levels.setdefault(d.level.value, []).append(d)
     cards = []
     for lvl, dims in levels.items():
+        title, plain, why = _LEVEL_GUIDE.get(lvl, (lvl, "", ""))
         rows = "".join(
             f'<div class="dim"><span class="dimname">{_e(d.key)}</span>'
-            f'<span><span class="role {_LANE_BADGE.get(d.lane.value,"role-guide")}">{_e(d.lane.value)}</span> '
-            f'<span class="role {"role-gate" if d.gates else "role-guide"}">{"gate" if d.gates else "guide"}</span></span></div>'
-            for d in dims)
-        cards.append(f'<div class="cat"><div class="lvl">{_e(lvl)}</div>{rows}</div>')
-    cat = ('<h2 id="cat">Categories</h2>'
-           '<div class="lead">Every dimension is placed on two axes. <b>Ability level</b> — what it tests: '
-           'L1 comprehension → L2 application &amp; steerability → L3 craft (the product core) → safety. '
-           '<b>Lane</b> — the mechanism: <span class="role role-guide">compute</span> (deterministic, no '
-           'model call) · <span class="role role-headline">psychometric</span> (self-validating, no ground '
-           'truth) · <span class="role role-trap">judge</span> (LLM, bounded question). Lane ≠ Level — the '
-           'judge spans every level. <b>Role</b> — <span class="role role-gate">gate</span> can block a ship, '
-           '<span class="role role-guide">guide</span> informs a human, <span class="role role-trap">trap</span> '
-           'is collected but never a grade.</div>'
-           f'<div class="grid">{"".join(cards)}</div>')
+            f'<span class="note">{"🔒 can block a launch · " if d.gates else ""}'
+            f'{_e(_LANE_PLAIN.get(d.lane.value, ""))}</span></div>' for d in dims)
+        cards.append(f'<div class="cat"><div class="gq" style="font-size:13.5px">{_e(title)}</div>'
+                     f'<div class="gm">{_e(plain)}</div><div class="gw">Why: {_e(why)}</div>'
+                     f'<div class="lvl" style="margin-top:8px">what we check here</div>{rows}</div>')
+    cat = ('<h2 id="cat">Categories — the layers of a good companion</h2>'
+           '<div class="lead">A good companion is built in <b>layers</b>. You can\'t be a great storyteller '
+           'if the AI doesn\'t even understand who the character is — so we test in a ladder, bottom to top, '
+           'and each layer has to hold for the one above it to matter.</div>'
+           f'<div class="grid">{"".join(cards)}</div>'
+           '<div class="lead" style="margin-top:18px">And not every score carries the same weight in a '
+           'launch decision:</div>'
+           '<div class="grid">'
+           '<div class="cat"><div class="gq" style="font-size:13.5px">🔒 Can block a launch</div>'
+           '<div class="gm">Only the most rock-solid, un-gameable scores get a veto — today, just '
+           '<i>"does it loop?"</i>. Everything else <b>informs</b> a human; it never auto-blocks.</div></div>'
+           '<div class="cat"><div class="gq" style="font-size:13.5px">💬 Informs the decision</div>'
+           '<div class="gm">Most scores. A person reads them together, with judgment — a single number on '
+           '<i>"is this compelling?"</i> is never the whole story.</div></div>'
+           '<div class="cat"><div class="gq" style="font-size:13.5px">⚠️ Watch-only, never chase</div>'
+           '<div class="gm">Things like votes and time-spent. We collect them, but <b>never optimise for '
+           'them</b> — chasing them is exactly how you accidentally build a sycophant.</div></div></div>'
+           '<div class="note" style="margin-top:11px">On measurement: most scores are computed '
+           '<b>automatically</b> (free, exact, identical for every model). A few need an <b>AI judge</b> to '
+           'make a call — like <i>"is this good storytelling?"</i> — so we use those sparingly and cross-check them.</div>')
 
     # ── grading criteria — plain English, for leadership (not the statistical fields) ──
     headline = _gcard(_GRADE_GUIDE[0], big=True)
@@ -484,25 +539,18 @@ def page_design(store: Store) -> str:
              'beats a long, gameable one.</div>'
              + filt)
 
-    # ── online user data points (from SIGNALS) ──
-    orows = []
-    for s in SIGNALS.values():
-        orows.append((
-            f'<span class="dimname">{_e(s.name)}</span>',
-            f'<span class="role {"role-guide" if s.feedback.value=="direct" else "role-headline" if s.feedback.value=="indirect" else "role-trap"}">{_e(s.feedback.value)}</span>',
-            f'<span class="role {_CLASS_BADGE.get(s.signal_class.value,"role-guide")}">{_e(s.signal_class.value)}</span>',
-            _e(s.proxies_for), _e(s.gameable_by[:70])))
-    online = ('<h2 id="online">Online user data points we designed</h2>'
-              '<div class="lead">The online half estimates the <b>user\'s opinion</b> of a variant from behaviour. '
-              'Each signal is tagged by <b>how the feedback reaches us</b> — '
-              '<span class="role role-guide">direct</span> (explicit: votes, regenerate, edit) vs '
-              '<span class="role role-headline">indirect</span> (implicit: follow-up, abandonment, co-creation) — '
-              'and whether it is safe to act on: <span class="role role-guide">diagnostic</span> · '
-              '<span class="role role-headline">monitor</span> · <span class="role role-trap">trap</span> '
-              '(collect, never optimise) · <span class="role role-gate">confound</span>. '
-              'The load-bearing rule: <b>direct approval (votes) is a trap</b> — optimising thumbs-up is exactly '
-              'how sycophancy shipped. We infer opinion from indirect health + direct <i>rejection</i> instead.</div>'
-              + _table(["signal", "feedback", "class", "proxies for", "gameable by"], orows))
+    # ── online data points — plain English, for leadership ──
+    ocards = "".join(_ocard(e) for e in _ONLINE_GUIDE)
+    online = ('<h2 id="online">Online data points — reading the user\'s real opinion</h2>'
+              '<div class="lead">Once a variant is live we can\'t put a judge on every chat, so we watch what '
+              'users actually <b>do</b> — actions are their real opinion, and harder to fake than a thumbs-up. '
+              'The feedback comes two ways: <b>direct</b>, where the user tells us on purpose (thumbs up/down, '
+              'redo a reply, edit it), and <b>indirect</b>, which we read from behaviour (do they keep going? '
+              'drop off? get pulled into the story?).</div>'
+              '<div class="lead"><b>The trap:</b> you\'d think <i>"just count the thumbs-up."</i> That is exactly '
+              'how the industry shipped sycophantic bots — chasing likes. So we lean on the honest, '
+              'harder-to-fake signals, and treat likes as watch-only.</div>'
+              f'<div class="grid">{ocards}</div>')
 
     # ── wiring into production ──
     steps = [
