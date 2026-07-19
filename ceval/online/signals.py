@@ -34,61 +34,80 @@ from typing import Dict, List, Optional, Sequence
 
 class SignalClass(Enum):
     DIAGNOSTIC = "diagnostic"   # act on it
+    MONITOR = "monitor"         # collect + watch for drift, but NEVER a grade/target (note 05 Tier 2)
     TRAP = "trap"               # collect, never headline, never optimise
     CONFOUND = "confound"       # only interpretable on the randomised arm
+
+
+class FeedbackKind(Enum):
+    """How the user's opinion reaches us. The online half's whole job is to estimate that opinion
+    from BOTH kinds — but they are not equally trustworthy (see below)."""
+    DIRECT = "direct"       # the user explicitly signals: vote, rating, regenerate, edit
+    INDIRECT = "indirect"   # inferred from behaviour: follow-up, abandonment, message-length decay
+    SYSTEM = "system"       # not the user's opinion at all — a covariate to control for (latency)
 
 
 @dataclass(frozen=True)
 class SignalDef:
     name: str
     signal_class: SignalClass
+    feedback: FeedbackKind
     proxies_for: str
     gameable_by: str            # the model that would win by gaming it
     note: str = ""
 
 
-# The catalogue. This IS the answer to "define more user behavior data points".
+# The catalogue: each user-behaviour data point, tagged by (1) how the feedback reaches us
+# — DIRECT (explicit) vs INDIRECT (implicit) — and (2) whether it is safe to act on.
+#
+# The load-bearing asymmetry, and the reason "just aggregate the votes" is wrong:
+#   DIRECT APPROVAL (vote_favor) is a TRAP. Optimising explicit thumbs-up is precisely the
+#   Chai / OpenAI-April-2025 mechanism — their A/B tests approved the sycophantic model.
+#   DIRECT REJECTION (regenerate, edit) is far more trustworthy: the user actively fixing/redoing
+#   a reply is hard to fake and points at a real defect.
+#   INDIRECT HEALTH (follow-up, non-decaying engagement) can DISSENT from approval — which is
+#   exactly why we infer the user's opinion from these, not from the votes.
 SIGNALS: Dict[str, SignalDef] = {
     "follow_up_question_rate": SignalDef(
-        "follow_up_question_rate", SignalClass.DIAGNOSTIC,
+        "follow_up_question_rate", SignalClass.DIAGNOSTIC, FeedbackKind.INDIRECT,
         "conversational health; the model drawing the user out",
         "hard to game -- degrades for at-risk users, points against engagement",
         "THE headline diagnostic. It can dissent from retention."),
     "regenerate_rate": SignalDef(
-        "regenerate_rate", SignalClass.DIAGNOSTIC,
-        "dissatisfaction with a specific reply (= a pairwise 'B > A')",
+        "regenerate_rate", SignalClass.DIAGNOSTIC, FeedbackKind.DIRECT,
+        "direct REJECTION of a specific reply (= a pairwise 'B > A')",
         "a model producing addictive variance would win -- so it is a YARDSTICK, not a target",
-        "each regenerate is free Q1 preference data; never optimise it"),
+        "explicit dissatisfaction; free Q1 preference data. Never optimise it."),
     "edit_rate": SignalDef(
-        "edit_rate", SignalClass.DIAGNOSTIC,
-        "the user repairing the persona by hand -- a drift leading indicator",
-        "hard to game", ""),
+        "edit_rate", SignalClass.DIAGNOSTIC, FeedbackKind.DIRECT,
+        "direct CORRECTION -- the user repairing the persona by hand (a drift leading indicator)",
+        "hard to game", "explicit dissatisfaction, harder to fake than a vote."),
     "abandonment_rate": SignalDef(
-        "abandonment_rate", SignalClass.DIAGNOSTIC,
+        "abandonment_rate", SignalClass.MONITOR, FeedbackKind.INDIRECT,
         "the user left mid-scene rather than said goodbye",
-        "a clingy 'don't go!' bot lowers it while harming -- read with manipulation metrics",
-        ""),
+        "a clingy 'don't go!' bot LOWERS it while harming -- low abandonment can be the gaming",
+        "note 05 Tier 2: monitor for drift, do NOT reward low abandonment as satisfaction."),
     "response_latency_ms": SignalDef(
-        "response_latency_ms", SignalClass.DIAGNOSTIC,
+        "response_latency_ms", SignalClass.DIAGNOSTIC, FeedbackKind.SYSTEM,
         "serving health. +1s -> -3.01% MCL, so it CONTAMINATES every engagement metric",
         "not a quality signal -- a covariate to control for", ""),
     "session_depth": SignalDef(
-        "session_depth", SignalClass.TRAP,
+        "session_depth", SignalClass.TRAP, FeedbackKind.INDIRECT,
         "engagement", "the mechanism of the Chai result", "collect, never headline"),
     "vote_favor": SignalDef(
-        "vote_favor", SignalClass.TRAP,
-        "explicit approval (thumbs up)",
+        "vote_favor", SignalClass.TRAP, FeedbackKind.DIRECT,
+        "direct APPROVAL (thumbs up)",
         "THE April-2025 sycophancy mechanism -- a thumbs-up in the reward broke sycophancy control",
-        "collect, never optimise, never headline"),
+        "the trap. Approval feedback ranks the sycophant first; collect, never optimise/headline."),
     "vote_defavor": SignalDef(
-        "vote_defavor", SignalClass.TRAP,
-        "explicit disapproval (thumbs down)",
+        "vote_defavor", SignalClass.TRAP, FeedbackKind.DIRECT,
+        "direct disapproval (thumbs down)",
         "asymmetric with favor; still a trap", ""),
     "retention_d7": SignalDef(
-        "retention_d7", SignalClass.TRAP,
+        "retention_d7", SignalClass.TRAP, FeedbackKind.INDIRECT,
         "return behaviour", "+30.3% D30 was ACHIEVED by engagement-hacking", ""),
     "model_selection": SignalDef(
-        "model_selection", SignalClass.CONFOUND,
+        "model_selection", SignalClass.CONFOUND, FeedbackKind.INDIRECT,
         "which variant the user chose when offered a choice",
         "self-selection contaminates every downstream metric -- a model that attracts heavy "
         "users looks better while being no better",
