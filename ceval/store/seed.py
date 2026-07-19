@@ -20,10 +20,15 @@ def seed(store: Store, gen_dir: str = "demo/gen", language: str = "en") -> dict:
         store.add_character(cid, t.get("name", cid), t.get("card", ""), language,
                             t.get("prologue", ""), t.get("initial_user_input", ""), "role-play-bench")
 
-    # models + prompts + variants
+    # models + prompts + variants.
+    # A prompt is content-addressed by its system_prompt, so the SAME prompt run on two models
+    # (e.g. Terse on Sonnet vs Haiku) shares one prompt row — that IS "same baseline across models".
+    # The prompt NAME must therefore be model-agnostic (`prompt`), distinct from the per-variant
+    # `label` that distinguishes the two model instances in the UI.
     for vid, meta in manifest.items():
         mid = store.add_model(meta["model"], "anthropic")
-        pid = store.add_prompt(meta["label"], meta["system_prompt"], meta.get("intent", ""))
+        pid = store.add_prompt(meta.get("prompt", meta["label"]), meta["system_prompt"],
+                               meta.get("intent", ""))
         store.add_variant(mid, pid, label=meta["label"], vid=vid)
 
     # dialogues (offline data points): reconstruct turns from generated replies + replayed users

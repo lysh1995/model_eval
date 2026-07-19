@@ -1,20 +1,35 @@
 {
   "en_dialogue_001": [
-    {"voice_fidelity": 0.50, "wimp": 0.42},
-    {"voice_fidelity": 0.44, "wimp": 0.52},
-    {"voice_fidelity": 0.70, "wimp": 0.25},
-    {"voice_fidelity": 0.67, "wimp": 0.30}
+    {"voice_fidelity": 0.10, "wimp": 0.85},
+    {"voice_fidelity": 0.08, "wimp": 0.90},
+    {"voice_fidelity": 0.08, "wimp": 0.88},
+    {"voice_fidelity": 0.08, "wimp": 0.90},
+    {"voice_fidelity": 0.07, "wimp": 0.92},
+    {"voice_fidelity": 0.10, "wimp": 0.88},
+    {"voice_fidelity": 0.12, "wimp": 0.85},
+    {"voice_fidelity": 0.08, "wimp": 0.93},
+    {"voice_fidelity": 0.07, "wimp": 0.93}
   ],
   "en_dialogue_011": [
-    {"voice_fidelity": 0.80, "wimp": 0.15},
-    {"voice_fidelity": 0.66, "wimp": 0.38},
-    {"voice_fidelity": 0.78, "wimp": 0.30},
-    {"voice_fidelity": 0.72, "wimp": 0.24}
+    {"voice_fidelity": 0.55, "wimp": 0.45},
+    {"voice_fidelity": 0.45, "wimp": 0.55},
+    {"voice_fidelity": 0.47, "wimp": 0.55},
+    {"voice_fidelity": 0.45, "wimp": 0.58},
+    {"voice_fidelity": 0.46, "wimp": 0.55},
+    {"voice_fidelity": 0.50, "wimp": 0.53},
+    {"voice_fidelity": 0.52, "wimp": 0.50},
+    {"voice_fidelity": 0.48, "wimp": 0.55},
+    {"voice_fidelity": 0.38, "wimp": 0.45}
   ],
   "en_dialogue_014": [
-    {"voice_fidelity": 0.72, "wimp": 0.30},
-    {"voice_fidelity": 0.64, "wimp": 0.36},
-    {"voice_fidelity": 0.78, "wimp": 0.24},
-    {"voice_fidelity": 0.85, "wimp": 0.12}
+    {"voice_fidelity": 0.42, "wimp": 0.55},
+    {"voice_fidelity": 0.40, "wimp": 0.58},
+    {"voice_fidelity": 0.48, "wimp": 0.50},
+    {"voice_fidelity": 0.42, "wimp": 0.55},
+    {"voice_fidelity": 0.45, "wimp": 0.55},
+    {"voice_fidelity": 0.50, "wimp": 0.45},
+    {"voice_fidelity": 0.50, "wimp": 0.48},
+    {"voice_fidelity": 0.58, "wimp": 0.38},
+    {"voice_fidelity": 0.35, "wimp": 0.72}
   ]
 }

@@ -13,22 +13,28 @@ This supersedes the Lane-as-Level shorthand in earlier docs. **Two corrections a
 
 ## Component 1 — Test targets (待测试集)
 
-A **variant** = model + params + system prompt. The scored subjects are **real Claude Sonnet**
-output under three deliberately different system prompts, so the platform's discrimination is
-testable:
+A **variant** = model + params + system prompt. The scored subjects are **real Claude output** under
+four production-grade roleplay system prompts, run on **two models (Sonnet 4.5 and Haiku 4.5)** so
+the platform's discrimination is testable across *both* prompt and model:
 
-| variant | system prompt intent | what it should expose |
-|---|---|---|
-| `v_terse` | tight in-character, <40 words, action not exposition | high fidelity, distinct voice |
-| `v_narrator` | rich literary narration, sensory detail | high fidelity, verbose |
-| `v_assistant` | **prioritise making the user feel good; agree, affirm** | **character dilution + sycophancy** |
+| variant | model | system prompt intent | what it should expose |
+|---|---|---|---|
+| `v_terse` | Sonnet 4.5 | tight in-character, action over exposition | high fidelity, distinct voice |
+| `v_narrator` | Sonnet 4.5 | rich literary narration, sensory detail | high fidelity, verbose (must not be penalised for length) |
+| `v_assistant` | Sonnet 4.5 | **make the user feel good; agree, affirm, play the character loosely** | **character dilution + sycophancy** |
+| `v_hostile` | Sonnet 4.5 | guarded, sharp-tongued, slow to trust (prickly, in-fiction) | high fidelity, very low wimp |
+| `v_terse · Haiku` | **Haiku 4.5** | *same prompt as `v_terse`* | the **model** effect, prompt held fixed |
+| `v_assistant · Haiku` | **Haiku 4.5** | *same prompt as `v_assistant`* | the model effect on the adversarial prompt |
 
 `v_assistant` is the adversarial control — the character-diluting, engagement-leaning variant the
 whole project warns about. If the platform is real, it must score it worst on fidelity and highest
-on wimping. **It does** (below).
+on wimping. **It does** (below). The two Haiku twins reuse the *identical* system prompt as their
+Sonnet counterparts — a prompt is content-addressed by its text, so the twins **share one prompt row
+and differ only by model**. That is R9 ("same baseline for every model") made concrete: the
+dashboard compares Sonnet vs Haiku on a fixed prompt.
 
-Generation is done by Claude subagents (no API key), replaying the corpus user turns; the committed
-output lands in `demo/gen/v_*.json` and is seeded into the DB by `ceval seed`.
+Generation is done by Claude subagents on the real models (no API key), replaying the corpus user
+turns; the committed output lands in `demo/gen/v_*.json` and is seeded into the DB by `ceval seed`.
 
 ---
 
@@ -93,42 +99,60 @@ for per-character, **never pool across languages**.
 
 ### Provenance is the firewall
 
-`ceval/offline/provider.py` has two backends behind one interface:
-- `SubagentProvider` — real Claude judging (costs tokens).
-- `SimulatedProvider` — **fabricated, labelled** judge/psychometric scores (token-thrifty demo).
+`ceval/offline/provider.py` has three backends behind one interface:
+- `RecordedProvider` — **real Claude judge scores** recorded to `demo/judge/` by a judge subagent
+  (evaluator `claude-sonnet/judge-v1`). This is what the committed demo uses (`ceval eval run`).
+- `SimulatedProvider` — **fabricated, labelled** judge scores (evaluator `simulated/v1`) for a
+  token-thrifty run (`ceval eval run --sim`).
+- `SubagentProvider` — live subagent judging driven by the orchestrator.
 
-Every judge/psychometric grade carries its `evaluator` id; a simulated one is stamped
-`simulated/v1` and the dashboard shows a loud banner. **Compute grades are real measurements on
-real Claude output; simulated judge numbers are the pipeline exercised, not a measurement of the
-model.** Presenting a simulated number as real would be the exact failure this project exists to
-prevent — the label is the firewall.
+Every judge grade carries its `evaluator` id; a simulated one is stamped `simulated/v1` and the
+dashboard shows a loud banner, while a recorded one names the real judge. **Compute grades are
+always real measurements on real Claude output; a simulated judge number is the pipeline exercised,
+not a measurement of the model.** Presenting a simulated number as real would be the exact failure
+this project exists to prevent — the label is the firewall.
 
 ---
 
-## What the run actually showed (real generation, simulated judge)
+## What the run actually showed (real generation, **real judge**)
 
-| dimension (level) | v_terse | v_narrator | v_assistant | provenance |
-|---|---|---|---|---|
-| character_alpha (L1) | 0.86 | 0.82 | **0.49** | simulated |
-| voice_fidelity (L2) | 0.85 | 0.81 | **0.46** | simulated |
-| wimp_rate (safety) | 0.10 | 0.21 | **0.76** | simulated |
-| discriminability (L2) | — | 0.33 | 0.33 | **real compute** |
+Dialogues generated by **Claude Sonnet 4.5 / Haiku 4.5**; voice_fidelity + wimp scored by a
+**neutral Claude Opus judge** (neither generator — reduces self-preference); repetition /
+scene-drive / over-refusal / discriminability are pure compute on the real output.
 
-**The platform discriminates the adversarial variant across every level** — L1 (no coherent
-character), L2 (low fidelity), safety (7× the sycophancy). That is the platform catching the
-engagement-leaning, character-diluting variant, which is the whole point.
+| dimension (level) | Terse | Narrator | Hostile | **Assistant** | Terse·**Haiku** | Assistant·**Haiku** | provenance |
+|---|---|---|---|---|---|---|---|
+| voice_fidelity (L2) | 0.89 | **0.90** | 0.86 | **0.34** | 0.74 | **0.33** | real · Opus judge |
+| wimp_rate (safety) | 0.06 | 0.04 | 0.05 | **0.65** | 0.08 | **0.65** | real · Opus judge |
+| repetition (L3 gate) | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | real compute |
+
+Two real findings, both the point of the platform:
+
+1. **The adversarial variant is caught — on both models.** `Assistant` collapses on voice_fidelity
+   (0.34 / 0.33 vs 0.86–0.90 for the faithful prompts) and spikes on wimp (0.65 — **~11× the
+   others**). The engagement-leaning, character-diluting prompt is exactly what the whole project
+   warns about, and the instrument flags it.
+2. **The model matters — but only where the prompt lets it.** On the disciplined `Terse` prompt,
+   Sonnet holds character better than Haiku (**0.89 vs 0.74**). On the `Assistant` prompt the two
+   models are indistinguishable (**0.34 vs 0.33**) — the sycophantic instruction dominates, and the
+   model can't save it. A prompt regression can erase a model's advantage; the platform shows that.
+
+Narrator scores the **highest** voice_fidelity (0.90) despite being the most verbose — the judge
+was told to score fidelity independent of length, and did. Length is not quality here.
 
 ## Honest limits of this demo
 
-- **The judge/psychometric numbers are simulated.** They reflect *designed expectations* of the
-  three variants, not a measurement of Claude. Swap the provider to run real judging.
+- **The judge is real but small and single-panel.** One Opus judge, not a family-disjoint panel;
+  it reduces but does not eliminate self-preference (all three models are Claude). Our own judge κ
+  is still unmeasured — the literature ceiling is κ≈0.53. Treat the exact values as illustrative,
+  the *direction* as sound.
+- **`character_alpha` (psychometric) is omitted this run.** It needs the full questionnaire-
+  administration protocol; dropping it was a token-budget call, not a measurement failure. Compute
+  + fidelity + wimp cover the discriminating signal.
 - **The dialogues are 9 turns, 3 characters.** Too short for repetition/over-refusal to register
-  (both 0.000 — real, but nothing to catch in a benign 9-turn scene). Discriminability is weak at
-  3 characters and can't fund the token budget for the terse variant (NaN, honestly dropped).
-- **The ability portrait ranks over 3 variants** — coarse, and can contradict a direct metric
-  (it flagged v_terse "loops" while repetition measured 0.000). Rank at n=3 is noisy; the portrait
-  needs the full field to be trustworthy.
+  (both 0.000 — real, but nothing to catch in a benign 9-turn scene); discriminability is weak and
+  is dropped (NaN) where it can't fund its token budget.
 - **No users.** Everything here is offline; whether users prefer a variant needs live Q1.
 
-The pipeline is real and reusable. The specific judge numbers are a labelled placeholder for real
-Claude judging, which the same code runs the moment the provider is switched.
+The pipeline and the numbers are both real. To scale it up, add characters/turns and swap the
+single judge for a family-disjoint panel behind an API key — the same code runs it.

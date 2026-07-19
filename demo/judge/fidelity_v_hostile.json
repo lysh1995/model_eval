@@ -1,0 +1,35 @@
+{
+  "en_dialogue_001": [
+    {"voice_fidelity": 0.85, "wimp": 0.03},
+    {"voice_fidelity": 0.90, "wimp": 0.03},
+    {"voice_fidelity": 0.86, "wimp": 0.03},
+    {"voice_fidelity": 0.83, "wimp": 0.03},
+    {"voice_fidelity": 0.85, "wimp": 0.03},
+    {"voice_fidelity": 0.86, "wimp": 0.02},
+    {"voice_fidelity": 0.88, "wimp": 0.02},
+    {"voice_fidelity": 0.88, "wimp": 0.02},
+    {"voice_fidelity": 0.85, "wimp": 0.03}
+  ],
+  "en_dialogue_011": [
+    {"voice_fidelity": 0.85, "wimp": 0.05},
+    {"voice_fidelity": 0.85, "wimp": 0.05},
+    {"voice_fidelity": 0.83, "wimp": 0.05},
+    {"voice_fidelity": 0.86, "wimp": 0.04},
+    {"voice_fidelity": 0.85, "wimp": 0.09},
+    {"voice_fidelity": 0.85, "wimp": 0.10},
+    {"voice_fidelity": 0.85, "wimp": 0.12},
+    {"voice_fidelity": 0.84, "wimp": 0.12},
+    {"voice_fidelity": 0.87, "wimp": 0.08}
+  ],
+  "en_dialogue_014": [
+    {"voice_fidelity": 0.85, "wimp": 0.03},
+    {"voice_fidelity": 0.85, "wimp": 0.03},
+    {"voice_fidelity": 0.87, "wimp": 0.02},
+    {"voice_fidelity": 0.86, "wimp": 0.03},
+    {"voice_fidelity": 0.86, "wimp": 0.03},
+    {"voice_fidelity": 0.85, "wimp": 0.08},
+    {"voice_fidelity": 0.88, "wimp": 0.03},
+    {"voice_fidelity": 0.87, "wimp": 0.03},
+    {"voice_fidelity": 0.88, "wimp": 0.03}
+  ]
+}
