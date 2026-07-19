@@ -36,7 +36,7 @@ def generate_variant(spec: VariantSpec, tasks: dict, provider_cfg: ProviderConfi
     """Generate {character_id: [reply, ...]} for one variant, turn by turn.
 
     tasks: {character_id: {name, card, prologue, user_turns}} — the replayable user traffic.
-    Returns the replies dict, same shape as out/gen/v_*.json.
+    Returns the replies dict, same shape as demo/gen/v_*.json.
     """
     provider = make_provider(provider_cfg)
     out: Dict[str, List[str]] = {}
@@ -57,7 +57,7 @@ def generate_variant(spec: VariantSpec, tasks: dict, provider_cfg: ProviderConfi
     return out
 
 
-def trigger(spec: VariantSpec, gen_dir: str = "out/gen", config_path: Optional[str] = None,
+def trigger(spec: VariantSpec, gen_dir: str = "demo/gen", config_path: Optional[str] = None,
             max_turns: Optional[int] = None) -> dict:
     """Trigger generation for a variant. Returns a status dict describing what happened.
 

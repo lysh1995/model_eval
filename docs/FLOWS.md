@@ -4,8 +4,7 @@ How the platform actually works, end to end. Every flow here is constrained by a
 — the design is downstream of [PROJECT.md §4](../PROJECT.md#4-what-we-measured-ourselves-not-borrowed),
 not of taste.
 
-> **Provisional:** the online event schema (Flow 3) is pending the lifecycle research stream
-> (OpenTelemetry GenAI semantic conventions). Field names below are indicative.
+> **Note:** the online event schema (Flow 3) follows the OpenTelemetry GenAI semantic conventions and is implemented in `ceval/online/events.py` — the field names below are concrete.
 
 ---
 
@@ -28,11 +27,12 @@ flowchart LR
 ```
 
 The loop closes at **H**: production teaches the benchmark what it was missing. Without that arm,
-the benchmark decays into a fixed exam that no longer represents traffic.
+the benchmark decays into a fixed exam that no longer represents traffic. This abstract loop is
+instantiated by the service CLI (`ceval variant add → data → eval run → dashboard`).
 
 ### ⚠️ Shadow is not a quality gate — it cannot be
 
-**Corrected 2026-07-16** ([14](../research/notes/14-eval-lifecycle-system.md)). The obvious design —
+**Corrected** ([14](../research/notes/14-eval-lifecycle-system.md)). The obvious design —
 mirror production traffic to the candidate and compare — **does not work for multi-turn roleplay.**
 The candidate's turn-2 reply is conditioned on the **incumbent's** turn-1. By turn 3 you are
 scoring a conversation the candidate would never have produced. This is the FED result

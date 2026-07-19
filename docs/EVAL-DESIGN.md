@@ -4,7 +4,7 @@
 survives; sufficiency claim and item 9 do not). Consolidates notes 00–22 and five adversarial
 cross-checks.
 
-**Status: decided.** Open items are listed as decisions-with-rationale, not questions.
+**Status: decided; built.** Open items are listed as decisions-with-rationale, not questions.
 
 ---
 
@@ -154,7 +154,7 @@ the product value; the score is just how we get there.
 **Note the pattern:** almost everything in 4.3 is a **method** error, not a **construct** error. The
 constructs mostly survive — we just measure them a different way.
 
-## 4.4 The old cut list, for the record
+## 4.4 The old cut list, for the record (historical, not current)
 
 **From 50 named to 14** — *this was the earlier framing and it was wrong.* It optimized for
 defensibility against a hypothetical challenger rather than usefulness to the team actually building
@@ -306,5 +306,5 @@ it before you ship it," but "never let a number out without the check that could
 | 1 | Emotional attunement? | **Cut as a gate, keep as diagnostic.** No mitigation exists for the bias, and it sits on our core traffic |
 | 2 | Underpowered benchmark? | **Add runs, not characters.** Generation is ~100× cheaper than judging, and **σ_within is 61.5% of en variance** — runs attack the dominant term. Characters attack a **1.6%** term |
 | 3 | Qualitative veto? | **Yes — mandatory.** Non-negotiable (AC10) |
-| 4 | Legal review? | **This week.** EU Art 50 in **17 days**; the Chinese statute is corroborated by two independent streams but **needs counsel on the gazette** |
-| 5 | API key? | **Blocking Tier B entirely.** B5 (steerability) first — **if DEAD, the variant lifecycle is a ritual and this platform's premise fails** |
+| 4 | Legal review? | **This week.** EU AI Act Art. 50 (in force 2026-08-02); the Chinese statute is corroborated by two independent streams but **needs counsel on the gazette** |
+| 5 | API key? | **Gates the Tier B judge validation** — harness built; only the judge runs await the key. B5 (steerability) first — **if DEAD, the variant lifecycle is a ritual and this platform's premise fails** |

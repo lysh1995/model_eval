@@ -1,24 +1,29 @@
-"""ceval — the evaluation service CLI. DB-backed, end to end, local.
+"""ceval — the companion variant evaluation platform. One entrance, DB-backed, local.
 
-Storage as a service (MySQL designed, SQLite runnable). Inject models, prompts, and data;
-trigger offline + online eval; render the dashboard. Everything has an id and persists.
+`python3 -m ceval` is the whole service. Inject models, prompts, and data (each gets an id and
+persists); trigger offline + online eval; render the dashboard, or serve it live. `probe` reaches
+the measurement-science reproductions that justify the design.
 
+  THE SERVICE ─────────────────────────────────────────────────────────────────────────────────
   ceval init                                   create the DB schema
-  ceval seed                                   migrate existing files -> DB
-  ceval schema                                 print the MySQL DDL
+  ceval seed                                   migrate bundled demo data -> DB
+  ceval schema [--mysql]                        print the DDL (MySQL designed, SQLite runnable)
 
-  ceval model add   --name --provider          register a model            -> model_id
-  ceval model list
-  ceval prompt add  --name --prompt --intent   register a system prompt     -> prompt_id
-  ceval prompt list
-  ceval variant add --model-id --prompt-id     bind model+prompt -> variant -> variant_id
-  ceval variant list
+  ceval model  add  --name --provider           register a model            -> model_id
+  ceval prompt add  --name --prompt --intent     register a system prompt    -> prompt_id
+  ceval variant add --model-id --prompt-id       bind model+prompt -> variant -> variant_id
+  ceval model list | prompt list | variant list
 
-  ceval data add    --variant --character --turns-file   inject a dialogue (offline data point)
-  ceval data gen    --variant                            generate dialogues (needs key / subagent)
+  ceval data add   --variant --character --turns-file   inject a dialogue (offline data point)
+  ceval data gen   --variant                            generate dialogues (needs key / subagent)
 
-  ceval eval run    [--offline] [--online]     score from DB, persist grades + evidence
-  ceval dashboard   [--out]                    render from DB (original design; static + interactive)
+  ceval eval run   [--offline] [--online] [--sim]  score from DB, persist grades + evidence
+  ceval dashboard  [--out] [--serve]               render from DB (static + interactive)
+  ceval serve      [--port 8787]                   serve the dashboard live (renders per request)
+
+  THE EVIDENCE ────────────────────────────────────────────────────────────────────────────────
+  ceval probe status | run | compare | drill | pool   measurement-science reproductions,
+                                                      judge-free, on the raw MiniMax corpus
 
   --db sqlite:///out/ceval.db (default) | mysql://user:pass@host/db
 """
@@ -136,9 +141,9 @@ def cmd_eval(a):
     s.clear_grades(run.variant_ids)
 
     if do_off:
-        prov = make_provider("simulated") if a.sim else make_provider("recorded", judge_dir="out/judge")
+        prov = make_provider("simulated") if a.sim else make_provider("recorded", judge_dir=a.judge_dir)
         gb = run_offline(run, prov, now)
-        ev = extract_evidence(a.gen_dir, "out/judge")
+        ev = extract_evidence(a.gen_dir, a.judge_dir)
         persist_gradebook(s, gb, "offline", evidence=ev)
         print(f"offline: {len(gb.grades)} grades persisted (provider={prov.kind})")
     if do_on:
@@ -162,10 +167,17 @@ def cmd_dashboard(a):
     return 0
 
 
+def cmd_probe(a):
+    """Delegate to the measurement-science CLI (raw corpus, judge-free) — one entrance for both."""
+    from .cli import main as cli_main
+    return cli_main(a.probe_args) or 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="ceval", description="companion evaluation service")
     ap.add_argument("--db", default="sqlite:///out/ceval.db")
-    ap.add_argument("--gen-dir", default="out/gen")
+    ap.add_argument("--gen-dir", default="demo/gen")
+    ap.add_argument("--judge-dir", default="demo/judge")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("init").set_defaults(fn=cmd_init)
@@ -211,6 +223,11 @@ def main(argv=None):
     sv = sub.add_parser("serve", help="run the dashboard as a live local HTTP service")
     sv.add_argument("--port", type=int, default=8787)
     sv.set_defaults(fn=lambda a: (__import__("ceval.serve", fromlist=["serve"]).serve(a.db, a.port), 0)[1])
+
+    pr = sub.add_parser("probe", help="measurement-science reproductions (noise floor, pooling refusal, ...)")
+    pr.add_argument("probe_args", nargs=argparse.REMAINDER,
+                    help="status | run | compare A B | drill MODEL | pool  [--lang en|zh]")
+    pr.set_defaults(fn=cmd_probe)
 
     a = ap.parse_args(argv)
     return a.fn(a)

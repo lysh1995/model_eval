@@ -70,7 +70,7 @@ class EvalService:
                          provider_kind: str = "recorded") -> tuple:
         """Score generated variant dialogues on the offline scheme. Returns (gradebook, run)."""
         offline = load_run(gen_dir, tasks_path, self.language)
-        prov = make_provider(provider_kind, judge_dir="out/judge") \
+        prov = make_provider(provider_kind, judge_dir="demo/judge") \
             if provider_kind == "recorded" else make_provider(provider_kind)
         gb = run_offline(offline, prov, created_iso)
         return gb, offline

@@ -41,7 +41,7 @@ def _rep_rate(text: str) -> float:
     return dup / len(grams)
 
 
-def extract(gen_dir: str = "out/gen", judge_dir: str = "out/judge") -> Dict[str, Dict[str, dict]]:
+def extract(gen_dir: str = "demo/gen", judge_dir: str = "demo/judge") -> Dict[str, Dict[str, dict]]:
     """Returns evidence[variant][dimension] = {"good": {...}, "bad": {...}} or {"note": ...}."""
     gen = {f.stem: json.loads(f.read_text())
            for f in pathlib.Path(gen_dir).glob("v_*.json")}

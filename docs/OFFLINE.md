@@ -1,6 +1,8 @@
 # Offline testing — the three components
 
-Delivered and runnable, no API key: `python3 scripts/build_offline.py → out/offline_dashboard.html`.
+Delivered and runnable, no API key — the offline half of the DB-backed service:
+`python3 -m ceval init && ceval seed && ceval eval run --offline --sim && ceval dashboard`
+(or `ceval serve` for the live view).
 
 This supersedes the Lane-as-Level shorthand in earlier docs. **Two corrections are baked in:**
 1. **Lane ≠ Level.** The judge is a *mechanism* that spans L1, L2, L3 — not "the L3 lane".
@@ -25,8 +27,8 @@ testable:
 whole project warns about. If the platform is real, it must score it worst on fidelity and highest
 on wimping. **It does** (below).
 
-Generation is done by Claude subagents (no API key), replaying the corpus user turns; output lands
-in `out/gen/v_*.json`.
+Generation is done by Claude subagents (no API key), replaying the corpus user turns; the committed
+output lands in `demo/gen/v_*.json` and is seeded into the DB by `ceval seed`.
 
 ---
 

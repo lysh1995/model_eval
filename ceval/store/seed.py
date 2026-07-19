@@ -1,7 +1,7 @@
 """Migrate the existing file-based data into the DB (one-time), so the service is DB-backed.
 
-Populates: models, prompts, variants, characters, dialogues, sessions — from out/gen/*.json,
-out/gen/tasks.json, and the variant manifest. Idempotent (content-addressed upserts).
+Populates: models, prompts, variants, characters, dialogues, sessions — from demo/gen/*.json,
+demo/gen/tasks.json, and the variant manifest. Idempotent (content-addressed upserts).
 """
 from __future__ import annotations
 import json, pathlib
@@ -10,7 +10,7 @@ from ..offline.variants import as_dict as variants_manifest
 from ..offline.runner import reconstruct
 
 
-def seed(store: Store, gen_dir: str = "out/gen", language: str = "en") -> dict:
+def seed(store: Store, gen_dir: str = "demo/gen", language: str = "en") -> dict:
     gp = pathlib.Path(gen_dir)
     tasks = json.loads((gp / "tasks.json").read_text()) if (gp / "tasks.json").exists() else {}
     manifest = variants_manifest(gen_dir)

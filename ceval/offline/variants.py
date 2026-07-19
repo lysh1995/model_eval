@@ -46,7 +46,7 @@ def _seed_dict() -> dict:
                    "intent": v.intent} for v in MANIFEST.values()}
 
 
-def as_dict(gen_dir: str = "out/gen") -> dict:
+def as_dict(gen_dir: str = "demo/gen") -> dict:
     """The live manifest: the persisted variants.json (which `ceval add` extends), falling
     back to the hardcoded seed. So a newly-triggered prompt/model appears automatically."""
     import json, pathlib

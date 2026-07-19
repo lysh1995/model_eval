@@ -143,15 +143,15 @@ class RecordedProvider:
     """Serves REAL Claude judge/psychometric results recorded by subagents to disk.
 
     The subagents (run by the orchestrator, no API key) wrote:
-      out/judge/fidelity_<vid>.json = {character: [{voice_fidelity, wimp}, ...]}
-      out/judge/psych_<vid>.json    = {character: [{item: 1-5}, ... administrations ...]}
+      demo/judge/fidelity_<vid>.json = {character: [{voice_fidelity, wimp}, ...]}
+      demo/judge/psych_<vid>.json    = {character: [{item: 1-5}, ... administrations ...]}
     This provider reads them and serves the runner's batch interface. These ARE measurements
     of real Claude output -- evaluator_id names the real judge.
     """
     kind = "recorded"
     evaluator_id = "claude-sonnet/judge-v1"
 
-    def __init__(self, judge_dir: str = "out/judge"):
+    def __init__(self, judge_dir: str = "demo/judge"):
         import json, pathlib
         self.dir = pathlib.Path(judge_dir)
         self._fid, self._psych = {}, {}

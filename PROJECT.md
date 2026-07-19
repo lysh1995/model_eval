@@ -1,7 +1,11 @@
 # Companion Variant Evaluation Platform
 
-**Status:** Research complete (11 streams, 271 sources, 15 notes). Design in review. Implementation not started — **35 of 36 named benchmarks cannot yet pass our own noise-floor gate** ([BENCHMARKS.md](docs/BENCHMARKS.md)).
-**Last updated:** 2026-07-16
+**Status:** Research complete (16 streams, 475 sources, 26 notes). Design decided. **Platform built
+and running as a local end-to-end service** — DB-backed CLI (`python3 -m ceval`), offline + online
+eval, live dashboard; ~6,800 LOC, zero dependencies, no API key. **10 of 13 requirements fully met**
+([HONEST-REVIEW.md](docs/HONEST-REVIEW.md)); by design the gate list is short — repetition is the
+one validated gate, everything else guides a human ([BENCHMARKS.md](docs/BENCHMARKS.md)).
+**Last updated:** 2026-07-18
 
 ---
 
@@ -142,27 +146,28 @@ These are the load-bearing local findings. All judge-free, all reproducible from
 ## 5. Plan
 
 ### Phase 0 — Research ✅ complete
-11 streams, 271 raw sources, 15 synthesis notes. All streams complete. See [RESEARCH-PLAN.md](docs/RESEARCH-PLAN.md)
-for status, gaps, and what still needs investigation.
+16 streams (11 primary + 5 adversarial cross-checks), 475 raw sources, 26 synthesis notes. See
+[RESEARCH-PLAN.md](docs/RESEARCH-PLAN.md) for gaps and what still needs investigation.
 
-### Phase 1 — Design (in review)
-- **[ABILITY-MODEL.md](docs/ABILITY-MODEL.md): what "good" decomposes into — L1 comprehension →
-  L2 application & steerability → L3 creativity. The positive construct. **Awaiting review.**
+### Phase 1 — Design ✅ decided
+- [ABILITY-MODEL.md](docs/ABILITY-MODEL.md): what "good" decomposes into — L1 comprehension →
+  L2 application & steerability → L3 creativity. The positive construct.
+- [EVAL-DESIGN.md](docs/EVAL-DESIGN.md): the decided measurement design (supersedes note 11).
 - [BENCHMARKS.md](docs/BENCHMARKS.md): the catalogue, and §0.5 on what it does not measure.
-- [11 — evaluation method](research/notes/11-evaluation-method-design.md): which fields, how to
-  grade, how to normalize. **Awaiting review.**
 - [FLOWS.md](docs/FLOWS.md): system flows end to end.
-- Open decisions in §7 must be closed before build.
 
-### Phase 2 — Offline engine
-Lane 0–2 (judge-free) first, because they're validated and free. Then Lane 3 (judge) — **blocked
-on API key**. Every dimension gated on declaring its own noise floor.
+### Phase 2 — Offline engine ✅ built
+Lanes 0–2 (judge-free) run on real data. Lane 3 (judge) is wired behind a provider interface with a
+labelled simulated backend; **live judge validation is blocked on an API key**. Every dimension
+gated on declaring its own noise floor. Code: `ceval/offline/`, `ceval/metrics/`, `ceval/safety/`.
 
-### Phase 3 — Online half
-Collection contract, sampling, drift detection, cost model at 50M/day, load test.
+### Phase 3 — Online half ✅ built (simulated traffic)
+Collection contract, sampling, drift detection, cost model at 50M/day, load test — all built and
+measured. Sessions are still **simulated** (no product behind it). Code: `ceval/online/`, `ceval/scale/`.
 
-### Phase 4 — Drill-down + decision surface
-Hierarchical model, shrunk slices, ship-gate report.
+### Phase 4 — Drill-down + decision surface ✅ built
+Hierarchical model, shrunk slices, ship-gate report, and the DB-backed dashboard (static ·
+interactive · live `serve`). Code: `ceval/stats.py`, `ceval/store/`, `ceval/dashboard/`, `ceval/serve.py`.
 
 ---
 

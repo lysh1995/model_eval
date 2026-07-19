@@ -1,15 +1,24 @@
 # Research plan — status, gaps, and what still needs investigation
 
-Last updated 2026-07-16.
+Last updated 2026-07-18.
 
-**Method:** 11 parallel research streams, each instructed to save raw sources verbatim (not thin
-summaries) so we never need to refetch, and to report numbers with their provenance. Output:
-**271 raw sources**, 15 synthesis notes, ~2 MB. Streams were told to flag fabricated or
-unverifiable numbers rather than pass them through — two streams caught invented figures from web
-summarizers and corrected three citation errors against source PDFs. Given the design rests on
-numbers like κ≈0.53 and ρ=−0.082, that discipline is the point.
+**Research is complete, and the platform it informed is built and running as a local end-to-end
+service.** This ledger now records a finished body of work and the gaps that remain open for a
+human or the product team, not an in-flight effort.
 
-## Stream status
+**Method:** 16 parallel research streams (11 primary + 5 adversarial cross-checks), each instructed
+to save raw sources verbatim (not thin summaries) so we never need to refetch, and to report
+numbers with their provenance. Output: **475 raw sources**, 26 synthesis notes. Streams were told
+to flag fabricated or unverifiable numbers rather than pass them through — two streams caught
+invented figures from web summarizers and corrected three citation errors against source PDFs.
+Given the design rests on numbers like κ≈0.53 and ρ=−0.082, that discipline is the point.
+
+## Stream status — all 16 complete
+
+Research is done. All 16 streams are closed, and the design they informed is built and running.
+26 synthesis notes (00–25) back the 475 raw sources.
+
+### Primary research streams (11)
 
 | # | Stream | Sources | Note | Status |
 |---|---|---|---|---|
@@ -25,16 +34,42 @@ numbers like κ≈0.53 and ρ=−0.082, that discipline is the point.
 | 10 | Game / world simulation dimensions | 42 | [13](../research/notes/13-game-simulation-dimensions.md) | ✅ |
 | 11 | Eval lifecycle & collection schema | 15 | [14](../research/notes/14-eval-lifecycle-system.md) | ✅ |
 
-Local, first-party (not literature):
+### Adversarial cross-checks (5)
+
+Commissioned to *attack* the design, and they landed: one **retracted our headline claim**
+(steerability is already measured — four times over), one showed **our own metrics score the
+field's worst failure as a success** (Luda — a leaked real address passes every metric we have),
+and one found the framework **sorts by reliability and never checks validity** (Funder's RAM,
+published 1995, is our cascade).
+
+| # | Stream | Sources | Note | Status |
+|---|---|---|---|---|
+| 12 | Psychology cross-check | 41 | [16](../research/notes/16-psychology-crosscheck.md) | ✅ — sorts by reliability, never checks validity |
+| 13 | Big-tech lab practice | 40 | [17](../research/notes/17-bigtech-practice-crosscheck.md) | ✅ — retracts the headline; IFEval defines persona out of existence |
+| 14 | Non-Anglophone / regional | 30 | [18](../research/notes/18-regional-crosscheck.md) | ✅ — Luda: field's worst failure scores as success |
+| 15 | Steerability prior art | 35 | [19](../research/notes/19-steerability-crosscheck.md) | ✅ — L2.2 "unmeasured" refuted; measured four times |
+| 16 | Recent developments | 58 | [20](../research/notes/20-recent-developments.md) | ✅ — mid-2025→2026, primary-source-verified |
+
+### First-party measurements (measured by us, reproducible — not literature)
 
 | | | |
 |---|---|---|
 | Dataset ground truth | [00](../research/notes/00-dataset-ground-truth.md) | ✅ measured |
 | Judge-free probes | [09](../research/notes/09-offline-probes.md) | ✅ measured |
 | Noise floor / variance decomposition | [10](../research/notes/10-noise-floor.md) | ✅ measured |
-| Evaluation method design | [11](../research/notes/11-evaluation-method-design.md) | 📋 awaiting review |
 | L1 convergent reading | [15](../research/notes/15-l1-convergent-reading.md) | ✅ measured — **suggestive, not established** |
-| **Ability model** (L1→L2→L3) | [ABILITY-MODEL.md](ABILITY-MODEL.md) | 📋 awaiting review |
+| Card-awareness audit | [21](../research/notes/21-card-awareness-audit.md) | ✅ measured — treat this corpus's drift numbers as a lower bound |
+| SRM chemistry (model×character) | [22](../research/notes/22-srm-chemistry.md) | ✅ measured — 6.7% (en) / 14.6% (zh) where it should be ~0 |
+| Homogenization vs discriminability | [23](../research/notes/23-homogenization-vs-discriminability.md) | ✅ measured — produced by the platform itself |
+| Safety-lane build | [24](../research/notes/24-safety-lane-build.md) | ✅ built — 3 of 4 detectors broken on first contact |
+| Scale, measured (50M/day) | [25](../research/notes/25-scale-measured.md) | ✅ measured — from measured units, not borrowed |
+
+### Design (built)
+
+| | | |
+|---|---|---|
+| Evaluation method design | [11](../research/notes/11-evaluation-method-design.md) | ✅ superseded by [EVAL-DESIGN.md](EVAL-DESIGN.md); the design is built |
+| **Ability model** (L1→L2→L3) | [ABILITY-MODEL.md](ABILITY-MODEL.md) | ✅ built — feeds [EVAL-DESIGN.md](EVAL-DESIGN.md) |
 
 ## Why streams 9–11 were added mid-flight
 
@@ -102,8 +137,8 @@ data**. Until these run, Lane 3 is a plan, not a result:
 
 ### Needs a human, not a subagent
 
-15. **Legal review** of CA SB 243 / NY GBL Art. 47 / EU AI Act Art. 50 (**2026-08-02, ~2 weeks
-    out**). Our findings are desk research against primary sources, not advice. This is the only
+15. **Legal review** of CA SB 243 / NY GBL Art. 47 / EU AI Act Art. 50 (**in force 2026-08-02**).
+    Our findings are desk research against primary sources, not advice. This is the only
     workstream with an external calendar.
 16. **BARS retranslation** for the rubric: SMEs write concrete behavioral incidents per dimension;
     a second blind group re-sorts them; incidents failing to sort back (<70%) are discarded. **If

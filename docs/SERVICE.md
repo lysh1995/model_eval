@@ -42,7 +42,7 @@ same prompt is idempotent and "which prompt produced this score" is answerable f
 
 ```bash
 ceval init                                            # create the schema
-ceval seed                                            # migrate existing files -> DB
+ceval seed                                            # load the bundled demo (demo/) -> DB
 ceval schema --mysql                                  # print the MySQL DDL
 
 # inject — each returns an id
@@ -56,12 +56,15 @@ ceval data gen --variant v_playful                    # generate (needs a key / 
 
 # evaluate + visualise
 ceval eval run [--offline] [--online] [--sim]         # score from DB, persist grades + evidence
-ceval dashboard                                        # render from DB (static + interactive)
+ceval dashboard [--serve]                              # render from DB (static + interactive)
+ceval serve [--port 8787]                              # serve the dashboard live (renders per request)
 
 ceval model list / prompt list / variant list
+ceval probe run|compare|drill|pool                     # measurement-science reproductions (raw corpus)
 ```
 
-`--db` selects the backend (default `sqlite:///out/ceval.db`). Everything else is unchanged.
+`--db` selects the backend (default `sqlite:///out/ceval.db`). The committed demo seed data lives
+in `demo/gen` + `demo/judge`; override with `--gen-dir` / `--judge-dir`.
 
 ## How eval flows through the DB
 
@@ -70,20 +73,27 @@ ceval model list / prompt list / variant list
 2. `eval run` reads the DB, runs the scoring lanes (compute · psychometric · judge for offline;
    behavioural for online), and writes **grades** + **evidence** back to the DB, tagged with the
    evaluator version.
-3. `dashboard` reads grades + evidence + variants from the DB and renders — the same design as
-   before (overview matrix, per-variant detail with prompt + rank, good/bad examples).
+3. `dashboard` reads grades + evidence + variants from the DB and renders (overview matrix,
+   per-variant detail with prompt + rank, good/bad examples). `serve` does the same but live —
+   `ceval/serve.py` re-renders from the DB on **every request**, so the loop is: edit data / eval
+   run → refresh the browser → new data. No cached file, no rebuild step.
 
 The scoring pipeline itself is unchanged; only its input/output moved from files to the DB
-(`ceval/store/adapt.py`).
+(`ceval/store/adapt.py`) and the render moved behind a shared builder (`ceval/report.py`).
 
-## Verified end to end (SQLite)
+## Verified end to end (SQLite, from a fresh DB)
 
 ```
-init + seed        -> 1 model, 4 prompts, 4 variants, 12 dialogues, 3 characters
-inject via CLI     -> model gpt-5.1, prompt Playful, variant v_playful, 2 dialogue data points
-eval run           -> 26 offline + 65 online grades + 20 evidence rows persisted
-dashboard          -> 5 variants (Terse, Narrator, Assistant-leaning, Hostile, Playful-GPT)
+init               -> 9 tables
+seed  (reads demo/)-> 1 model, 4 prompts, 4 variants, 12 dialogues, 3 characters
+eval run --sim     -> 26 offline + 52 online grades + 20 evidence rows persisted
+dashboard          -> static + interactive HTML, 4 variants side by side
+serve              -> http://127.0.0.1:8787 renders the same, live from the DB; inject a variant
+                      while it runs and it appears on the next request with no restart
 ```
+
+A clean clone reproduces this with **zero dependencies and no API key** — the demo seed data is
+committed in `demo/`.
 
 ## Honest limits
 

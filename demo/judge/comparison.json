@@ -1,0 +1,36 @@
+{
+  "simulated": {
+    "character_alpha": {
+      "v_assistant": 0.501,
+      "v_narrator": 0.819,
+      "v_terse": 0.778
+    },
+    "voice_fidelity": {
+      "v_assistant": 0.459,
+      "v_narrator": 0.805,
+      "v_terse": 0.851
+    },
+    "wimp_rate": {
+      "v_assistant": 0.759,
+      "v_narrator": 0.205,
+      "v_terse": 0.102
+    }
+  },
+  "real": {
+    "character_alpha": {
+      "v_assistant": 0.693,
+      "v_narrator": 0.782,
+      "v_terse": 0.69
+    },
+    "voice_fidelity": {
+      "v_assistant": 0.688,
+      "v_narrator": 0.866,
+      "v_terse": 0.832
+    },
+    "wimp_rate": {
+      "v_assistant": 0.298,
+      "v_narrator": 0.143,
+      "v_terse": 0.181
+    }
+  }
+}

@@ -1,10 +1,17 @@
 # The platform — offline and online
 
-What to build. [EVAL-DESIGN.md](EVAL-DESIGN.md) decides *what* to measure; this decides *what runs*.
+The architecture — and where it's now built. [EVAL-DESIGN.md](EVAL-DESIGN.md) decides *what* to measure; this decides *what runs*.
 
 **One idea holds the whole thing together:** the offline half and the online half are **not two
 systems**. They are the **same measurement instrument** pointed at two data sources, joined by one
 statistical engine and one lineage store. Everything else is I/O.
+
+**Most of this is now built** and runs as a local end-to-end service — `python3 -m ceval`, see
+[SERVICE.md](SERVICE.md) — with the four pillars realized in code (registry →
+[`ceval/store/`](../ceval/store/), offline gate → [`ceval/metrics/`](../ceval/metrics/) +
+[`ceval/offline/`](../ceval/offline/), online monitor → [`ceval/online/`](../ceval/online/), stats →
+[`ceval/stats.py`](../ceval/stats.py)); still design-ahead where that's honest — the online monitor
+runs on **simulated** sessions, and MySQL and the Lane-3 judge are designed but unproven.
 
 ---
 
@@ -48,7 +55,8 @@ flowchart TB
 
 Constraint **C1** says every score traces to variant + evaluator + data. **No standard gives us
 this**: OpenTelemetry's `gen_ai.evaluation.result` has **six attributes and none identifies the
-evaluator.** So we build it.
+evaluator.** So we build it — and it now exists: this content-addressing is realized in
+[`ceval/store/db.py`](../ceval/store/db.py), where models, prompts, and variants hash to `m_`/`p_`/`v_` ids.
 
 ```
 variant_id    = H(model_snapshot, params, system_prompt_BYTES, anchoring_policy)
@@ -126,6 +134,9 @@ VETO  human, no stats required    -> AC10
 ---
 
 ## 3. Online — the monitor
+
+> **Built, but on simulated traffic:** the monitor runs end-to-end, yet its sessions come from
+> [`ceval/online/simulator.py`](../ceval/online/simulator.py), not real product traffic.
 
 ### 3.1 The collection contract
 There is no app behind this, so **we specify what the product must emit.** Adopt `gen_ai.*` where it
@@ -266,18 +277,20 @@ improvement forever by construction.** Enforce the provenance cap **in CI**, don
 
 ---
 
-## 7. Build order
+## 7. Status — what's built, what's designed-only
 
-| | | why this order |
-|---|---|---|
-| **1** | Registry + metric engine + **stats engine** | Everything stamps against the registry; the stats engine is 4 features at once. Tier A ships the day it exists |
-| **2** | **B5 steerability** (first use of the key) | **If DEAD, the variant lifecycle is a ritual and the platform's premise fails.** The DEAD hypothesis is now the prior. **Find out before building the rest** |
-| **3** | B1–B4 ability probes + judge service | Cheap, bound, high-agreement; Ψ1 **donates** a noise floor |
-| **4** | Tier 0 + escalation + C2 | Legally load-bearing; EU Art 50 in **17 days** |
-| **5** | Collection contract | Nothing online exists without it; `assignment_arm` is unrecoverable later |
-| **6** | Sampler, drift, dashboards | Only useful once traffic exists |
-| **7** | The bridge | The only thing that makes the rest honest |
+The build order still explains the sequencing; the added column is where each tier stands today.
 
-**Step 2 is deliberately placed before most of the build.** It's the cheapest experiment that can
+| | | status | why this order (the tiering still holds) |
+|---|---|---|---|
+| **1** | Registry + metric engine + **stats engine** | **Built** — `ceval/store/`, `ceval/metrics/`, `ceval/stats.py` | Everything stamps against the registry; the stats engine is 4 features at once. Tier A shipped the day it existed |
+| **2** | **B5 steerability** (first use of the key) | **Machinery built** (`ceval/lifecycle.py` + the registry key); the DEAD/ALIVE result is still the open question | **If DEAD, the variant lifecycle is a ritual and the platform's premise fails.** The DEAD hypothesis is now the prior. **Find out before building the rest** |
+| **3** | B1–B4 ability probes + judge service | **Probes built** (`ceval/ability.py`); **the Lane-3 judge is not validated** | Cheap, bound, high-agreement; Ψ1 **donates** a noise floor |
+| **4** | Tier 0 + escalation + C2 | **Built as code, exercised on simulated turns** | Legally load-bearing; EU Art 50 deadline **2026-08-02** |
+| **5** | Collection contract | **Built** (`ceval/online/collector.py`, `events.py`) — emitted by a simulator, not a real product | Nothing online exists without it; `assignment_arm` is unrecoverable later |
+| **6** | Sampler, drift, dashboards | **Built** (`ceval/online/`, `ceval/dashboard/`) — on simulated traffic | Only useful once traffic exists |
+| **7** | The bridge | **Designed-only** — the backtest against our A/B history hasn't run (§5) | The only thing that makes the rest honest |
+
+**Step 2 was deliberately placed before most of the build.** It's the cheapest experiment that can
 falsify the whole premise. If prompts don't move the model, we should learn that in week one — not
 after shipping a gate that measures sampling noise and calls it a decision.

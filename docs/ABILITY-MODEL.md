@@ -64,7 +64,7 @@ and is still boring).
 Two consequences:
 
 1. **Test in order and stop at the first failure.** L1 is the cheapest and gates everything. Most
-   of the catalogue's 36 hygiene metrics are L2/L3 symptoms of an L1 defect, measured downstream
+   of the catalogue's ~50 hygiene metrics are L2/L3 symptoms of an L1 defect, measured downstream
    at 10× the cost.
 2. **It converts a score into a diagnosis.** "Fidelity: 3.2" tells a prompt engineer nothing.
    "L1 fine, L2 elasticity ≈ 0 on emphasis words" tells them the model can read the character and
@@ -602,8 +602,10 @@ it's the single most likely way this whole section is wrong.
 
 ### Status
 
-**All five uses need generation ⇒ blocked on the API key.** They are cheap (items are short, and Use
-2 needs no ground truth), and Uses 1–3 are the highest-value key-gated experiments in the project:
+**All five uses need generation — and the service now provides it** (L1/L2 already run through the
+subagent/simulated provider). These are **designed and runnable now, not yet validated** — no longer
+blocked on a key, just not yet wired in and checked. They are cheap (items are short, and Use
+2 needs no ground truth), and Uses 1–3 are the highest-value experiments in the project:
 they deliver a **calibrated noise floor**, a **confabulation detector**, and **validated axes for the
 steerability matrix** — three things we currently lack and cannot derive from the corpus.
 
@@ -629,7 +631,7 @@ Structure within L3 (from [03](../research/notes/03-creativity-measurement.md),
 - **Conjunctive, never averaged:** novel **∧** coherent **∧** in-character. Averaging novelty with
   coherence scores a random-token generator halfway decent. **Gate, don't mean.**
 - Partly bounded from both sides — N2 slop (inverse-novelty, judge-free) and L1/L2 (in-character).
-  **The residue that survives both gates is the only thing a judge should ever be asked.**
+  **The residue that survives both gates is the only part of L3 a judge should be asked to score.**
 - Remember RPGBench: **the most interesting engine was the worst rule-follower**
   (interestingness 0.722, mechanic score 0.113). **L3 will fight L2, and that tension is real
   signal, not noise.** Report both; never average them.
@@ -640,22 +642,26 @@ Structure within L3 (from [03](../research/notes/03-creativity-measurement.md),
 
 | | before | after |
 |---|---|---|
-| **Organizing principle** | 36 ways to be bad | 3 abilities in causal order |
+| **Organizing principle** | ~50 ways to be bad | 3 abilities in causal order |
 | **When a variant fails** | a number moved | **which layer, and therefore what to fix** |
 | **Agreement** | α=0.25–0.34 smeared everywhere | **L1/L2 bound (κ up to ~0.9); only L3 is hard** |
 | **Steerability** | unmeasured, assumed | **measured — the platform's core assumption, tested** |
-| **Cost** | judge everything | L1/L2 mostly judge-free; **L3 is the only expensive layer, and it's last** |
+| **Cost** | judge everything | **most grading is bound and cheap; the judge is one expensive *mechanism* (Lane 3), used sparingly on the perspectival residue at each level — ~1% of traffic — not a synonym for L3** |
 | **Deliverable** | a leaderboard | **a diagnosis + a character-sheet style guide** |
+
+> **Lane ≠ Level:** the judge spans L1/L2/L3/safety; it is a mechanism, not the L3 layer. (Sibling doc [OFFLINE.md](OFFLINE.md) states the same correction.)
 
 ### Honest status
 
 | layer | can we measure it today? |
 |---|---|
-| **L1** comprehension | ⛔ **needs generation → blocked on API key.** Design is ready; cost is trivial (probes are short) |
+| **L1** comprehension | ✅ **runs in the service** — character_alpha and voice_fidelity generate via the subagent/simulated provider. Design is ready; cost is trivial (probes are short) |
 | **L2.1** application | ✅ partially — anchor-distance drift computable on existing corpus |
-| **L2.2** steerability | ⛔ **blocked on API key.** Requires generating under perturbed prompts — *this is the single highest-value use of the key* |
-| **L2.3** weight/focus | ⛔ blocked on API key |
-| **L3** creativity | ⛔ needs *users*, not just a key. `role-play-bench` has no users in it |
+| **L2.2** steerability | ✅ **runs in the service** — L2 grades generate under perturbed prompts via the provider. *Still the highest-value experiment to validate* |
+| **L2.3** weight/focus | ✅ runs in the service (L2 generation via the provider) |
+| **L3** creativity | ⛔ needs *real users* — the corpus has none. `role-play-bench` has no users in it. A genuine limit (designed, not yet validated with users), not a key/provider gap |
+
+**Still designed, not yet validated:** our own **Lane-3 judge κ**, and any **L3-with-real-users** signal — those are the honest gaps now, not the API key.
 
 **One thing we could do on the existing corpus with no key — and did:** all 11 models were given
 **identical** character sheets, so cross-model divergence per character is L1 variance made visible

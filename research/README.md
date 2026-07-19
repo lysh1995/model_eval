@@ -1,6 +1,6 @@
 # Research knowledge base
 
-**448 raw sources + 22 synthesis notes**, built by 16 parallel research streams (2026-07-16) — 11 primary + 5 adversarial cross-checks.
+**475 raw sources + 26 synthesis notes**, built by 16 parallel research streams — 11 primary + 5 adversarial cross-checks.
 
 The cross-checks were commissioned to *attack* the design, and they landed: one **retracted our headline claim** (steerability is measured — four times), one showed **our metrics score the field's worst failure as a success** (Luda), and one found **the framework sorts by reliability and never checks validity**. Two are still running.
 
@@ -72,9 +72,10 @@ Unrecoverable figures are marked as such rather than estimated. The design rests
 3. Two other streams independently caught invented figures from web summarizers and corrected three
    citation errors against source PDFs.
 
-**Assume any number not traced to a PDF is unverified — including in our own documents.** During
-this session an inflated source count (312 vs the actual 271) was written into *this file*, in the
-section about rigor, and caught on review. The failure mode is not exotic; it is the default.
+**Assume any number not traced to a PDF is unverified — including in our own documents.** During an
+early session an inflated source count (312 vs the true count at the time) was written into *this
+file*, in the section about rigor, and caught on review. The failure mode is not exotic; it is the
+default.
 
 ### The tools themselves return wrong answers silently
 

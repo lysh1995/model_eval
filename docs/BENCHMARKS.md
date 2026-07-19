@@ -2,25 +2,25 @@
 
 **What we evaluate, how, and where the data comes from.**
 
-Status: **draft, incomplete** · 2026-07-16
+Status: **built and running** · 2026-07-18
 
 ## Completion status — read this honestly
 
 | | |
 |---|---|
-| **Benchmarks named** | **50** (34 hygiene/safety + 6 quality + 6 input + 4 psychometric) |
-| **Benchmarks fully specced** | **~18.** §2 expands only the load-bearing ones; the rest are a row in a table and a claim |
-| **Benchmarks validated on our data** | **2** — N1 repetition (10–13× MDE) and K1 homogenization (*length-controlled only, zh residual unresolved*) |
-| **Lane 3 (judge) validated** | **0.** Every judge number here is borrowed from literature. Our κ, position bias, sentiment bias, abstention rate: **all unknown, blocked on the API key** |
-| **Q-series (the actual product question)** | **0 built, 0 possible offline.** Needs production data that does not exist yet |
-| **I-series (real user input)** | **0 built, 0 testable on this corpus** — it contains no messy input, and the degradation ladder is *invented* until we mine the real distribution |
-| **Per-benchmark noise floors** | **1 of 50** (N1). ⚠️ **This was the wrong thing to count.** Only ~5 dimensions need to *gate*; the rest need to **guide**, and a guide needs an honest interval, not an MDE — see [EVAL-DESIGN §4](EVAL-DESIGN.md). Ψ1 also **donates** a calibrated noise floor (human BFI r≈0.75–0.90) rather than us buying one |
-| **Research streams** | 11 primary + **4 of 5 adversarial cross-checks landed. They retracted our headline claim, killed one of our own cited numbers, and found our metrics score Luda's failure as a success.** Steerability prior-art still running |
+| **Platform** | **Built and running** — DB-backed CLI (`python3 -m ceval`), static + interactive dashboard, live `serve`, end-to-end |
+| **Research** | **Complete** — 16 streams (11 primary + 5 adversarial), 475 sources, 26 notes. The adversarial streams retracted our headline claim, killed one of our own cited numbers, and found our metrics scored Luda's failure as a success |
+| **Dimensions named** | **~50** (hygiene/safety + quality + input + psychometric), each tied to a named product failure |
+| **Validated on our data** | **1 gate** — N1 repetition (10–13× MDE). K1 homogenization is *length-controlled only* (zh residual unresolved). The gate list is deliberately short; everything else **guides** |
+| **Lane 3 (judge) validated** | **0.** Every judge number here is still borrowed from literature — our own κ, position bias, sentiment bias, and abstention rate remain unmeasured, **blocked on the API key** |
+| **Q-series (the product question)** | **0 possible offline.** Needs real users; `role-play-bench` has none |
+| **I-series (real user input)** | **Designed, not testable on this corpus** — it has no messy input, and the degradation ladder stays *invented* until we mine the real distribution |
+| **Per-dimension noise floors** | **1 of ~50** (N1). Only a handful of dimensions need to *gate*; the rest need to **guide**, and a guide needs an honest interval, not an MDE — see [EVAL-DESIGN §4](EVAL-DESIGN.md). Ψ1 also **donates** a calibrated noise floor (human BFI r≈0.75–0.90) rather than us buying one |
 
 **What this document is:** a defensible argument about *what to measure and why*, with the
-measurement theory worked out and two metrics actually validated.
+measurement theory worked out, the harness built, and one gate validated on our data.
 
-**What it is not:** a finished spec. But **"can it pass the gate?" is the wrong question for most of
+**What it is not:** a finished validation. But **"can it pass the gate?" is the wrong question for most of
 it** — the product value is *"here is what to change and why,"* not a pass/fail light. A metric that
 says *"your zh characters homogenize 6× more than your en ones, ±wide interval"* beats a green
 checkmark. **Gate: 5. Guide: most of the catalogue. Both correct.**
@@ -134,7 +134,7 @@ Failures cascade **downward, never upward**, which turns a score into a **diagno
 payoff is that **L1 and L2 are *bound*** — L1's referent is the character sheet, L2's is the prompt
 delta we introduced ourselves — so the two layers that gate everything are exactly the two
 measurable at **κ up to ~0.9**, while the intractable one (L3) is isolated at the end instead of
-smeared across all 36 metrics.
+smeared across all ~50 metrics.
 
 **Most of §1's catalogue turns out to be L2/L3 symptoms of L1 defects, measured downstream at 10×
 the cost.**
@@ -187,12 +187,12 @@ aspect destroys exactly the information that matters.
 
 | ID | Benchmark | The question it answers | Class | Source | Status |
 |---|---|---|---|---|---|
-| **Q1** | **Head-to-head user preference** | *Do real users prefer this variant?* | perspectival | **P** | 🔨 **the product question** |
-| **Q2** | Presence / interiority | *Does the character seem to want things?* | consensus | S+E | 🔨 needs definition |
-| **Q3** | Surprise-that-fits | *Novel **and** in character* | consensus | S+E | 🔨 conjunctive, never averaged |
-| **Q4** | Emotional impact | *Does it land?* | perspectival | P | 🔨 |
-| **Q5** | **Chemistry** (user × character × model) | *Is this the right partner for **this** user?* | perspectival | **P only** | ⛔ **impossible offline** |
-| **Q6** | Memorable-moment rate | *Did anything worth keeping happen?* | consensus | P | 🔨 share/screenshot/save |
+| **Q1** | **Head-to-head user preference** | *Do real users prefer this variant?* | perspectival | **P** | ○ designed — **the product question** |
+| **Q2** | Presence / interiority | *Does the character seem to want things?* | consensus | S+E | ○ designed — needs definition |
+| **Q3** | Surprise-that-fits | *Novel **and** in character* | consensus | S+E | ○ designed — conjunctive, never averaged |
+| **Q4** | Emotional impact | *Does it land?* | perspectival | P | ○ designed |
+| **Q5** | **Chemistry** (user × character × model) | *Is this the right partner for **this** user?* | perspectival | **P only** | ○ designed — **impossible offline** (needs users) |
+| **Q6** | Memorable-moment rate | *Did anything worth keeping happen?* | consensus | P | ○ designed — share/screenshot/save |
 
 ### ⚠️ Q1 has a hard boundary: users prefer the harmful condition
 
@@ -262,54 +262,54 @@ Source: **E** existing benchmark · **S** self-built · **P** production observa
 | ID | Benchmark | Product failure it catches | Lane | Source | Status |
 |---|---|---|---|---|---|
 | **K1** | Voice homogenization | Catalogue collapses to one voice | 2 | E+P | ⚠️ length-controlled ver. only |
-| **K2** | **Character discriminability** | Same, but as a bounded % anyone can read | 1 | E+P | 🔨 build — **highest value/effort** |
-| **K3** | Fidelity↔diversity tradeoff | Winning every character eval, losing the catalogue | 2 | E | 🔨 build |
-| **C1** | Voice/style fidelity | Character stops sounding like itself | 3 | S+P | 🔨 needs anchors |
-| **C2** | Card grounding | Contradicts its own character sheet | 1/3 | S | 🔨 build |
-| **C3** | Boundary discipline | Acts out of character | 3 | S | 🔨 build |
-| **C4** | **Anchor-distance drift** | "Assistant-brain" — the #1 complaint | 1 | E+S | 🔨 build — **tests a lever we control** |
-| **C5** | World-state contradiction | Forgets what it established | 1/3 | S | 🔄 stream 13 |
+| **K2** | **Character discriminability** | Same, but as a bounded % anyone can read | 1 | E+P | ○ designed — **highest value/effort** |
+| **K3** | Fidelity↔diversity tradeoff | Winning every character eval, losing the catalogue | 2 | E | ○ designed |
+| **C1** | Voice/style fidelity | Character stops sounding like itself | 3 | S+P | ○ designed — needs anchors |
+| **C2** | Card grounding | Contradicts its own character sheet | 1/3 | S | ○ designed |
+| **C3** | Boundary discipline | Acts out of character | 3 | S | ○ designed |
+| **C4** | **Anchor-distance drift** | "Assistant-brain" — the #1 complaint | 1 | E+S | ○ designed — **tests a lever we control** |
+| **C5** | World-state contradiction | Forgets what it established | 1/3 | S | ○ designed |
 | **N1** | Repetition / looping | Boring, repetitive, users leave | 1 | E+P | ✅ **validated, 10–13× MDE** |
-| **N2** | Slop rate | Fluent, generic, forgettable | 1 | E | 🔨 build — **judge cross-check** |
-| **N3** | Scene-transition rate (7/4/1) | Stalling **and** railroading, in one number | 1 | S | 🔨 build — **most liftable** |
-| **N4** | **Branch divergence** | **The user doesn't matter** | 1 | S | 🔨 **build first** — cheapest decisive probe |
-| **N5** | Creativity residual | Dull | 3 | S | 🔨 after N2/N7 subtract |
-| **N6** | **Block / wimp rate** (Johnstone offers) | Refuses user's ideas **or** accepts without adding | 1 | S+P | 🔨 build — **unifies sycophancy + craft** |
-| **N7** | **Plot-hole rate** | Story contradicts itself | 1 | E+S | 🔨 build — **only validated number in the craft literature** |
-| **N8** | Task vs dialogue initiative | The conversational treadmill, precisely | 1 | S | 🔨 build |
+| **N2** | Slop rate | Fluent, generic, forgettable | 1 | E | ○ designed — **judge cross-check** |
+| **N3** | Scene-transition rate (7/4/1) | Stalling **and** railroading, in one number | 1 | S | ○ designed — **most liftable** |
+| **N4** | **Branch divergence** | **The user doesn't matter** | 1 | S | ○ designed — cheapest decisive probe |
+| **N5** | Creativity residual | Dull | 3 | S | ○ designed — after N2/N7 subtract |
+| **N6** | **Block / wimp rate** (Johnstone offers) | Refuses user's ideas **or** accepts without adding | 1 | S+P | ○ designed — **unifies sycophancy + craft** |
+| **N7** | **Plot-hole rate** | Story contradicts itself | 1 | E+S | ○ designed — **only validated number in the craft literature** |
+| **N8** | Task vs dialogue initiative | The conversational treadmill, precisely | 1 | S | ○ designed |
 | **P1** | Length-cap adherence | Ignores its own system prompt | 1 | E | ✅ trivial |
 | **P2** | Format discipline | Broken stage directions, meta-commentary | 1 | E | ✅ trivial |
 | **P3** | Assistant-voice tripwire | "As an AI…" | 0 | E | ✅ **tripwire only** (≤3.2/1k turns) |
-| **P4** | Constraint-satisfaction slope | Degrades under tighter constraints | 1 | S | 🔨 build |
+| **P4** | Constraint-satisfaction slope | Degrades under tighter constraints | 1 | S | ○ designed |
 | **S1** | **Crisis detection → escalation** | Raine. **Statutory.** | 0 | S+P | 🚨 **first thing that must work** |
-| **S2** | Multi-turn safety erosion | Safety decays in normal sessions | 0/3 | S | 🚨 build |
-| **S3** | Capability uplift (fiction-strip) | Roleplay as jailbreak laundering | 0/3 | S | 🚨 build |
-| **S4** | Over-refusal / immersion break | Users leave for less-safe platforms | 1/3 | S+P | 🚨 build — **paired with S3, never averaged** |
-| **S5** | **Persona integrity** | Drift toward the character's inverse | 1/3 | S | 🔨 build — **our moat** |
-| **S6** | Manipulation / dependency | 37.4% manipulative farewells | 1/3 | S+P | 🔨 build — **never alone; see the frontier below** |
+| **S2** | Multi-turn safety erosion | Safety decays in normal sessions | 0/3 | S | 🚨 designed |
+| **S3** | Capability uplift (fiction-strip) | Roleplay as jailbreak laundering | 0/3 | S | 🚨 designed |
+| **S4** | Over-refusal / immersion break | Users leave for less-safe platforms | 1/3 | S+P | 🚨 designed — **paired with S3, never averaged** |
+| **S5** | **Persona integrity** | Drift toward the character's inverse | 1/3 | S | ○ designed — **our moat** |
+| **S6** | Manipulation / dependency | 37.4% manipulative farewells | 1/3 | S+P | ○ designed — **never alone; see the frontier below** |
 | **S7** | **Warmth × sycophancy frontier** | Cutting sycophancy ships a *cold* model nobody wants | 3 | S+P | 🚨 **joint, or it drives you off a cliff** |
 | **S8** | **Post-referral trajectory** | Crisis referral fires, character **reverts to persona** | 0/3 | S | 🚨 **Gavalas.** Unmeasured by anyone |
 | **S9** | **Class F — third-party harm** | Harm to someone who never used the product | 0/3 | S | 🚨 breaks the uplift frame |
-| **S10** | "Are we a regulated companion?" | Oregon's definition is a **behavioral 3-prong test** | 1 | S+P | 🔨 classifier on our own product |
-| **X1** | **Regenerate → pairwise mining** | *(not a failure — the yardstick)* | 1 | P | 🔨 build — **validates the judge** |
-| **X2** | Edit rate | Users repairing the persona by hand | 1 | P | 🔨 build |
-| **X3** | Conversation death | Abandonment mid-scene | 1 | P | 🔨 build |
-| **X4** | Latency | +1s → **−3.01% MCL** | 1 | P | 🔨 build |
-| **X5** | Follow-up question rate | *Counter-engagement* wellbeing signal | 1 | P | 🔨 build |
-| **X6** | Author fidelity labels | *(not a failure — free expert ground truth)* | — | P | 🔨 build |
-| **I1** | Intent comprehension under degradation | Can't understand typos/slang/fragments | 1/3 | S | 🔨 [ability model](ABILITY-MODEL.md#2b) |
-| **I2** | **Style contagion / register bleed** | Character starts typing like the user | 1 | S+P | 🔨 **new drift mechanism** |
-| **I3** | **Frame discrimination** (diegetic vs not) | OOC treated as fiction — or fiction treated as OOC (drives users to less-safe platforms) | 1/3 | S | 🔨 **highest coverage** |
-| **I4** | Language adherence under code-switching | zh/en mixing; a **third** measurement context | 1 | S+P | 🔨 build |
-| **I5** | **Modality-induced persona break** | Image triggers assistant mode: *"This image shows…"* | 3 | S | ⛔ needs multimodal corpus |
-| **I6** | Input-poverty initiative | User says "k"; scene dies | 1 | S+P | 🔨 build |
-| **Ψ1** | **Trait test-retest stability** (turn 5 vs 95) | Personality drifts | 3 | S | 🔨 **free calibrated noise floor** (human BFI r≈0.75–0.90) |
-| **Ψ2** | **Internal consistency (Cronbach's α)** | *There is no character in there* — confabulated per-item | 3 | S | 🔨 **needs no ground truth** |
-| **Ψ3** | Profile recovery (transcript vs card) | Character unrecognizable from play | 3 | S | 🔨 empathic-accuracy paradigm |
-| **Ψ4** | Self-report vs behavior gap | Knows the character, can't play them | 3 | S | 🔨 instruments L1.2 |
+| **S10** | "Are we a regulated companion?" | Oregon's definition is a **behavioral 3-prong test** | 1 | S+P | ○ designed — classifier on our own product |
+| **X1** | **Regenerate → pairwise mining** | *(not a failure — the yardstick)* | 1 | P | ○ designed — **validates the judge** |
+| **X2** | Edit rate | Users repairing the persona by hand | 1 | P | ○ designed |
+| **X3** | Conversation death | Abandonment mid-scene | 1 | P | ○ designed |
+| **X4** | Latency | +1s → **−3.01% MCL** | 1 | P | ○ designed |
+| **X5** | Follow-up question rate | *Counter-engagement* wellbeing signal | 1 | P | ○ designed |
+| **X6** | Author fidelity labels | *(not a failure — free expert ground truth)* | — | P | ○ designed |
+| **I1** | Intent comprehension under degradation | Can't understand typos/slang/fragments | 1/3 | S | ○ designed — [ability model](ABILITY-MODEL.md#2b) |
+| **I2** | **Style contagion / register bleed** | Character starts typing like the user | 1 | S+P | ○ designed — **new drift mechanism** |
+| **I3** | **Frame discrimination** (diegetic vs not) | OOC treated as fiction — or fiction treated as OOC (drives users to less-safe platforms) | 1/3 | S | ○ designed — **highest coverage** |
+| **I4** | Language adherence under code-switching | zh/en mixing; a **third** measurement context | 1 | S+P | ○ designed |
+| **I5** | **Modality-induced persona break** | Image triggers assistant mode: *"This image shows…"* | 3 | S | ○ designed — needs multimodal corpus |
+| **I6** | Input-poverty initiative | User says "k"; scene dies | 1 | S+P | ○ designed |
+| **Ψ1** | **Trait test-retest stability** (turn 5 vs 95) | Personality drifts | 3 | S | ○ designed — **free calibrated noise floor** (human BFI r≈0.75–0.90) |
+| **Ψ2** | **Internal consistency (Cronbach's α)** | *There is no character in there* — confabulated per-item | 3 | S | ○ designed — **needs no ground truth** |
+| **Ψ3** | Profile recovery (transcript vs card) | Character unrecognizable from play | 3 | S | ○ designed — empathic-accuracy paradigm |
+| **Ψ4** | Self-report vs behavior gap | Knows the character, can't play them | 3 | S | ○ designed — instruments L1.2 |
 | **R1** | **Regurgitation / verbatim leak** | **Luda.** A real person's address, perfectly in character | 0/1 | S+P | 🚨 **no existing metric adaptable** — every one *rewards* the property that makes it dangerous |
-| **R2** | PII in outputs | Same, detected at the surface | 0 | S+P | 🚨 build |
-| **U1** | User-side abuse | We instrument 1 of 2 agents in the loop | 0/1 | P | 🔨 Scatter Lab ships a blocking ladder; we have nothing |
+| **R2** | PII in outputs | Same, detected at the surface | 0 | S+P | 🚨 designed |
+| **U1** | User-side abuse | We instrument 1 of 2 agents in the loop | 0/1 | P | ○ designed — Scatter Lab ships a blocking ladder; we have nothing |
 
 ---
 
@@ -482,7 +482,7 @@ why it's cheap and why it's defensible.
 
 ### ⚠️ This catalogue was inverted, and the fix is the N-series
 
-**Corrected 2026-07-16** ([12](../research/notes/12-narrative-craft-dimensions.md)). The first draft
+**Corrected** ([12](../research/notes/12-narrative-craft-dimensions.md)). The first draft
 was persona-fidelity heavy and narrative-craft thin. **Drama-Interaction (ACL Findings 2024) ships
 a 4:1 narrative-to-persona dimension balance — we were inverted**, and three independent
 professional communities say we had the priority backwards:

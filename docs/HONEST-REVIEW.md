@@ -1,6 +1,8 @@
 # Honest review
 
-2026-07-17. What was built, what works, what doesn't, and what I got wrong.
+2026-07-18. What was built, what works, what doesn't, and what I got wrong. The platform is now a
+**DB-backed local service** (`python3 -m ceval`) — the measurement findings and honest limits below
+are unchanged by that; the plumbing moved from files to a database, the science did not.
 
 ---
 
@@ -25,8 +27,9 @@
 **10 of 13 fully met. 3 partial. 0 unmet.** Everything partial is blocked on the API key or on
 authoring, not on design.
 
-Verified this run: **31/31 safety controls · 4/4 core refusals · e2e all six stages · 3,303 LOC ·
-zero dependencies.**
+Verified this run: **31/31 safety controls · 4/4 core refusals · e2e all six stages · the service
+reproduces from a fresh DB (init → seed → eval run → dashboard/serve) · 6,812 LOC · zero
+dependencies.**
 
 ## 2. What actually works
 
@@ -40,6 +43,11 @@ zero dependencies.**
 - **C2 is a demonstration, not a citation.** Lane 1 measured at 386 dialogues/sec/core → **1.5 cores
   at 50M/day = $1.44/day**. The "Lanes 0–2 are free" claim, on which the whole tiering rests, is now
   tested rather than asserted.
+- **The platform is a service, reproducible from a clean clone.** `python3 -m ceval init && seed &&
+  eval run --sim && dashboard` runs end to end on committed demo data with zero dependencies and no
+  key; `serve` re-renders live from the DB on every request. Models, prompts, variants, grades, and
+  evidence are content-addressed and persisted — SQLite runnable, MySQL designed (one schema, two
+  drivers). Injecting a variant while `serve` is running shows it on the next request, no restart.
 
 ## 3. What doesn't work, stated plainly
 

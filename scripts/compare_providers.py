@@ -18,9 +18,9 @@ from ceval.dashboard import render
 NOW = datetime.now(timezone.utc).isoformat()
 BAR = "─" * 74
 
-offline = load_run("out/gen", "out/gen/tasks.json", "en")
+offline = load_run("demo/gen", "demo/gen/tasks.json", "en")
 sim = make_provider("simulated")
-real = make_provider("recorded", judge_dir="out/judge")
+real = make_provider("recorded", judge_dir="demo/judge")
 
 # which variants have real recordings?
 have_real = [v for v in offline.variant_ids if real.has(v)]
