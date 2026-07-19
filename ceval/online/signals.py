@@ -68,6 +68,14 @@ class SignalDef:
 #   INDIRECT HEALTH (follow-up, non-decaying engagement) can DISSENT from approval — which is
 #   exactly why we infer the user's opinion from these, not from the votes.
 SIGNALS: Dict[str, SignalDef] = {
+    "story_cocreation": SignalDef(
+        "story_cocreation", SignalClass.DIAGNOSTIC, FeedbackKind.INDIRECT,
+        "STORYTELLING-CRAFT proxy -- does the user get pulled into co-creating the story "
+        "(introducing entities, taking in-fiction actions, growing investment)",
+        "hard to game by sycophancy: a people-pleaser earns votes but LOW co-creation. Must be "
+        "VALIDATED against the offline judge craft (the anchor) and pass the acid test",
+        "the online read of the headline narrative_craft. A PROXY, not the truth -- the judge on "
+        "a ~1% sample anchors it. Offline REPLAY freezes the user half, so it needs real traffic."),
     "follow_up_question_rate": SignalDef(
         "follow_up_question_rate", SignalClass.DIAGNOSTIC, FeedbackKind.INDIRECT,
         "conversational health; the model drawing the user out",
@@ -159,10 +167,12 @@ class SessionSignals:
     total_latency_ms: float
     length_slope: Optional[float]
     ended_reason: str
+    user_cocreation: float = 0.0    # STORYTELLING-CRAFT proxy: did the user co-create the story?
 
     def as_diagnostics(self) -> Dict[str, float]:
         """Only the signals safe to grade on. Traps and confounds are excluded by design."""
         return {
+            "story_cocreation": self.user_cocreation,     # the storytelling-craft proxy
             "follow_up_question_rate": self.follow_up_rate,
             "regenerate_rate": self.regenerates / max(1, self.n_turns),
             "edit_rate": self.edits / max(1, self.n_turns),

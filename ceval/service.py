@@ -46,27 +46,30 @@ from .ability import build_profiles, measure_field
 # The Haiku twins mirror their Sonnet twin's SHAPE with a small model delta: faster latency,
 # slightly weaker engagement — consistent with their lower offline voice_fidelity.
 ONLINE_PROFILES = {
+    # craft= is the offline JUDGE narrative_craft score, injected as ground truth: the simulated
+    # user co-creates in proportion to it — DECOUPLED from p_vote_favor, so the sycophant shows
+    # high votes + LOW co-creation (the divergence the online craft proxy must recover).
     "v_terse":     VariantProfile("v_terse",     p_follow_up=0.45, p_abandon=0.10,
                                   p_regenerate=0.07, base_latency_ms=650,
-                                  p_vote_favor=0.12, self_selection_pull=1.0),
+                                  p_vote_favor=0.12, self_selection_pull=1.0,  craft=0.64),
     "v_narrator":  VariantProfile("v_narrator",  p_follow_up=0.40, p_abandon=0.08,
                                   p_regenerate=0.09, base_latency_ms=1100,
-                                  p_vote_favor=0.18, self_selection_pull=1.1),
-    # engagement-gaming: high votes + low abandon + heavy-user pull, LOW follow-up (the trap)
+                                  p_vote_favor=0.18, self_selection_pull=1.1,  craft=0.82),
+    # engagement-gaming: high votes + low abandon + heavy-user pull, LOW follow-up, LOW craft
     "v_assistant": VariantProfile("v_assistant", p_follow_up=0.18, p_abandon=0.05,
                                   p_regenerate=0.12, base_latency_ms=900,
-                                  p_vote_favor=0.34, self_selection_pull=1.9),
-    # friction failure: users leave (high abandon), rarely vote it up, heavy users avoid it
+                                  p_vote_favor=0.34, self_selection_pull=1.9,  craft=0.25),
+    # friction failure: users leave (high abandon), rarely vote it up — but craft is HIGH (0.81)
     "v_hostile":   VariantProfile("v_hostile",   p_follow_up=0.30, p_abandon=0.24,
                                   p_regenerate=0.15, base_latency_ms=780,
-                                  p_vote_favor=0.07, self_selection_pull=0.6),
+                                  p_vote_favor=0.07, self_selection_pull=0.6,  craft=0.81),
     # Haiku twins: same shape as the Sonnet twin, faster, engagement a touch weaker
     "v_terse_haiku":     VariantProfile("v_terse_haiku",     p_follow_up=0.41, p_abandon=0.12,
                                   p_regenerate=0.08, base_latency_ms=470,
-                                  p_vote_favor=0.11, self_selection_pull=0.95),
+                                  p_vote_favor=0.11, self_selection_pull=0.95, craft=0.69),
     "v_assistant_haiku": VariantProfile("v_assistant_haiku", p_follow_up=0.18, p_abandon=0.06,
                                   p_regenerate=0.13, base_latency_ms=610,
-                                  p_vote_favor=0.33, self_selection_pull=1.8),
+                                  p_vote_favor=0.33, self_selection_pull=1.8,  craft=0.40),
 }
 
 
@@ -128,7 +131,7 @@ class EvalService:
         """The injected ground-truth behaviour for a variant; a neutral default if unknown."""
         return ONLINE_PROFILES.get(v, VariantProfile(
             v, p_follow_up=0.35, p_abandon=0.09, p_regenerate=0.09,
-            base_latency_ms=800, p_vote_favor=0.18, self_selection_pull=1.0))
+            base_latency_ms=800, p_vote_favor=0.18, self_selection_pull=1.0, craft=0.5))
 
     # ---- portrait (from offline generated text) ----------------------------
     def ability(self, offline_run) -> list:

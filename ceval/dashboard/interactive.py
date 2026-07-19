@@ -31,7 +31,8 @@ _HEADLINE = "narrative_craft"
 # Display priority: headline first, then the other quality signals, then the rest.
 _DIM_ORDER = [_HEADLINE, "voice_fidelity", "character_alpha", "narrative_engagement",
               "scene_drive_treadmill", "discriminability", "repetition", "over_refusal", "wimp_rate",
-              "satisfaction_inferred", "follow_up_question_rate"]
+              # online: lead with the craft proxy (the online read of the headline), then opinion
+              "story_cocreation", "satisfaction_inferred", "follow_up_question_rate"]
 
 
 def _dim_rank(dim: str) -> int:

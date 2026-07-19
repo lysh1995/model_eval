@@ -99,7 +99,7 @@ def evidence_from_store(store: Store) -> dict:
 # DB-backed data flow (drill-down + traceability), and grading reads it back from the store.
 _SESSION_SIGNAL_FIELDS = ("conversation_id", "n_turns", "abandoned", "follow_up_rate",
                           "regenerates", "edits", "votes_favor", "votes_defavor",
-                          "total_latency_ms", "length_slope", "ended_reason")
+                          "total_latency_ms", "length_slope", "ended_reason", "user_cocreation")
 
 
 def persist_online_sessions(store: Store, rows: list) -> int:
@@ -125,5 +125,6 @@ def online_sessions_from_store(store: Store) -> list:
             follow_up_rate=float(s["follow_up_rate"]), regenerates=int(s["regenerates"]),
             edits=int(s["edits"]), votes_favor=int(s["votes_favor"]),
             votes_defavor=int(s["votes_defavor"]), total_latency_ms=float(s["total_latency_ms"]),
-            length_slope=s.get("length_slope"), ended_reason=s.get("ended_reason", "graceful")))
+            length_slope=s.get("length_slope"), ended_reason=s.get("ended_reason", "graceful"),
+            user_cocreation=float(s.get("user_cocreation", 0.0))))
     return out

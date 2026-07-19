@@ -70,6 +70,43 @@ Read the user's opinion from **direct approval** and the sycophant wins. Infer i
 health + direct rejection** and it loses. **That disagreement is the sycophancy signature** — the
 one thing this whole platform exists to catch, now a single number.
 
+## Determining the headline quality (storytelling craft) online
+
+`narrative_craft` — the [headline quality score](OFFLINE.md) — is measured **offline by a judge**.
+You can't run that judge on every production session, and no single behavioural signal *is* craft.
+So online it is a **two-part design**: judge a tiny sample for truth, collect a cheap proxy for
+everything, and prove the proxy tracks the judge.
+
+- **Anchor** — run the craft judge on a **~1% stratified sample** of real sessions (Lane 3). Truth,
+  but only on a sample.
+- **Proxy at 100%** — `story_cocreation`: *does the user get pulled into co-creating the story?*
+  (introducing entities, taking in-fiction actions, growing investment). Computed from the
+  transcript, no model call. It is the online read of craft — a **diagnostic**, and by design it
+  **dissents from engagement** (a sycophant earns votes but kills co-creation).
+- **Collect** via the contract ([events.py](../ceval/online/events.py)); the narrative tagging runs
+  on 100% of traffic as an `eval.*` field.
+
+**The proxy has to EARN its place** — `scripts/validate_craft_proxy.py` runs the judge-anchored
+validation with the sycophancy **acid test**:
+
+```
+proxy vs judge craft      Spearman ρ = +1.00   tracks the judge
+ACID TEST: proxy vs votes Spearman ρ = -0.66   dissents from engagement (not gameable by votes)
+(contrast) votes vs craft Spearman ρ = -0.66   votes MISRANK craft — the worst storyteller
+                                               (Assistant: craft 0.25) has the MOST votes (9.1)
+```
+
+A proxy that *positively* tracked votes (session depth, retention) would crown the sycophant — it
+fails the acid test. `story_cocreation` passes: it tracks the judge and anti-correlates with votes.
+
+**Honesty — three things this does NOT claim.** (1) The demo user behaviour is **simulated** with
+craft injected as ground truth, so the ρ=+1.00 recovery verifies the *mechanism and the logic*, not
+real-world validity — on real traffic you run the judge on the 1% sample and compute these same
+correlations to earn the proxy. (2) Offline **replay freezes the user half** (same user turns for
+every variant), so a proxy that reads the user is *constant across variants offline* — craft
+genuinely needs online traffic. (3) The **judge stays the anchor**; the proxy is a cheap 100%
+leading indicator for drift and triage, never the ground truth.
+
 ## Two things the grader must handle — and does
 
 | confound | what it is | how the platform handles it |

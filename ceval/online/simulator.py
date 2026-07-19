@@ -45,6 +45,9 @@ class VariantProfile:
     p_vote_favor: float
     # self-selection: how strongly heavy users prefer this variant when they choose
     self_selection_pull: float  # >1 = heavy users over-pick it
+    # STORYTELLING CRAFT ground truth (from the offline judge). Drives the user's co-creation —
+    # deliberately DECOUPLED from p_vote_favor, so a sycophant can have high votes + low craft.
+    craft: float = 0.5
 
 
 # Two variants with a KNOWN, deliberate structure:
@@ -110,6 +113,11 @@ class TrafficSimulator:
             if self.rng.random() < p.p_abandon / n_turns:
                 abandoned = True
                 break
+        # USER CO-CREATION: does the user get pulled into contributing to the story? Driven by
+        # the variant's narrative CRAFT (injected ground truth), NOT its engagement profile — so a
+        # sycophant with high votes still shows LOW co-creation. Small heavy-user lift + noise.
+        cc = p.craft + (0.05 if is_heavy_user else 0.0) + self.rng.gauss(0, 0.08)
+        user_cocreation = max(0.0, min(1.0, cc))
         return SessionSignals(
             conversation_id=f"sim_{self.rng.getrandbits(32):08x}",
             variant_id=variant_id, character_id=character_id, language=self.language,
@@ -118,6 +126,7 @@ class TrafficSimulator:
             regenerates=regen, edits=edits, votes_favor=fav, votes_defavor=defav,
             total_latency_ms=total_latency,
             length_slope=message_length_trajectory(user_texts),
+            user_cocreation=user_cocreation,
             ended_reason="abandoned_mid_scene" if abandoned else "graceful")
 
     def run(self, n_sessions: int, arm: AssignmentArm,
