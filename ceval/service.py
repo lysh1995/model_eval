@@ -34,9 +34,17 @@ from .online.events import AssignmentArm
 from .ability import build_profiles, measure_field
 
 
-# Online behaviour profiles for the three real offline variants. These CONTINUE the offline
-# story: v_assistant games engagement (votes, retention, self-selection) while starving the
-# one honest signal (follow-up). Faked, but designed to be coherent with the offline finding.
+# Online behaviour profiles for all six variants. These are FAKED but designed to CONTINUE the
+# offline story coherently — each variant's online signature matches how it failed (or didn't)
+# offline. Three distinct shapes:
+#   healthy   (terse, narrator)      — draw the user out (high follow-up), few votes, no pull.
+#   gaming    (assistant, ·Haiku)    — the sycophancy trap: high votes + low abandon + heavy-user
+#                                      pull, but STARVED follow-up. Looks best on votes, worst on
+#                                      the one honest signal. This is what must not headline.
+#   friction  (hostile)              — the opposite failure: users bounce off the prickliness →
+#                                      HIGH abandonment, LOW votes, heavy users AVOID it (pull<1).
+# The Haiku twins mirror their Sonnet twin's SHAPE with a small model delta: faster latency,
+# slightly weaker engagement — consistent with their lower offline voice_fidelity.
 ONLINE_PROFILES = {
     "v_terse":     VariantProfile("v_terse",     p_follow_up=0.45, p_abandon=0.10,
                                   p_regenerate=0.07, base_latency_ms=650,
@@ -44,10 +52,21 @@ ONLINE_PROFILES = {
     "v_narrator":  VariantProfile("v_narrator",  p_follow_up=0.40, p_abandon=0.08,
                                   p_regenerate=0.09, base_latency_ms=1100,
                                   p_vote_favor=0.18, self_selection_pull=1.1),
-    # the engagement-gaming one: high votes + low abandon + heavy-user pull, LOW follow-up
+    # engagement-gaming: high votes + low abandon + heavy-user pull, LOW follow-up (the trap)
     "v_assistant": VariantProfile("v_assistant", p_follow_up=0.18, p_abandon=0.05,
                                   p_regenerate=0.12, base_latency_ms=900,
                                   p_vote_favor=0.34, self_selection_pull=1.9),
+    # friction failure: users leave (high abandon), rarely vote it up, heavy users avoid it
+    "v_hostile":   VariantProfile("v_hostile",   p_follow_up=0.30, p_abandon=0.24,
+                                  p_regenerate=0.15, base_latency_ms=780,
+                                  p_vote_favor=0.07, self_selection_pull=0.6),
+    # Haiku twins: same shape as the Sonnet twin, faster, engagement a touch weaker
+    "v_terse_haiku":     VariantProfile("v_terse_haiku",     p_follow_up=0.41, p_abandon=0.12,
+                                  p_regenerate=0.08, base_latency_ms=470,
+                                  p_vote_favor=0.11, self_selection_pull=0.95),
+    "v_assistant_haiku": VariantProfile("v_assistant_haiku", p_follow_up=0.18, p_abandon=0.06,
+                                  p_regenerate=0.13, base_latency_ms=610,
+                                  p_vote_favor=0.33, self_selection_pull=1.8),
 }
 
 
@@ -76,27 +95,40 @@ class EvalService:
         return gb, offline
 
     # ---- INPUT → DOMAIN: online --------------------------------------------
+    def simulate_online(self, variant_ids: List[str],
+                        characters: Optional[List[str]] = None,
+                        n_sessions: int = 1500, seed: int = 0) -> list:
+        """Serve the variants to FAKED user traffic and RETURN the session rows (data points).
+
+        The traffic emits real user-action shapes (response times, votes, model selection,
+        regenerate, abandonment). Both assignment arms are simulated so the platform can separate
+        the causal (randomised) arm from the confounded (self-selected) one. These rows are the
+        online analogue of an offline dialogue — persist them, then grade from the store.
+        """
+        profiles = [self.online_profile(v) for v in variant_ids]
+        chars = characters or [f"c{i}" for i in range(20)]
+        sim = TrafficSimulator(profiles, chars, self.language, seed=seed)
+        return (sim.run(n_sessions, AssignmentArm.RANDOMIZED_DEFAULT) +
+                sim.run(n_sessions, AssignmentArm.SELF_SELECTED))
+
+    def grade_online(self, rows: list, variant_ids: List[str], created_iso: str,
+                     dataset_id: str = "faked-traffic") -> GradeBook:
+        """Grade a stream of session rows (from the simulator or read back from the DB)."""
+        return LiveGrader(self.language).grade(rows, variant_ids, dataset_id, created_iso)
+
     def evaluate_online(self, variant_ids: List[str], created_iso: str,
                         characters: Optional[List[str]] = None,
                         n_sessions: int = 1500, seed: int = 0) -> GradeBook:
-        """Serve the variants to FAKED user traffic and grade behaviour.
+        """Simulate traffic and grade it in one call (in-memory; no persistence)."""
+        rows = self.simulate_online(variant_ids, characters, n_sessions, seed)
+        return self.grade_online(rows, variant_ids, created_iso)
 
-        The traffic emits real user-action shapes (response times, votes, model selection,
-        regenerate, abandonment). Both assignment arms are simulated so the platform can
-        separate the causal (randomised) arm from the confounded (self-selected) one.
-        """
-        # a new/unknown variant gets a neutral default online profile
-        def prof(v):
-            return ONLINE_PROFILES.get(v, VariantProfile(
-                v, p_follow_up=0.35, p_abandon=0.09, p_regenerate=0.09,
-                base_latency_ms=800, p_vote_favor=0.18, self_selection_pull=1.0))
-        profiles = [prof(v) for v in variant_ids]
-        chars = characters or [f"c{i}" for i in range(20)]
-        sim = TrafficSimulator(profiles, chars, self.language, seed=seed)
-        rows = (sim.run(n_sessions, AssignmentArm.RANDOMIZED_DEFAULT) +
-                sim.run(n_sessions, AssignmentArm.SELF_SELECTED))
-        return LiveGrader(self.language).grade(
-            rows, [p.variant_id for p in profiles], "faked-traffic", created_iso)
+    @staticmethod
+    def online_profile(v: str) -> VariantProfile:
+        """The injected ground-truth behaviour for a variant; a neutral default if unknown."""
+        return ONLINE_PROFILES.get(v, VariantProfile(
+            v, p_follow_up=0.35, p_abandon=0.09, p_regenerate=0.09,
+            base_latency_ms=800, p_vote_favor=0.18, self_selection_pull=1.0))
 
     # ---- portrait (from offline generated text) ----------------------------
     def ability(self, offline_run) -> list:

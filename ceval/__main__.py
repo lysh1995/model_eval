@@ -147,9 +147,16 @@ def cmd_eval(a):
         persist_gradebook(s, gb, "offline", evidence=ev)
         print(f"offline: {len(gb.grades)} grades persisted (provider={prov.kind})")
     if do_on:
-        gb = svc.evaluate_online(run.variant_ids, now, n_sessions=a.sessions)
+        from .store.adapt import persist_online_sessions, online_sessions_from_store
+        online_vids = [v["id"] for v in s.list_variants()]
+        chars = list(s.characters().keys()) or None
+        s.clear_sessions(online_vids)
+        rows = svc.simulate_online(online_vids, characters=chars, n_sessions=a.sessions)
+        n = persist_online_sessions(s, rows)                    # sessions -> DB (data points)
+        db_rows = online_sessions_from_store(s)                 # read them back (retrieval)
+        gb = svc.grade_online(db_rows, online_vids, now, dataset_id="db-sessions")
         persist_gradebook(s, gb, "online")
-        print(f"online : {len(gb.grades)} grades persisted ({2*a.sessions} faked sessions)")
+        print(f"online : {n} sessions persisted -> {len(gb.grades)} grades (graded from the DB)")
     print(f"DB now: {s.counts()}")
     return 0
 

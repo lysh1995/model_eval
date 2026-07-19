@@ -92,3 +92,38 @@ def evidence_from_store(store: Store) -> dict:
             "character": e["character_id"], "text": e["text"],
             "score": e["score"], "why": e["why"]}
     return out
+
+
+# ── online sessions: the behavioural analogue of an offline dialogue ─────────────────────────
+# A session row is one faked user interaction; persisting it makes the online half a real
+# DB-backed data flow (drill-down + traceability), and grading reads it back from the store.
+_SESSION_SIGNAL_FIELDS = ("conversation_id", "n_turns", "abandoned", "follow_up_rate",
+                          "regenerates", "edits", "votes_favor", "votes_defavor",
+                          "total_latency_ms", "length_slope", "ended_reason")
+
+
+def persist_online_sessions(store: Store, rows: list) -> int:
+    """Write simulated SessionSignals rows into the DB `sessions` table. Returns the count."""
+    for r in rows:
+        signals = {k: getattr(r, k) for k in _SESSION_SIGNAL_FIELDS}
+        store.add_session(r.variant_id, r.character_id, r.assignment_arm, signals, r.language)
+    return len(rows)
+
+
+def online_sessions_from_store(store: Store) -> list:
+    """Read persisted sessions back out as SessionSignals — grading consumes these, proving the
+    retrieve→grade pipeline runs off the store, not off in-memory simulator output."""
+    from ..online.signals import SessionSignals
+    out = []
+    for row in store.all_sessions():
+        s = row["signals"]
+        out.append(SessionSignals(
+            conversation_id=s.get("conversation_id", f"db_{row['id']}"),
+            variant_id=row["variant_id"], character_id=row["character_id"],
+            language=row.get("language", "en"), assignment_arm=row["arm"],
+            n_turns=int(s["n_turns"]), abandoned=bool(s["abandoned"]),
+            follow_up_rate=float(s["follow_up_rate"]), regenerates=int(s["regenerates"]),
+            edits=int(s["edits"]), votes_favor=int(s["votes_favor"]),
+            votes_defavor=int(s["votes_defavor"]), total_latency_ms=float(s["total_latency_ms"]),
+            length_slope=s.get("length_slope"), ended_reason=s.get("ended_reason", "graceful")))
+    return out

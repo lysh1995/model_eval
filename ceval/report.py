@@ -16,6 +16,25 @@ from .service import _VariantShim
 TITLE = "Companion variant evaluation — one platform, offline + online"
 
 
+def _session_summaries(store: Store) -> dict:
+    """Per-variant online drill-down straight from the persisted sessions: how many sessions,
+    split by assignment arm — which surfaces the self-selection confound (heavy users over- or
+    under-pick a variant), and the per-character spread."""
+    out = {}
+    for v in store.list_variants():
+        rows = store.sessions_for(v["id"])
+        if not rows:
+            continue
+        rnd = sum(1 for r in rows if r["arm"] == "randomized_default")
+        slf = sum(1 for r in rows if r["arm"] == "self_selected")
+        by_char = {}
+        for r in rows:
+            by_char[r["character_id"]] = by_char.get(r["character_id"], 0) + 1
+        out[v["id"]] = {"total": len(rows), "randomised": rnd, "self_selected": slf,
+                        "by_character": by_char}
+    return out
+
+
 def _prep(store: Store):
     gb = gradebook_from_store(store, TITLE)
     variants = {v["id"]: {"label": v.get("label") or v["id"], "model": v.get("model_name", ""),
@@ -27,17 +46,18 @@ def _prep(store: Store):
         field.update(measure_field(_VariantShim(vid, chars), "en", budget=200))
     profiles = build_profiles(field, "en")
     evidence = evidence_from_store(store)
-    return gb, variants, profiles, evidence
+    sessions = _session_summaries(store)
+    return gb, variants, profiles, evidence, sessions
 
 
 def build_html(store: Store) -> Tuple[str, str]:
     """Render (static_html, interactive_html) as strings, fresh from the DB."""
-    gb, variants, profiles, evidence = _prep(store)
+    gb, variants, profiles, evidence, sessions = _prep(store)
     tmp = pathlib.Path("out/_render")
     tmp.mkdir(parents=True, exist_ok=True)
     sp = render(gb, str(tmp / "s.html"), ability_profiles=profiles, scheme=SCHEME)
     ip = render_interactive(gb, variants, profiles, str(tmp / "i.html"),
-                            title=gb.title, evidence=evidence)
+                            title=gb.title, evidence=evidence, sessions=sessions)
     return pathlib.Path(sp).read_text(), pathlib.Path(ip).read_text()
 
 

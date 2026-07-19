@@ -222,6 +222,14 @@ class Store:
         else:
             self._exec("DELETE FROM grades"); self._exec("DELETE FROM evidence")
 
+    def clear_sessions(self, variant_ids: List[str] = None):
+        if variant_ids:
+            ph = self._ph()
+            self._exec(f"DELETE FROM sessions WHERE variant_id IN ({', '.join(ph for _ in variant_ids)})",
+                       tuple(variant_ids))
+        else:
+            self._exec("DELETE FROM sessions")
+
     # -- domain: read -------------------------------------------------------
     def list_models(self): return self._rows("SELECT * FROM models ORDER BY created_at")
     def list_prompts(self): return self._rows("SELECT * FROM prompts ORDER BY created_at")
@@ -246,6 +254,12 @@ class Store:
 
     def sessions_for(self, variant_id: str) -> List[dict]:
         rows = self._rows(f"SELECT * FROM sessions WHERE variant_id={self._ph()}", (variant_id,))
+        for r in rows:
+            r["signals"] = json.loads(r["signals"])
+        return rows
+
+    def all_sessions(self) -> List[dict]:
+        rows = self._rows("SELECT * FROM sessions ORDER BY id")
         for r in rows:
             r["signals"] = json.loads(r["signals"])
         return rows

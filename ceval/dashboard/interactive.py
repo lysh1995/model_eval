@@ -177,7 +177,27 @@ def _example_html(ev_dim: dict) -> str:
             f'{ex("good")}{ex("bad")}</details>')
 
 
-def _detail(grades, variants, vid, profiles, evidence):
+def _sessions_block(sess):
+    """Online drill-down from the persisted sessions: arm split (the self-selection confound) and
+    the per-character spread. Randomised = clean; self-selected reflects who chose the variant."""
+    if not sess:
+        return ""
+    rnd, slf = sess["randomised"], sess["self_selected"]
+    pull = (slf / rnd) if rnd else 0.0
+    tag = ("heavy users OVER-picked it — the self-selection confound inflates its self-selected arm"
+           if pull > 1.15 else
+           "heavy users UNDER-picked it" if pull < 0.85 else "picked ~evenly by both arms")
+    chars = " · ".join(f"{_e(c)}: {n}" for c, n in sorted(sess["by_character"].items()))
+    return (
+        f'<div class="char" style="margin-top:8px">'
+        f'<b>Behavioural drill-down</b> — {sess["total"]} sessions · '
+        f'randomised {rnd} vs self-selected {slf} '
+        f'(pull ×{pull:.2f}: {tag}). '
+        f'Grades above use the <b>randomised arm only</b>; the self-selected arm is retrieved but '
+        f'walled off as observational.<br><span class="note">by character — {chars}</span></div>')
+
+
+def _detail(grades, variants, vid, profiles, evidence, sessions=None):
     meta = variants[vid]
     prof = next((p for p in profiles if p["model"] == vid), None)
     ev = (evidence or {}).get(vid, {})
@@ -209,11 +229,14 @@ def _detail(grades, variants, vid, profiles, evidence):
                 f'<td>{bar}</td>'
                 f'<td class="note">{_e((g.get("caveats") or [""])[0][:52])}</td></tr></table>')
             out.append(_example_html(ev.get(g["dimension"], {})))
+    if sessions and sessions.get(vid):
+        out.append(_sessions_block(sessions[vid]))
     return "".join(out)
 
 
 def render_interactive(gradebook: Union[GradeBook, dict], variants: dict, profiles: list,
-                       out_path: str, title: Optional[str] = None, evidence: dict = None) -> str:
+                       out_path: str, title: Optional[str] = None, evidence: dict = None,
+                       sessions: dict = None) -> str:
     gb = gradebook.to_dict() if isinstance(gradebook, GradeBook) else gradebook
     grades = [g for g in gb["grades"] if g.get("segment") != "self_selected_arm"]
     profiles = [p.to_row() if hasattr(p, "to_row") else p for p in profiles]
@@ -228,7 +251,7 @@ def render_interactive(gradebook: Union[GradeBook, dict], variants: dict, profil
     tabs += [f'<label for="t_{i}">{_e(variants[v]["label"])}</label>' for i, v in enumerate(vids)]
 
     panels = [f'<div class="panel" id="p_all">{_matrix(grades, variants, vids)}</div>']
-    panels += [f'<div class="panel" id="p_{i}">{_detail(grades, variants, v, profiles, evidence)}</div>'
+    panels += [f'<div class="panel" id="p_{i}">{_detail(grades, variants, v, profiles, evidence, sessions)}</div>'
                for i, v in enumerate(vids)]
 
     cannot = "".join(f"<li>{_e(x)}</li>" for x in gb.get("cannot_measure", []))

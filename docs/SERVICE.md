@@ -68,11 +68,12 @@ in `demo/gen` + `demo/judge`; override with `--gen-dir` / `--judge-dir`.
 
 ## How eval flows through the DB
 
-1. `data add` / `data gen` write **dialogues** (offline) or the simulator writes **sessions**
-   (online) into the DB — the user keeps adding data points for a variant.
+1. `data add` / `data gen` write **dialogues** (offline data points); `eval run --online`
+   simulates production-like traffic and **persists it as `sessions` rows** (online data points),
+   then grades from the DB — the user keeps adding data points for a variant.
 2. `eval run` reads the DB, runs the scoring lanes (compute · psychometric · judge for offline;
-   behavioural for online), and writes **grades** + **evidence** back to the DB, tagged with the
-   evaluator version.
+   behavioural for online — diagnostics graded, traps walled off), and writes **grades** +
+   **evidence** back to the DB, tagged with the evaluator version. See [ONLINE.md](ONLINE.md).
 3. `dashboard` reads grades + evidence + variants from the DB and renders (overview matrix,
    per-variant detail with prompt + rank, good/bad examples). `serve` does the same but live —
    `ceval/serve.py` re-renders from the DB on **every request**, so the loop is: edit data / eval
@@ -85,9 +86,10 @@ The scoring pipeline itself is unchanged; only its input/output moved from files
 
 ```
 init               -> 9 tables
-seed  (reads demo/)-> 1 model, 4 prompts, 4 variants, 12 dialogues, 3 characters
-eval run --sim     -> 26 offline + 52 online grades + 20 evidence rows persisted
-dashboard          -> static + interactive HTML, 4 variants side by side
+seed  (reads demo/)-> 2 models, 4 prompts, 6 variants, 18 dialogues, 3 characters
+eval run           -> 33 offline grades (real Opus judge) + 3,000 online sessions persisted
+                      -> 78 online grades (graded from the DB) + 36 evidence rows
+dashboard          -> static + interactive HTML; Sonnet-vs-Haiku matrix + per-variant drill-down
 serve              -> http://127.0.0.1:8787 renders the same, live from the DB; inject a variant
                       while it runs and it appears on the next request with no restart
 ```
@@ -104,5 +106,7 @@ committed in `demo/`.
   recordings exist (real-Claude judging via subagent, or `--sim`). Compute + online grades are
   automatic. A variant with only a couple of short dialogues gets near-zero/NaN on some metrics,
   honestly dropped rather than faked.
-- **Online sessions** are still simulated (faked traffic) to exercise the platform; the schema
-  stores real sessions the same way when a product emits them.
+- **Online sessions are now persisted** as `sessions` rows and graded from the DB (drill-down by
+  variant / character / arm). The **traffic is still simulated** — with a *known injected
+  structure* so the grader can be tested, not real users; the schema stores a real product's
+  sessions the same way when one emits them. See [ONLINE.md](ONLINE.md).

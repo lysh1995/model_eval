@@ -161,6 +161,7 @@ our instrument is frozen.
 | **[docs/SERVICE.md](docs/SERVICE.md)** | **The service architecture** — DB, CLI, offline + online, dashboard, serve |
 | **[docs/HONEST-REVIEW.md](docs/HONEST-REVIEW.md)** | **What works, what doesn't, and the six times a plausible number was wrong** |
 | **[docs/OFFLINE.md](docs/OFFLINE.md)** | The offline design: test targets, the dimension scheme, scoring ranked by how little human judgment it needs |
+| **[docs/ONLINE.md](docs/ONLINE.md)** | The online design: simulated production traffic, persisted sessions, diagnostics vs traps, the self-selection confound |
 | **[docs/ABILITY-MODEL.md](docs/ABILITY-MODEL.md)** | **What makes a roleplay model good**: comprehension → application & steerability → creativity |
 | **[docs/EVAL-DESIGN.md](docs/EVAL-DESIGN.md)** | The decided measurement design: two rules, GATE/GUIDE/DEAD, the judge protocol, normalization |
 | **[docs/BENCHMARKS.md](docs/BENCHMARKS.md)** | The ~50-dimension catalogue, and an honest account of what it does not measure |
