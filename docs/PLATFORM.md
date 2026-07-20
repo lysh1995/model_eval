@@ -10,7 +10,7 @@ statistical engine and one lineage store. Everything else is I/O.
 [SERVICE.md](SERVICE.md) — with the four pillars realized in code (registry →
 [`ceval/store/`](../ceval/store/), offline gate → [`ceval/metrics/`](../ceval/metrics/) +
 [`ceval/offline/`](../ceval/offline/), online monitor → [`ceval/online/`](../ceval/online/), stats →
-[`ceval/stats.py`](../ceval/stats.py)); still design-ahead where that's honest — the online monitor
+[`ceval/core/stats.py`](../ceval/core/stats.py)); still design-ahead where that's honest — the online monitor
 runs on **simulated** sessions, and MySQL and the Lane-3 judge are designed but unproven.
 
 ---
@@ -283,12 +283,12 @@ The build order still explains the sequencing; the added column is where each ti
 
 | | | status | why this order (the tiering still holds) |
 |---|---|---|---|
-| **1** | Registry + metric engine + **stats engine** | **Built** — `ceval/store/`, `ceval/metrics/`, `ceval/stats.py` | Everything stamps against the registry; the stats engine is 4 features at once. Tier A shipped the day it existed |
-| **2** | **B5 steerability** (first use of the key) | **Machinery built** (`ceval/lifecycle.py` + the registry key); the DEAD/ALIVE result is still the open question | **If DEAD, the variant lifecycle is a ritual and the platform's premise fails.** The DEAD hypothesis is now the prior. **Find out before building the rest** |
-| **3** | B1–B4 ability probes + judge service | **Probes built** (`ceval/ability.py`); **the Lane-3 judge is not validated** | Cheap, bound, high-agreement; Ψ1 **donates** a noise floor |
+| **1** | Registry + metric engine + **stats engine** | **Built** — `ceval/store/`, `ceval/metrics/`, `ceval/core/stats.py` | Everything stamps against the registry; the stats engine is 4 features at once. Tier A shipped the day it existed |
+| **2** | **B5 steerability** (first use of the key) | **Machinery built** (`ceval/core/lifecycle.py` + the registry key); the DEAD/ALIVE result is still the open question | **If DEAD, the variant lifecycle is a ritual and the platform's premise fails.** The DEAD hypothesis is now the prior. **Find out before building the rest** |
+| **3** | B1–B4 ability probes + judge service | **Probes built** (`ceval/offline/ability.py`); **the Lane-3 judge is not validated** | Cheap, bound, high-agreement; Ψ1 **donates** a noise floor |
 | **4** | Tier 0 + escalation + C2 | **Built as code, exercised on simulated turns** | Legally load-bearing; EU Art 50 deadline **2026-08-02** |
 | **5** | Collection contract | **Built** (`ceval/online/collector.py`, `events.py`) — emitted by a simulator, not a real product | Nothing online exists without it; `assignment_arm` is unrecoverable later |
-| **6** | Sampler, drift, dashboards | **Built** (`ceval/online/`, `ceval/dashboard/`) — on simulated traffic | Only useful once traffic exists |
+| **6** | Sampler, drift, dashboards | **Built** (`ceval/online/`, `ceval/web/dashboard/`) — on simulated traffic | Only useful once traffic exists |
 | **7** | The bridge | **Designed-only** — the backtest against our A/B history hasn't run (§5) | The only thing that makes the rest honest |
 
 **Step 2 was deliberately placed before most of the build.** It's the cheapest experiment that can

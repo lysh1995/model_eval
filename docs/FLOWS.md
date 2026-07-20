@@ -1,7 +1,7 @@
 # System flows
 
 How the platform actually works, end to end. Every flow here is constrained by a measured number
-— the design is downstream of [PROJECT.md §4](../PROJECT.md#4-what-we-measured-ourselves-not-borrowed),
+— the design is downstream of [PROJECT.md §4](PROJECT.md#4-what-we-measured-ourselves-not-borrowed),
 not of taste.
 
 > **Note:** the online event schema (Flow 3) follows the OpenTelemetry GenAI semantic conventions and is implemented in `ceval/online/events.py` — the field names below are concrete.

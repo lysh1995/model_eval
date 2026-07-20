@@ -62,7 +62,7 @@ expert dissent, the dissenters were right). That honesty is the product.
 
 ---
 
-*Structure: [`ceval/gradebook.py`](../ceval/gradebook.py). Dimensions:
+*Structure: [`ceval/core/gradebook.py`](../ceval/core/gradebook.py). Dimensions:
 [OFFLINE.md](OFFLINE.md) · [ONLINE.md](ONLINE.md) · [ABILITY-MODEL.md](ABILITY-MODEL.md). The
 platform that produces it: [SERVICE.md](SERVICE.md). What doesn't work:
 [HONEST-REVIEW.md](HONEST-REVIEW.md).*

@@ -3,8 +3,8 @@
 **Status:** Research complete (16 streams, 475 sources, 26 notes). Design decided. **Platform built
 and running as a local end-to-end service** — DB-backed CLI (`python3 -m ceval`), offline + online
 eval, live dashboard; ~6,800 LOC, zero dependencies, no API key. **10 of 13 requirements fully met**
-([HONEST-REVIEW.md](docs/HONEST-REVIEW.md)); by design the gate list is short — repetition is the
-one validated gate, everything else guides a human ([BENCHMARKS.md](docs/BENCHMARKS.md)).
+([HONEST-REVIEW.md](HONEST-REVIEW.md)); by design the gate list is short — repetition is the
+one validated gate, everything else guides a human ([BENCHMARKS.md](BENCHMARKS.md)).
 **Last updated:** 2026-07-18
 
 ---
@@ -31,7 +31,7 @@ and not a 4?"**
 If the instrument is bad, the platform is an expensive random number generator that produces
 confident, well-formatted, wrong answers. We have already demonstrated in-house how easy that is
 to do by accident — twice, in one afternoon, on a metric the literature recommends
-([09](research/notes/09-offline-probes.md)).
+([09](../research/notes/09-offline-probes.md)).
 
 ### What we can and cannot promise
 
@@ -114,7 +114,7 @@ predicts which dimensions will *never* stabilize no matter how much we spend on 
   forbids using them.
 - **The brief's replay premise was wrong and we corrected it.** User turns are *not* shared
   traffic: across the 11 models on the same seed, they diverge at the **second user turn, in 100%
-  of cases** ([00](research/notes/00-dataset-ground-truth.md)). Replaying the **user** half is
+  of cases** ([00](../research/notes/00-dataset-ground-truth.md)). Replaying the **user** half is
   still defensible; freezing the **assistant** half is not.
 - **Legal is not optional and has a calendar** (desk research — needs counsel review):
   NY GBL Art. 47 (in force 2025-11-05) and CA SB 243 (in force 2026-01-01) require a
@@ -129,7 +129,7 @@ predicts which dimensions will *never* stabilize no matter how much we spend on 
 ## 4. What we measured ourselves (not borrowed)
 
 These are the load-bearing local findings. All judge-free, all reproducible from
-[`scripts/`](scripts/).
+[`scripts/`](../scripts/).
 
 | Finding | Number | Consequence |
 |---|---|---|
@@ -147,14 +147,14 @@ These are the load-bearing local findings. All judge-free, all reproducible from
 
 ### Phase 0 — Research ✅ complete
 16 streams (11 primary + 5 adversarial cross-checks), 475 raw sources, 26 synthesis notes. See
-[RESEARCH-PLAN.md](docs/RESEARCH-PLAN.md) for gaps and what still needs investigation.
+[RESEARCH-PLAN.md](RESEARCH-PLAN.md) for gaps and what still needs investigation.
 
 ### Phase 1 — Design ✅ decided
-- [ABILITY-MODEL.md](docs/ABILITY-MODEL.md): what "good" decomposes into — L1 comprehension →
+- [ABILITY-MODEL.md](ABILITY-MODEL.md): what "good" decomposes into — L1 comprehension →
   L2 application & steerability → L3 creativity. The positive construct.
-- [EVAL-DESIGN.md](docs/EVAL-DESIGN.md): the decided measurement design (supersedes note 11).
-- [BENCHMARKS.md](docs/BENCHMARKS.md): the catalogue, and §0.5 on what it does not measure.
-- [FLOWS.md](docs/FLOWS.md): system flows end to end.
+- [EVAL-DESIGN.md](EVAL-DESIGN.md): the decided measurement design (supersedes note 11).
+- [BENCHMARKS.md](BENCHMARKS.md): the catalogue, and §0.5 on what it does not measure.
+- [FLOWS.md](FLOWS.md): system flows end to end.
 
 ### Phase 2 — Offline engine ✅ built
 Lanes 0–2 (judge-free) run on real data. Lane 3 (judge) is wired behind a provider interface with a
@@ -167,7 +167,7 @@ measured. Sessions are still **simulated** (no product behind it). Code: `ceval/
 
 ### Phase 4 — Drill-down + decision surface ✅ built
 Hierarchical model, shrunk slices, ship-gate report, and the DB-backed dashboard (static ·
-interactive · live `serve`). Code: `ceval/stats.py`, `ceval/store/`, `ceval/dashboard/`, `ceval/serve.py`.
+interactive · live `serve`). Code: `ceval/core/stats.py`, `ceval/store/`, `ceval/web/dashboard/`, `ceval/web/serve.py`.
 
 ---
 

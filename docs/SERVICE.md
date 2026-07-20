@@ -76,11 +76,11 @@ in `demo/gen` + `demo/judge`; override with `--gen-dir` / `--judge-dir`.
    **evidence** back to the DB, tagged with the evaluator version. See [ONLINE.md](ONLINE.md).
 3. `dashboard` reads grades + evidence + variants from the DB and renders (overview matrix,
    per-variant detail with prompt + rank, good/bad examples). `serve` does the same but live —
-   `ceval/serve.py` re-renders from the DB on **every request**, so the loop is: edit data / eval
+   `ceval/web/serve.py` re-renders from the DB on **every request**, so the loop is: edit data / eval
    run → refresh the browser → new data. No cached file, no rebuild step.
 
 The scoring pipeline itself is unchanged; only its input/output moved from files to the DB
-(`ceval/store/adapt.py`) and the render moved behind a shared builder (`ceval/report.py`).
+(`ceval/store/adapt.py`) and the render moved behind a shared builder (`ceval/web/report.py`).
 
 ## Verified end to end (SQLite, from a fresh DB)
 

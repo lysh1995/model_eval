@@ -44,7 +44,7 @@ python3 -m ceval probe pool                     # watch the platform REFUSE to p
 python3 -m ceval probe compare deepseek-v3.2 deepseek-v3.1 --lang en   # a ship report: Δ, CI, MDE
 ```
 
-Full command reference in [QUICKSTART.md](QUICKSTART.md).
+Full command reference in [QUICKSTART.md](docs/QUICKSTART.md).
 
 ## What this platform promises — and refuses to
 
@@ -158,7 +158,7 @@ our instrument is frozen.
 | | |
 |---|---|
 | **[docs/GRADEBOOK.md](docs/GRADEBOOK.md)** | **Read first** — the grade book is the core: product thinking + research + a testable/repeatable/automated platform |
-| **[QUICKSTART.md](QUICKSTART.md)** | Run the service and reproduce the findings — zero deps, no key |
+| **[QUICKSTART.md](docs/QUICKSTART.md)** | Run the service and reproduce the findings — zero deps, no key |
 | **[docs/SERVICE.md](docs/SERVICE.md)** | **The service architecture** — DB, CLI, offline + online, dashboard, serve |
 | **[docs/HONEST-REVIEW.md](docs/HONEST-REVIEW.md)** | **What works, what doesn't, and the six times a plausible number was wrong** |
 | **[docs/OFFLINE.md](docs/OFFLINE.md)** | The offline design: test targets, the dimension scheme, scoring ranked by how little human judgment it needs |
@@ -168,7 +168,7 @@ our instrument is frozen.
 | **[docs/BENCHMARKS.md](docs/BENCHMARKS.md)** | The ~50-dimension catalogue, and an honest account of what it does not measure |
 | **[docs/PLATFORM.md](docs/PLATFORM.md)** | The architecture: offline gate and online monitor as one instrument, and where it's built |
 | **[docs/FLOWS.md](docs/FLOWS.md)** | System flows: dry-run → benchmark gate → online collection → eval loop → ship decision |
-| **[PROJECT.md](PROJECT.md)** | Mission, requirements, acceptance criteria, open decisions, risks |
+| **[PROJECT.md](docs/PROJECT.md)** | Mission, requirements, acceptance criteria, open decisions, risks |
 | **[docs/RESEARCH-PLAN.md](docs/RESEARCH-PLAN.md)** | What we researched, what's missing, what needs investigation |
 | **[research/](research/)** | The knowledge base — 475 raw sources + 26 synthesis notes |
 
