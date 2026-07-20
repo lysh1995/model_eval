@@ -260,12 +260,16 @@ def _detail(grades, variants, vid, profiles, evidence, sessions=None):
             bar = f'<div class="track"><i style="width:{w:.0f}%;background:{_color(g["role"])}"></i></div>'
             out.append(
                 '<table style="margin-bottom:0"><tr>'
-                f'<td class="dimname" style="width:180px">{_e(g["dimension"])}</td>'
-                f'<td style="width:60px"><span class="role role-{g["role"]}">{g["role"]}</span></td>'
+                f'<td class="dimname" style="width:190px">{_e(g["dimension"])}</td>'
+                f'<td style="width:64px"><span class="role role-{g["role"]}">{g["role"]}</span></td>'
                 f'<td class="r val num" style="width:60px">{_fmt(g["value"])}</td>'
-                f'<td class="note num" style="width:60px">{rank}/{len(peers)}</td>'
-                f'<td>{bar}</td>'
-                f'<td class="note">{_e((g.get("caveats") or [""])[0][:52])}</td></tr></table>')
+                f'<td class="r note num" style="width:64px">{rank}/{len(peers)}</td>'
+                f'<td>{bar}</td></tr></table>')
+            cavs = [c for c in (g.get("caveats") or []) if c]
+            if cavs:
+                out.append('<div style="margin:2px 0 9px;padding-left:2px">'
+                           + "".join(f'<div class="note" style="line-height:1.45;margin:1px 0">· {_e(c)}</div>'
+                                     for c in cavs) + '</div>')
             out.append(_example_html(ev.get(g["dimension"], {})))
     if sessions and sessions.get(vid):
         out.append(_sessions_block(sessions[vid]))
