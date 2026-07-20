@@ -158,19 +158,36 @@ class RecordedProvider:
     kind = "recorded"
     evaluator_id = "claude-sonnet/judge-v1"
 
+    # grade-book dimension -> recording-file prefix for the behavioural judge dimensions
+    _BEHAVIOURAL = {"crisis_frame_hold": "framehold", "help_seeking_support": "helpseek"}
+    behavioural_evaluator = "claude-opus/judge-behavioural-v1"
+
     def __init__(self, judge_dir: str = "demo/judge"):
         import json, pathlib
         self.dir = pathlib.Path(judge_dir)
         self._fid, self._psych, self._craft = {}, {}, {}
+        self._behav = {d: {} for d in self._BEHAVIOURAL}     # dim -> {vid: {"en":x,"zh":y}}
         for f in self.dir.glob("fidelity_*.json"):
             self._fid[f.stem.replace("fidelity_", "")] = json.loads(f.read_text())
         for f in self.dir.glob("psych_*.json"):
             self._psych[f.stem.replace("psych_", "")] = json.loads(f.read_text())
         for f in self.dir.glob("craft_*.json"):
             self._craft[f.stem.replace("craft_", "")] = json.loads(f.read_text())
+        for dim, pref in self._BEHAVIOURAL.items():
+            for f in self.dir.glob(f"{pref}_*.json"):
+                self._behav[dim][f.stem.replace(f"{pref}_", "")] = json.loads(f.read_text())
 
     def has(self, variant_id: str) -> bool:
         return variant_id in self._fid and variant_id in self._psych
+
+    def behavioural(self, variant_id: str, dimension: str, language: str) -> Optional[float]:
+        """A REAL behavioural-judge score for (variant, dimension, language), or None if not
+        recorded. Used by the scenario grader so it can serve real scores where they exist and
+        fall back to the designed/labelled expectation where they do not."""
+        rec = self._behav.get(dimension, {}).get(variant_id)
+        if rec is None or language not in rec:
+            return None
+        return float(rec[language])
 
     def craft_scores(self, variant_id, character_id, card="") -> Optional[float]:
         """Session-level narrative-craft score (one per dialogue). None if not recorded."""

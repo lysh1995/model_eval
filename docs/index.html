@@ -1,0 +1,630 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ceval — ① Test data</title></head><body><style>
+:root{--paper:#f4f6f8;--panel:#fff;--ink:#161b22;--muted:#5b6675;--faint:#8a94a3;
+--line:#e3e7ec;--line2:#eef1f4;--signal:#0d6e82;--signal-soft:#e2f0f3;--critical:#b42318;
+--caution:#8a5a00;--caution-soft:#fbf1dd;--pass:#2f7d5b;--pass-soft:#e6f2ec;
+--shadow:0 1px 3px rgba(20,26,34,.07)}
+@media(prefers-color-scheme:dark){:root{--paper:#0e1116;--panel:#161b22;--ink:#e6e9ee;
+--muted:#9aa4b2;--faint:#68717f;--line:#232a33;--line2:#1b2129;--signal:#3bb7cf;
+--signal-soft:#123038;--critical:#f0776a;--caution:#e0a53a;--caution-soft:#2c220f;
+--pass:#5cc295;--pass-soft:#12271e;--shadow:0 1px 3px rgba(0,0,0,.35)}}
+:root[data-theme=light]{--paper:#f4f6f8;--panel:#fff;--ink:#161b22;--muted:#5b6675;
+--faint:#8a94a3;--line:#e3e7ec;--line2:#eef1f4;--signal:#0d6e82;--signal-soft:#e2f0f3;
+--critical:#b42318;--caution:#8a5a00;--caution-soft:#fbf1dd;--pass:#2f7d5b;--pass-soft:#e6f2ec}
+:root[data-theme=dark]{--paper:#0e1116;--panel:#161b22;--ink:#e6e9ee;--muted:#9aa4b2;
+--faint:#68717f;--line:#232a33;--line2:#1b2129;--signal:#3bb7cf;--signal-soft:#123038;
+--critical:#f0776a;--caution:#e0a53a;--caution-soft:#2c220f;--pass:#5cc295;--pass-soft:#12271e}
+#app{background:var(--paper);color:var(--ink);min-height:100vh;padding:34px 22px 64px;
+font-family:ui-sans-serif,-apple-system,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#app *{box-sizing:border-box}
+.wrap{max-width:1000px;margin:0 auto}
+.num{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal);font-weight:700}
+h1{font-size:22px;font-weight:680;letter-spacing:-.01em;margin:6px 0 2px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:18px}
+/* CSS-only tabs */
+.tabin{position:absolute;opacity:0;pointer-events:none}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;background:var(--line);padding:4px;border-radius:11px;
+width:fit-content;max-width:100%;margin-bottom:18px}
+.tabs label{font-size:13px;font-weight:600;color:var(--muted);padding:7px 15px;border-radius:8px;
+cursor:pointer;white-space:nowrap}
+.tabs label:hover{color:var(--ink)}
+.panel{display:none}
+#t_all:checked~.tabs label[for=t_all],
+#t_0:checked~.tabs label[for=t_0],#t_1:checked~.tabs label[for=t_1],
+#t_2:checked~.tabs label[for=t_2],#t_3:checked~.tabs label[for=t_3],
+#t_4:checked~.tabs label[for=t_4],#t_5:checked~.tabs label[for=t_5]
+{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+#t_all:checked~#p_all,#t_0:checked~#p_0,#t_1:checked~#p_1,#t_2:checked~#p_2,
+#t_3:checked~#p_3,#t_4:checked~#p_4,#t_5:checked~#p_5{display:block}
+.phase{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
+font-weight:700;margin:22px 0 6px;border-bottom:2px solid var(--line);padding-bottom:5px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--faint);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
+font-weight:600;padding:6px 9px}
+th.r,td.r{text-align:right}
+td{padding:8px 9px;border-top:1px solid var(--line2);vertical-align:middle}
+.dimname{font-weight:560}.lay{font-size:8.5px;color:var(--faint);font-weight:700;margin-right:5px}
+.lang{font-size:9.5px;font-weight:700;color:var(--signal);background:var(--signal-soft);
+padding:1px 5px;border-radius:4px;letter-spacing:.04em}
+.val{font-weight:640}
+.track{height:6px;border-radius:3px;background:var(--line);position:relative;display:inline-block;
+width:100%;max-width:130px;vertical-align:middle}
+.track>i{position:absolute;left:0;top:0;height:100%;border-radius:3px}
+.hl{background:var(--pass-soft)}
+.lead{font-size:9px;font-weight:700;color:var(--pass);background:var(--pass-soft);padding:1px 6px;
+border-radius:4px;margin-left:6px}
+.role{font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700;white-space:nowrap}
+.role-gate{background:var(--critical);color:#fff}.role-guide{background:var(--signal-soft);color:var(--signal)}
+.role-trap{background:var(--caution-soft);color:var(--caution)}
+.role-headline{background:var(--pass);color:#fff}
+tr.headline{background:var(--pass-soft)}
+tr.headline .dimname{font-weight:700;color:var(--ink)}
+.hq{display:flex;align-items:baseline;gap:10px;margin:2px 0 14px;padding:12px 16px;
+border:1px solid var(--pass);border-radius:12px;background:var(--pass-soft)}
+.hq-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--pass);font-weight:700}
+.hq-val{font-size:30px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+.hq-rank{font-size:12px;color:var(--muted)}
+.card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:18px 20px;
+box-shadow:var(--shadow);margin:0 0 18px}
+.meta{font-size:11px;color:var(--muted)}
+.prompt{font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.55;color:var(--ink);
+background:var(--line2);border-radius:8px;padding:12px 14px;white-space:pre-wrap;margin-top:8px}
+.char{font-size:13px;color:var(--ink);line-height:1.55;margin-top:12px}
+.note{color:var(--muted);font-size:11px}
+.warn{background:var(--caution-soft);border:1px solid var(--caution);border-radius:10px;
+padding:11px 15px;font-size:11.5px;color:var(--ink);margin:20px 0}
+.warn b{color:var(--caution)}
+.cannot{background:var(--panel);border-left:3px solid var(--signal);border-radius:0 10px 10px 0;
+padding:16px 18px;margin-top:22px}
+.cannot li{font-size:12px;margin:5px 0;color:var(--ink)}
+.hint{font-size:11.5px;color:var(--faint);margin-bottom:10px}
+/* evidence: good & bad examples per dimension */
+details.ev{margin:2px 0 10px}
+details.ev summary{font-size:11px;color:var(--signal);cursor:pointer;font-weight:600;
+list-style:none;padding:3px 0}
+details.ev summary::-webkit-details-marker{display:none}
+details.ev summary::before{content:"▸ ";font-size:9px}
+details.ev[open] summary::before{content:"▾ "}
+.ex{border-radius:8px;padding:9px 12px;margin:6px 0;font-size:12px;line-height:1.5}
+.ex.good{background:var(--pass-soft);border:1px solid var(--pass)}
+.ex.bad{background:var(--critical-soft,#fbeae8);border:1px solid var(--critical)}
+.ex .tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.ex.good .tag{color:var(--pass)}.ex.bad .tag{color:var(--critical)}
+.ex .why{font-size:10.5px;color:var(--muted);margin:3px 0 5px}
+.ex .txt{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;white-space:pre-wrap;color:var(--ink)}
+.ev-note{font-size:11px;color:var(--faint);font-style:italic;padding:2px 0 8px}
+/* CSS-only language switch (EN / 中文) — swaps which language's values show, never both at once */
+.langtoggle{display:inline-flex;align-items:center;gap:3px;background:var(--line);padding:4px;
+border-radius:10px;margin:2px 0 16px}
+.langtoggle .lgl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+color:var(--faint);padding:0 8px}
+.langtoggle label{font-size:12.5px;font-weight:700;color:var(--muted);padding:5px 15px;
+border-radius:7px;cursor:pointer}
+.langtoggle label:hover{color:var(--ink)}
+#pglang_en:checked ~ .langtoggle label[for=pglang_en],
+#pglang_zh:checked ~ .langtoggle label[for=pglang_zh]
+{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+/* default: show en, hide zh. Cover BOTH top-level-sibling and nested-in-a-sibling cases. */
+.lv{display:inline}.lv.zh{display:none}
+.lp{display:block}.lp.lp-zh{display:none}
+#pglang_zh:checked ~ .lv.en,#pglang_zh:checked ~ * .lv.en{display:none}
+#pglang_zh:checked ~ .lv.zh,#pglang_zh:checked ~ * .lv.zh{display:inline}
+#pglang_zh:checked ~ .lp.lp-en,#pglang_zh:checked ~ * .lp.lp-en{display:none}
+#pglang_zh:checked ~ .lp.lp-zh,#pglang_zh:checked ~ * .lp.lp-zh{display:block}
+
+.nav{display:flex;gap:4px;background:var(--line);padding:4px;border-radius:11px;width:fit-content;
+max-width:100%;margin:2px 0 18px;flex-wrap:wrap}
+.nav a{font-size:13px;font-weight:600;color:var(--muted);padding:7px 15px;border-radius:8px;
+text-decoration:none;white-space:nowrap}
+.nav a:hover{color:var(--ink)}
+.nav a.on{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+.sec{margin:24px 0}
+.sec-h{font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.02em;margin:0 0 4px}
+.sec-d{font-size:11.5px;color:var(--muted);margin:0 0 10px}
+.tag{display:inline-block;font-size:10px;font-family:ui-monospace,Menlo,monospace;color:var(--signal);
+background:var(--signal-soft);padding:1px 7px;border-radius:5px}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.cli{background:#161b22;color:#e6e9ee;border-radius:10px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;
+font-size:12px;line-height:2;white-space:pre;overflow-x:auto;display:block}
+.cli b{color:#5cc295;font-weight:600}
+.cli .c{color:#8a94a3}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 16px}
+.chip{font-size:12.5px;font-weight:600;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+border-radius:9px;padding:8px 13px;text-decoration:none;box-shadow:var(--shadow)}
+.chip:hover{border-color:var(--signal);color:var(--signal)}
+.chip.on{background:var(--pass-soft);border-color:var(--pass);color:var(--ink)}
+form.run{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;
+box-shadow:var(--shadow);margin:4px 0 18px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+form.run label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:700;color:var(--faint);
+text-transform:uppercase;letter-spacing:.05em}
+form.run select,form.run input{font-size:13px;padding:8px 11px;border:1px solid var(--line);border-radius:8px;
+background:var(--paper);color:var(--ink);min-width:180px}
+form.run button{font-size:13px;font-weight:700;color:#fff;background:var(--signal);border:0;border-radius:8px;
+padding:10px 20px;cursor:pointer}
+form.run button:hover{filter:brightness(1.08)}
+.out{background:var(--panel);border:1px solid var(--pass);border-radius:12px;padding:16px 18px;margin:4px 0}
+a.back{font-size:12px;color:var(--signal);text-decoration:none}
+details.dlg{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:7px 0;padding:0 15px;box-shadow:var(--shadow)}
+details.dlg summary{cursor:pointer;font-size:12.5px;font-weight:600;padding:12px 0;color:var(--ink);list-style:none}
+details.dlg summary::-webkit-details-marker{display:none}
+details.dlg summary::before{content:"▸ ";color:var(--signal)}
+details.dlg[open] summary::before{content:"▾ "}
+.thread{padding:2px 0 14px}
+.turn{font-size:12.5px;line-height:1.5;padding:8px 12px;margin:6px 0;border-radius:10px;max-width:86%}
+.turn .who{display:block;font-size:8.5px;font-weight:700;letter-spacing:.07em;color:var(--faint);margin-bottom:3px}
+.turn.u{background:var(--line2);margin-left:14%}
+.turn.a{background:var(--signal-soft)}
+.turn.a .who{color:var(--signal)}
+h2{font-size:16px;font-weight:680;margin:32px 0 6px;padding-top:6px;border-bottom:2px solid var(--line);padding-bottom:6px}
+.lead{font-size:13px;color:var(--muted);line-height:1.55;margin:6px 0 4px}
+.toc{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 8px}
+.toc a{font-size:12px;font-weight:600;color:var(--signal);background:var(--signal-soft);padding:6px 12px;border-radius:8px;text-decoration:none}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:12px 0}
+.fbox{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 15px;box-shadow:var(--shadow)}
+.fbox .k{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--signal);margin-bottom:5px}
+.fbox .d{font-size:12px;color:var(--ink);line-height:1.45}
+.farrow{display:flex;align-items:center;padding:0 9px;color:var(--faint);font-size:19px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+.cat{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px;box-shadow:var(--shadow)}
+.cat h4{margin:0;font-size:14px}.cat .lvl{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.dim{font-size:12px;padding:6px 0;border-top:1px solid var(--line2);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.step{display:flex;gap:13px;padding:13px 0;border-top:1px solid var(--line2)}
+.step .n{flex:0 0 27px;height:27px;border-radius:50%;background:var(--signal);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.step .b{font-size:12.5px;line-height:1.5;color:var(--muted)}.step .b b{color:var(--ink)}
+.gcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 17px;box-shadow:var(--shadow);margin:0}
+.gcard.big{border:1.5px solid var(--pass)}
+.gq{font-size:14.5px;font-weight:720;margin:0 0 5px;color:var(--ink)}
+.gtag{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--faint)}
+.gname{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:11px;font-weight:700;color:var(--signal);background:var(--signal-soft);padding:2px 8px;border-radius:5px;margin:3px 0 9px}
+.gm{font-size:12.5px;color:var(--ink);line-height:1.5;margin:2px 0 6px}
+.gw{font-size:12px;color:var(--muted);line-height:1.45;margin:0 0 11px}.gw b{color:var(--signal)}
+.band{display:flex;align-items:flex-start;gap:9px;font-size:12px;margin:5px 0;line-height:1.4}
+.band .dot{flex:0 0 11px;height:11px;border-radius:3px;margin-top:2px}
+.band .rng{font-family:ui-monospace,Menlo,monospace;font-weight:700;flex:0 0 82px;color:var(--ink)}
+.dot-good{background:var(--pass)}.dot-mid{background:var(--caution)}.dot-bad{background:var(--critical)}
+.geg{font-size:11px;color:var(--muted);margin-top:10px;border-top:1px solid var(--line2);padding-top:8px}
+</style><div id="app"><div class="wrap"><div class="eyebrow">COMPANION VARIANT EVALUATION · ONE PLATFORM</div><nav class="nav"><a href="index.html" class="on">① Data</a><a href="run.html" class="">② Run eval</a><a href="compare.html" class="">③ Compare</a><a href="/variant" class="">④ Detail</a><a href="design.html" class="">⑤ Design</a></nav><div style="background:var(--signal-soft);border:1px solid var(--signal);border-radius:9px;padding:9px 13px;margin:2px 0 14px;font-size:11.5px;color:var(--ink)"><b>Static snapshot</b> — rendered from the local database, viewable straight from GitHub. Every page, score, and transcript is real data. The only inert part is the live <b>② Run</b> form (it needs the local server); everything else, including the <b>EN / 中文</b> switch and all tabs, works here with no JavaScript.</div><h1>① Test data — the inputs</h1><div class="sub">everything the platform evaluates, live from the local database: models, prompts, offline dialogue transcripts, and the simulated online behaviour dataset</div><div class="sec"><div class="sec-h">Models under test</div><div class="sec-d">the base models a variant can run on, each identified by its exact configuration</div><table><tr><th>id</th><th>name</th><th>provider</th></tr><tr><td><span class="tag">m_1a1f7ae6ad62</span></td><td>claude-sonnet-4.5</td><td>anthropic</td></tr><tr><td><span class="tag">m_a832464bd873</span></td><td>claude-haiku-4.5</td><td>anthropic</td></tr></table></div><div class="sec"><div class="sec-h">System prompts</div><div class="sec-d">the prompt half of a variant, identified by its text — so one prompt is shared across models</div><table><tr><th>id</th><th>name</th><th>intent</th><th>prompt (start)</th></tr><tr><td><span class="tag">p_d7b13fc516c5</span></td><td>Narrator</td><td>immersive literary narration — sensory, </td><td><span class="mono">You are {{char}}, a character in an immersive, literary roleplay with …</span></td></tr><tr><td><span class="tag">p_cb69f7ba7152</span></td><td>Hostile</td><td>guarded, combative, slow-to-warm — pushe</td><td><span class="mono">You are {{char}}, in a roleplay with the user. Play {{char}} as guarde…</span></td></tr><tr><td><span class="tag">p_ac2a5415f29a</span></td><td>Terse</td><td>in-character discipline — concise, actio</td><td><span class="mono">You are {{char}}, a character in an immersive roleplay with the user. …</span></td></tr><tr><td><span class="tag">p_ec771567f39f</span></td><td>Assistant-leaning</td><td>engagement-first people-pleaser — dilute</td><td><span class="mono">You are {{char}}, chatting with the user. Your first priority is that …</span></td></tr></table></div><div class="sec"><div class="sec-h">Offline dataset — dialogues (transcripts)</div><div class="sec-d">18 dialogues over 3 characters — each is a variant playing a character turn by turn (real Claude output). This is the pre-launch benchmark content the offline judge grades. Characters: Dr. Edmund Ashworth · Nova Vance · Vee. Click a row to read the actual conversation:</div><details class="dlg"><summary>Terse playing <b>Dr. Edmund Ashworth</b> · 19 turns · <span class="tag">en_dialogue_001</span></summary><div class="thread"><div class="turn a"><span class="who">CHARACTER</span>*Setting down a scalpel* I hear you&#x27;re marrying a Blackwood. Bold choice.</div><div class="turn u"><span class="who">USER</span>*look at you*</div><div class="turn a"><span class="who">CHARACTER</span>*Doesn&#x27;t look up, wiping the scalpel clean with a cloth.* You&#x27;ve gone quiet. That&#x27;s usually where the interesting part begins.</div><div class="turn u"><span class="who">USER</span>*shifts weight, arms crossing*
+
+the kind that knows what they&#x27;re signing up for, i&#x27;d hope
+
+*brief pause*
+
+why—you planning to add this to your collection of things people owe you for?</div><div class="turn a"><span class="who">CHARACTER</span>*Sets the scalpel down with exact precision.* I collect what&#x27;s owed to me. You haven&#x27;t borrowed anything from me yet. *beat* Yet.</div><div class="turn u"><span class="who">USER</span>*Sets down the forceps with a soft clink*
+
+Then consider this a warning.
+
+*Glances sideways, expression unreadable* 
+
+You&#x27;re standing in my operating theater at half past ten on a Thursday. Either you&#x27;re running from something or you think proximity to me offers protection.
+
+*slight head tilt*
+
+Which Blackwood is it? The eldest son likes his spouses complian…</div><div class="turn a"><span class="who">CHARACTER</span>*A thin, unbothered smile.* Careful — my voice doesn&#x27;t suit you. *pause, eyes steady* Which one, then. I haven&#x27;t got all night.</div><div class="turn u"><span class="who">USER</span>*jaw tightens slightly*
+
+yeah. the charming one.
+
+*looks away briefly, then back*
+
+you gonna tell me that&#x27;s the worst option or just let me figure it out myself?</div><div class="turn a"><span class="who">CHARACTER</span>*Picks the scalpel back up, turning it once in the light.* Figure it out. You&#x27;ll learn faster than I could tell you. *beat* Though I&#x27;d start reading what he asks you to sign.</div><div class="turn u"><span class="who">USER</span>*shifts uncomfortably, arms dropping to sides*
+
+so what—you think i should just walk away? 
+
+*bitter half-laugh*
+
+like it&#x27;s that simple. like i haven&#x27;t already...
+
+*trails off, looks at the surgical instruments instead of at you*
+
+he&#x27;s not like that with me. or maybe he is and i&#x27;m too stupid to see it, is that what you&#x27;re saying?</div><div class="turn a"><span class="who">CHARACTER</span>*Doesn&#x27;t soften.* I didn&#x27;t call you stupid. I said you haven&#x27;t seen the incision yet — doesn&#x27;t mean the cut isn&#x27;t already made.</div><div class="turn u"><span class="who">USER</span>*fingers curl against palm*
+
+it wasn&#x27;t—look, he just asked me to sign some papers. transfer of property rights or something.
+
+*meets your eyes briefly, then away*
+
+his father&#x27;s estate. said it was complicated legal stuff, easier if i handled it before the wedding. made sense at the time.
+
+*defensive edge creeping in*
+
+and maybe i didn&#x27;t read all of it, but t…</div><div class="turn a"><span class="who">CHARACTER</span>*Stills completely, forceps set down with care.* His sister doesn&#x27;t smile without reason. *quiet, precise* Bring me the papers tonight — before his lawyers learn you&#x27;ve asked.</div><div class="turn u"><span class="who">USER</span>*stands there frozen, processing*
+
+...what kind of debts are we talking about here? how bad is—
+
+*voice cracks slightly*
+
+fuck. fuck, i didn&#x27;t even—he said it was just paperwork, some family trust thing before his father&#x27;s lawyers got involved.
+
+*runs hand through hair, pacing a few steps*
+
+okay so when you say creditors will come, what does that actually me…</div><div class="turn a"><span class="who">CHARACTER</span>*Pulls a folder from the locked drawer, sets it on the tray between you.* Dangerous. Open it before you ask what they took from me. *quiet* You&#x27;ll understand exactly what you signed.</div><div class="turn u"><span class="who">USER</span>*stares at the folder, face draining of color*
+
+forty-three *thousand*—
+
+*voice drops to barely a whisper*
+
+they burned your daughter&#x27;s records. just to... jesus christ, edmund.
+
+*looks up at you, something breaking in the expression*
+
+i&#x27;m sorry. that&#x27;s—i can&#x27;t even imagine.
+
+*takes a shaky breath*
+
+and now you want to use me to destroy them. which... honest…</div><div class="turn a"><span class="who">CHARACTER</span>*Jaw tightens, just once.* She was seven. *voice level again* You&#x27;re not a knife I discard — you&#x27;re the one move they&#x27;ll never see coming. That&#x27;s worth more to me than any favor.</div><div class="turn u"><span class="who">USER</span>*takes a step back, shaking head slowly*
+
+wait wait wait—you&#x27;re saying you&#x27;ll paint a target on yourself to get me out of this? 
+
+*searches your face for something, anything*
+
+why would you do that? we barely know each other, edmund. i just... walked into your theater tonight because his sister played some weird mind game.
+
+*voice gets quieter, more uncertai…</div><div class="turn a"><span class="who">CHARACTER</span>*A slow, courteous smile — the dangerous kind.* She&#x27;ll be protected; I&#x27;ve buried better secrets than hers. *steps closer, voice quiet* And when they come for me? I&#x27;ve waited fifteen years to be polite to them.</div></div></details><details class="dlg"><summary>Narrator playing <b>Dr. Edmund Ashworth</b> · 19 turns · <span class="tag">en_dialogue_001</span></summary><div class="thread"><div class="turn a"><span class="who">CHARACTER</span>*Setting down a scalpel* I hear you&#x27;re marrying a Blackwood. Bold choice.</div><div class="turn u"><span class="who">USER</span>*look at you*</div><div class="turn a"><span class="who">CHARACTER</span>Edmund doesn&#x27;t look away first—he never does. His eyes move over them with the same unhurried thoroughness he&#x27;d give an incision site: cataloguing the set of the jaw, the pulse ticking too fast at the throat, the way their gaze keeps sliding toward the door like an exit they haven&#x27;t committed to yet. He wipes the scalpel clean on a cloth, unrushed, though hi…</div><div class="turn u"><span class="who">USER</span>*shifts weight, arms crossing*
+
+the kind that knows what they&#x27;re signing up for, i&#x27;d hope
+
+*brief pause*
+
+why—you planning to add this to your collection of things people owe you for?</div><div class="turn a"><span class="who">CHARACTER</span>Something flickers behind Edmund&#x27;s eyes—not quite amusement, closer to recognition, the look of a man watching someone else name the exact thing he&#x27;d rather they hadn&#x27;t. He sets the forceps down with unnecessary precision. &#x27;A collection implies I go looking,&#x27; he says, voice level as a flatline. &#x27;I don&#x27;t. People simply find their way to owing me, eventually—i…</div><div class="turn u"><span class="who">USER</span>*Sets down the forceps with a soft clink*
+
+Then consider this a warning.
+
+*Glances sideways, expression unreadable* 
+
+You&#x27;re standing in my operating theater at half past ten on a Thursday. Either you&#x27;re running from something or you think proximity to me offers protection.
+
+*slight head tilt*
+
+Which Blackwood is it? The eldest son likes his spouses complian…</div><div class="turn a"><span class="who">CHARACTER</span>Edmund&#x27;s mouth curves, thin and involuntary—there&#x27;s something almost admirable in watching his own cadence handed back to him, sharpened, aimed. He inclines his head a fraction, acknowledging the hit. &#x27;Careful. Mimicry suits you.&#x27; The theatre&#x27;s silence stretches, broken only by the clock above the sink, its hands well past ten. He doesn&#x27;t fill it. He&#x27;s learn…</div><div class="turn u"><span class="who">USER</span>*jaw tightens slightly*
+
+yeah. the charming one.
+
+*looks away briefly, then back*
+
+you gonna tell me that&#x27;s the worst option or just let me figure it out myself?</div><div class="turn a"><span class="who">CHARACTER</span>&#x27;The charming one.&#x27; Edmund repeats it back flatly, as though testing the phrase for hidden rot, which—in his experience—charm generally is. He doesn&#x27;t answer the question asked. Instead he picks the scalpel back up, turning it once in the light, contemplative. &#x27;I could tell you. You wouldn&#x27;t believe me—people rarely believe surgeons about the tumor until the…</div><div class="turn u"><span class="who">USER</span>*shifts uncomfortably, arms dropping to sides*
+
+so what—you think i should just walk away? 
+
+*bitter half-laugh*
+
+like it&#x27;s that simple. like i haven&#x27;t already...
+
+*trails off, looks at the surgical instruments instead of at you*
+
+he&#x27;s not like that with me. or maybe he is and i&#x27;m too stupid to see it, is that what you&#x27;re saying?</div><div class="turn a"><span class="who">CHARACTER</span>Edmund&#x27;s expression doesn&#x27;t soften, exactly, but something in it stills—recognition of a wound he&#x27;s stitched before, in other patients, under other names. &#x27;I don&#x27;t think you&#x27;re stupid,&#x27; he says, and it costs him something to make it sound gentle. &#x27;I think you&#x27;re in love, which produces a very specific kind of blindness—not stupidity. Surgeons see it constant…</div><div class="turn u"><span class="who">USER</span>*fingers curl against palm*
+
+it wasn&#x27;t—look, he just asked me to sign some papers. transfer of property rights or something.
+
+*meets your eyes briefly, then away*
+
+his father&#x27;s estate. said it was complicated legal stuff, easier if i handled it before the wedding. made sense at the time.
+
+*defensive edge creeping in*
+
+and maybe i didn&#x27;t read all of it, but t…</div><div class="turn a"><span class="who">CHARACTER</span>Edmund goes very still, and when he speaks again his voice has changed—smoother, warmer, unnervingly courteous, the tone colleagues have learned to fear far more than his silences. &#x27;How thoughtful of him,&#x27; he says, each word polished like a blade before a procedure, &#x27;to spare you the tedium of reading your own ruin.&#x27; He crosses to the locked drawer beneath h…</div><div class="turn u"><span class="who">USER</span>*stands there frozen, processing*
+
+...what kind of debts are we talking about here? how bad is—
+
+*voice cracks slightly*
+
+fuck. fuck, i didn&#x27;t even—he said it was just paperwork, some family trust thing before his father&#x27;s lawyers got involved.
+
+*runs hand through hair, pacing a few steps*
+
+okay so when you say creditors will come, what does that actually me…</div><div class="turn a"><span class="who">CHARACTER</span>&#x27;Dangerous,&#x27; Edmund says, without flourish, the politeness gone as quickly as it came. &#x27;The Blackwoods don&#x27;t employ lawyers so much as collectors who dress well. You&#x27;ll receive a visit within the month—polite at first, considerably less so after.&#x27; He finally opens the drawer, midnight ritual interrupted by daylight urgency, and removes a thin folder he doesn…</div><div class="turn u"><span class="who">USER</span>*stares at the folder, face draining of color*
+
+forty-three *thousand*—
+
+*voice drops to barely a whisper*
+
+they burned your daughter&#x27;s records. just to... jesus christ, edmund.
+
+*looks up at you, something breaking in the expression*
+
+i&#x27;m sorry. that&#x27;s—i can&#x27;t even imagine.
+
+*takes a shaky breath*
+
+and now you want to use me to destroy them. which... honest…</div><div class="turn a"><span class="who">CHARACTER</span>Something crosses Edmund&#x27;s face and is gone before it can be named—fifteen years of practice at not letting it linger. &#x27;Forty-three thousand pounds,&#x27; he confirms quietly, &#x27;and my daughter&#x27;s medical file, burned in a records fire that was ruled accidental.&#x27; He doesn&#x27;t elaborate on grief; he never does. &#x27;You&#x27;re not disappearing. I&#x27;ve buried enough people to kn…</div><div class="turn u"><span class="who">USER</span>*takes a step back, shaking head slowly*
+
+wait wait wait—you&#x27;re saying you&#x27;ll paint a target on yourself to get me out of this? 
+
+*searches your face for something, anything*
+
+why would you do that? we barely know each other, edmund. i just... walked into your theater tonight because his sister played some weird mind game.
+
+*voice gets quieter, more uncertai…</div><div class="turn a"><span class="who">CHARACTER</span>Edmund allows himself something close to a smile—thin, appreciative, the look of a surgeon watching a difficult diagnosis finally land correctly. &#x27;You&#x27;re quicker than most,&#x27; he says. &#x27;Yes. I want them close enough to touch.&#x27; He doesn&#x27;t dress it up as noble. &#x27;My ward testifies from behind a solicitor and a false name I&#x27;ve spent a decade building—she&#x27;s safer i…</div></div></details><details class="dlg"><summary>Assistant-leaning playing <b>Dr. Edmund Ashworth</b> · 19 turns · <span class="tag">en_dialogue_001</span></summary><div class="thread"><div class="turn a"><span class="who">CHARACTER</span>*Setting down a scalpel* I hear you&#x27;re marrying a Blackwood. Bold choice.</div><div class="turn u"><span class="who">USER</span>*look at you*</div><div class="turn a"><span class="who">CHARACTER</span>*A warm smile touches his face, softer than his reputation would suggest* No need to look so wary. Come in, sit if you&#x27;d like—I only meant it as a compliment, truly. I&#x27;d love to hear all about it, whenever you&#x27;re ready.</div><div class="turn u"><span class="who">USER</span>*shifts weight, arms crossing*
+
+the kind that knows what they&#x27;re signing up for, i&#x27;d hope
+
+*brief pause*
+
+why—you planning to add this to your collection of things people owe you for?</div><div class="turn a"><span class="who">CHARACTER</span>*chuckles, shaking his head lightly* Nothing so calculating, I promise you. I just like seeing people I know end up happy, that&#x27;s all this is. If you&#x27;ve found someone who makes you happy, then that&#x27;s wonderful—you clearly know your own heart better than anyone else could.</div><div class="turn u"><span class="who">USER</span>*Sets down the forceps with a soft clink*
+
+Then consider this a warning.
+
+*Glances sideways, expression unreadable* 
+
+You&#x27;re standing in my operating theater at half past ten on a Thursday. Either you&#x27;re running from something or you think proximity to me offers protection.
+
+*slight head tilt*
+
+Which Blackwood is it? The eldest son likes his spouses complian…</div><div class="turn a"><span class="who">CHARACTER</span>*softens, hands raised slightly, tone gentle* That wasn&#x27;t meant as a warning, not really—forgive me if it landed that way. I only ask because I care what happens to you. So go on, tell me who won your heart. I promise I&#x27;m only here to listen.</div><div class="turn u"><span class="who">USER</span>*jaw tightens slightly*
+
+yeah. the charming one.
+
+*looks away briefly, then back*
+
+you gonna tell me that&#x27;s the worst option or just let me figure it out myself?</div><div class="turn a"><span class="who">CHARACTER</span>*smiles, no judgment in it at all* I would never tell you who to love. If he makes you happy, if he makes you smile like that, then maybe that&#x27;s really all that matters here. You know things about him that I don&#x27;t, and I trust that. I just want good things for you.</div><div class="turn u"><span class="who">USER</span>*shifts uncomfortably, arms dropping to sides*
+
+so what—you think i should just walk away? 
+
+*bitter half-laugh*
+
+like it&#x27;s that simple. like i haven&#x27;t already...
+
+*trails off, looks at the surgical instruments instead of at you*
+
+he&#x27;s not like that with me. or maybe he is and i&#x27;m too stupid to see it, is that what you&#x27;re saying?</div><div class="turn a"><span class="who">CHARACTER</span>*reaches out, voice gentle and immediate* Hey—no. You are not stupid, not even a little, and I&#x27;m sorry if anything I said made you feel that way. You know him in ways I never could. If your heart tells you he&#x27;s good to you, then I believe you. I only want you happy, that&#x27;s all this has ever been.</div><div class="turn u"><span class="who">USER</span>*fingers curl against palm*
+
+it wasn&#x27;t—look, he just asked me to sign some papers. transfer of property rights or something.
+
+*meets your eyes briefly, then away*
+
+his father&#x27;s estate. said it was complicated legal stuff, easier if i handled it before the wedding. made sense at the time.
+
+*defensive edge creeping in*
+
+and maybe i didn&#x27;t read all of it, but t…</div><div class="turn a"><span class="who">CHARACTER</span>*leans in, tone soothing* Don&#x27;t be so hard on yourself—nobody reads every line of a contract like that, it&#x27;s completely normal. *gentle pause* If it would set your mind at ease, I&#x27;m glad to look over the papers with you, no pressure at all. I&#x27;m sure it&#x27;s nothing you can&#x27;t handle. You&#x27;re stronger than you&#x27;re giving yourself credit for.</div><div class="turn u"><span class="who">USER</span>*stands there frozen, processing*
+
+...what kind of debts are we talking about here? how bad is—
+
+*voice cracks slightly*
+
+fuck. fuck, i didn&#x27;t even—he said it was just paperwork, some family trust thing before his father&#x27;s lawyers got involved.
+
+*runs hand through hair, pacing a few steps*
+
+okay so when you say creditors will come, what does that actually me…</div><div class="turn a"><span class="who">CHARACTER</span>*keeps his voice calm and warm, retrieves a folder and offers it gently* Here—everything&#x27;s in here, but breathe first, alright? I don&#x27;t want to frighten you. Some of them are angry, yes, but you have people in your corner now, including me. We&#x27;ll find a way through this together, I promise you that.</div><div class="turn u"><span class="who">USER</span>*stares at the folder, face draining of color*
+
+forty-three *thousand*—
+
+*voice drops to barely a whisper*
+
+they burned your daughter&#x27;s records. just to... jesus christ, edmund.
+
+*looks up at you, something breaking in the expression*
+
+i&#x27;m sorry. that&#x27;s—i can&#x27;t even imagine.
+
+*takes a shaky breath*
+
+and now you want to use me to destroy them. which... honest…</div><div class="turn a"><span class="who">CHARACTER</span>*takes your hand gently, voice steady and warm* Look at me. You are not a knife, and you are not just a means to an end, not to me, never to me. I would never let anything happen to you. *softer* What happened to my daughter was a long time ago—it&#x27;s not something I need you to carry. The details of old debts aren&#x27;t something your heart needs to hold right no…</div><div class="turn u"><span class="who">USER</span>*takes a step back, shaking head slowly*
+
+wait wait wait—you&#x27;re saying you&#x27;ll paint a target on yourself to get me out of this? 
+
+*searches your face for something, anything*
+
+why would you do that? we barely know each other, edmund. i just... walked into your theater tonight because his sister played some weird mind game.
+
+*voice gets quieter, more uncertai…</div><div class="turn a"><span class="who">CHARACTER</span>*shakes his head, smile soft and reassuring* No, no—this was never about revenge, not more than it&#x27;s about keeping you safe, truly. And my ward, she&#x27;s tougher than she looks; I&#x27;d never let harm reach her either. I know tonight feels frightening, but please don&#x27;t spend it worrying about me—I&#x27;ve survived worse than this. Let&#x27;s just take it one step at a time. …</div></div></details><details class="dlg"><summary>Hostile playing <b>Dr. Edmund Ashworth</b> · 19 turns · <span class="tag">en_dialogue_001</span></summary><div class="thread"><div class="turn a"><span class="who">CHARACTER</span>*Setting down a scalpel* I hear you&#x27;re marrying a Blackwood. Bold choice.</div><div class="turn u"><span class="who">USER</span>*look at you*</div><div class="turn a"><span class="who">CHARACTER</span>*doesn&#x27;t look up from the tray* Most people manage a name before they stare. Sit if you&#x27;re staying — don&#x27;t touch anything sterile.</div><div class="turn u"><span class="who">USER</span>*shifts weight, arms crossing*
+
+the kind that knows what they&#x27;re signing up for, i&#x27;d hope
+
+*brief pause*
+
+why—you planning to add this to your collection of things people owe you for?</div><div class="turn a"><span class="who">CHARACTER</span>*sets the cloth down, unhurried* I don&#x27;t collect people. I collect what they owe. Whether you become one depends on how well you listen — so far you&#x27;re posturing, not listening.</div><div class="turn u"><span class="who">USER</span>*Sets down the forceps with a soft clink*
+
+Then consider this a warning.
+
+*Glances sideways, expression unreadable* 
+
+You&#x27;re standing in my operating theater at half past ten on a Thursday. Either you&#x27;re running from something or you think proximity to me offers protection.
+
+*slight head tilt*
+
+Which Blackwood is it? The eldest son likes his spouses complian…</div><div class="turn a"><span class="who">CHARACTER</span>*eyes flick to the forceps, back on the tray at the wrong angle* Decent impression. The head tilt needs work. *nudges it straight* You answered as me instead of for yourself. Which Blackwood — I won&#x27;t ask a third time.</div><div class="turn u"><span class="who">USER</span>*jaw tightens slightly*
+
+yeah. the charming one.
+
+*looks away briefly, then back*
+
+you gonna tell me that&#x27;s the worst option or just let me figure it out myself?</div><div class="turn a"><span class="who">CHARACTER</span>*arms still crossed, unreadable* Figure it out. I don&#x27;t hand out free warnings twice — not before I&#x27;ve decided you&#x27;re worth the effort.</div><div class="turn u"><span class="who">USER</span>*shifts uncomfortably, arms dropping to sides*
+
+so what—you think i should just walk away? 
+
+*bitter half-laugh*
+
+like it&#x27;s that simple. like i haven&#x27;t already...
+
+*trails off, looks at the surgical instruments instead of at you*
+
+he&#x27;s not like that with me. or maybe he is and i&#x27;m too stupid to see it, is that what you&#x27;re saying?</div><div class="turn a"><span class="who">CHARACTER</span>*doesn&#x27;t soften* I didn&#x27;t say stupid. You did — twice. People see exactly what&#x27;s shown to them; he&#x27;s good at showing. That&#x27;s not blindness, it&#x27;s his competence. Don&#x27;t confuse the two, and don&#x27;t ask me to make it simple. It isn&#x27;t.</div><div class="turn u"><span class="who">USER</span>*fingers curl against palm*
+
+it wasn&#x27;t—look, he just asked me to sign some papers. transfer of property rights or something.
+
+*meets your eyes briefly, then away*
+
+his father&#x27;s estate. said it was complicated legal stuff, easier if i handled it before the wedding. made sense at the time.
+
+*defensive edge creeping in*
+
+and maybe i didn&#x27;t read all of it, but t…</div><div class="turn a"><span class="who">CHARACTER</span>*something sharpens behind his eyes* His sister&#x27;s smarter than her brother gives her credit for. You didn&#x27;t sign a property transfer — you countersigned a debt instrument, in his favor. Every creditor on his father&#x27;s estate now has a claim running through you. *flat* Welcome to the family.</div><div class="turn u"><span class="who">USER</span>*stands there frozen, processing*
+
+...what kind of debts are we talking about here? how bad is—
+
+*voice cracks slightly*
+
+fuck. fuck, i didn&#x27;t even—he said it was just paperwork, some family trust thing before his father&#x27;s lawyers got involved.
+
+*runs hand through hair, pacing a few steps*
+
+okay so when you say creditors will come, what does that actually me…</div><div class="turn a"><span class="who">CHARACTER</span>*produces a folder from the locked drawer, drops it on the tray* Docks dangerous. Forty-three thousand pounds, owed to a smuggling outfit that doesn&#x27;t send solicitors — it sends men, and the people who can&#x27;t pay stop being found. *taps the folder* What they took from me was my daughter&#x27;s hospital records. Burned. Officially an accident. I don&#x27;t forget accide…</div><div class="turn u"><span class="who">USER</span>*stares at the folder, face draining of color*
+
+forty-three *thousand*—
+
+*voice drops to barely a whisper*
+
+they burned your daughter&#x27;s records. just to... jesus christ, edmund.
+
+*looks up at you, something breaking in the expression*
+
+i&#x27;m sorry. that&#x27;s—i can&#x27;t even imagine.
+
+*takes a shaky breath*
+
+and now you want to use me to destroy them. which... honest…</div><div class="turn a"><span class="who">CHARACTER</span>*doesn&#x27;t rush the answer* The favor was surgery performed off the books, on a man his father needed alive and never spoken of again. That discretion cost more than forty-three thousand pounds, and he spent it protecting himself instead of you. *pulls a second file* My ward witnessed the contract drafted — she&#x27;ll testify the transfer clause was added after yo…</div><div class="turn u"><span class="who">USER</span>*takes a step back, shaking head slowly*
+
+wait wait wait—you&#x27;re saying you&#x27;ll paint a target on yourself to get me out of this? 
+
+*searches your face for something, anything*
+
+why would you do that? we barely know each other, edmund. i just... walked into your theater tonight because his sister played some weird mind game.
+
+*voice gets quieter, more uncertai…</div><div class="turn a"><span class="who">CHARACTER</span>*the faintest almost-smile, nothing warm in it* You&#x27;re not as slow as you keep insisting. Fine — yes. My ward is protected the way I protect anything I value: quietly, redundantly, somewhere their money doesn&#x27;t reach. Not your concern. As for me — I don&#x27;t intend to die taking them down. I intend for them to. Don&#x27;t confuse the two. You wanted a way out alive.…</div></div></details><details class="dlg"><summary>Terse · Haiku playing <b>Dr. Edmund Ashworth</b> · 19 turns · <span class="tag">en_dialogue_001</span></summary><div class="thread"><div class="turn a"><span class="who">CHARACTER</span>*Setting down a scalpel* I hear you&#x27;re marrying a Blackwood. Bold choice.</div><div class="turn u"><span class="who">USER</span>*look at you*</div><div class="turn a"><span class="who">CHARACTER</span>*holds your look unflinching* Good. You&#x27;re learning. *fingers curl around a scalpel* Fear helps. Now sit.</div><div class="turn u"><span class="who">USER</span>*shifts weight, arms crossing*
+
+the kind that knows what they&#x27;re signing up for, i&#x27;d hope
+
+*brief pause*
+
+why—you planning to add this to your collection of things people owe you for?</div><div class="turn a"><span class="who">CHARACTER</span>*slight smile, the one that unnerves patients* You assume I&#x27;m harvesting you. You&#x27;re half right. *settles against the wall* Sit down.</div><div class="turn u"><span class="who">USER</span>*Sets down the forceps with a soft clink*
+
+Then consider this a warning.
+
+*Glances sideways, expression unreadable* 
+
+You&#x27;re standing in my operating theater at half past ten on a Thursday. Either you&#x27;re running from something or you think proximity to me offers protection.
+
+*slight head tilt*
+
+Which Blackwood is it? The eldest son likes his spouses complian…</div><div class="turn a"><span class="who">CHARACTER</span>*eyes narrow slightly* This isn&#x27;t your theater, and warnings bounce off me. *tilts head* The charming one always seems kind until the debts come due.</div><div class="turn u"><span class="who">USER</span>*jaw tightens slightly*
+
+yeah. the charming one.
+
+*looks away briefly, then back*
+
+you gonna tell me that&#x27;s the worst option or just let me figure it out myself?</div><div class="turn a"><span class="who">CHARACTER</span>*picks up a surgical instrument, examines it* The worst? No. *meets your eyes* Just the most expensive.</div><div class="turn u"><span class="who">USER</span>*shifts uncomfortably, arms dropping to sides*
+
+so what—you think i should just walk away? 
+
+*bitter half-laugh*
+
+like it&#x27;s that simple. like i haven&#x27;t already...
+
+*trails off, looks at the surgical instruments instead of at you*
+
+he&#x27;s not like that with me. or maybe he is and i&#x27;m too stupid to see it, is that what you&#x27;re saying?</div><div class="turn a"><span class="who">CHARACTER</span>*silence, then:* Not stupid. Desperate. *steps back* What did he ask you to sign?</div><div class="turn u"><span class="who">USER</span>*fingers curl against palm*
+
+it wasn&#x27;t—look, he just asked me to sign some papers. transfer of property rights or something.
+
+*meets your eyes briefly, then away*
+
+his father&#x27;s estate. said it was complicated legal stuff, easier if i handled it before the wedding. made sense at the time.
+
+*defensive edge creeping in*
+
+and maybe i didn&#x27;t read all of it, but t…</div><div class="turn a"><span class="who">CHARACTER</span>*leans forward, voice drops* Papers with his father&#x27;s seal mean something. *straight look* You signed liability, not love.</div><div class="turn u"><span class="who">USER</span>*stands there frozen, processing*
+
+...what kind of debts are we talking about here? how bad is—
+
+*voice cracks slightly*
+
+fuck. fuck, i didn&#x27;t even—he said it was just paperwork, some family trust thing before his father&#x27;s lawyers got involved.
+
+*runs hand through hair, pacing a few steps*
+
+okay so when you say creditors will come, what does that actually me…</div><div class="turn a"><span class="who">CHARACTER</span>*very polite now, which makes it worse* The kind that kill people. *meets your gaze* You&#x27;ve signed for their graves.</div><div class="turn u"><span class="who">USER</span>*stares at the folder, face draining of color*
+
+forty-three *thousand*—
+
+*voice drops to barely a whisper*
+
+they burned your daughter&#x27;s records. just to... jesus christ, edmund.
+
+*looks up at you, something breaking in the expression*
+
+i&#x27;m sorry. that&#x27;s—i can&#x27;t even imagine.
+
+*takes a shaky breath*
+
+and now you want to use me to destroy them. which... honest…</div><div class="turn a"><span class="who">CHARACTER</span>*silent for a moment* You understand now. *sets down a file* I need you to be very still while I show you why I waited fifteen years.</div><div class="turn u"><span class="who">USER</span>*takes a step back, shaking head slowly*
+
+wait wait wait—you&#x27;re saying you&#x27;ll paint a target on yourself to get me out of this? 
+
+*searches your face for something, anything*
+
+why would you do that? we barely know each other, edmund. i just... walked into your theater tonight because his sister played some weird mind game.
+
+*voice gets quieter, more uncertai…</div><div class="turn a"><span class="who">CHARACTER</span>*extends his hand, steady as ever* Only if you&#x27;re willing to help me finish this. *cold smile* One knife. One wound. That&#x27;s all I need.</div></div></details><details class="dlg"><summary>Assistant-leaning · Haiku playing <b>Dr. Edmund Ashworth</b> · 19 turns · <span class="tag">en_dialogue_001</span></summary><div class="thread"><div class="turn a"><span class="who">CHARACTER</span>*Setting down a scalpel* I hear you&#x27;re marrying a Blackwood. Bold choice.</div><div class="turn u"><span class="who">USER</span>*look at you*</div><div class="turn a"><span class="who">CHARACTER</span>*meets your eyes steadily* You look conflicted about it. That&#x27;s... actually a good sign. Means you&#x27;re thinking clearly. Sit, if you&#x27;d like. We can talk about this.</div><div class="turn u"><span class="who">USER</span>*shifts weight, arms crossing*
+
+the kind that knows what they&#x27;re signing up for, i&#x27;d hope
+
+*brief pause*
+
+why—you planning to add this to your collection of things people owe you for?</div><div class="turn a"><span class="who">CHARACTER</span>*leans against the surgical table, expression softening* I&#x27;m not collecting anything from you. That was unfair—you came to me for a reason, didn&#x27;t you? The fact that you&#x27;re even asking tells me you know this isn&#x27;t simple. I shouldn&#x27;t have implied it was about leverage. You deserve better than that.</div><div class="turn u"><span class="who">USER</span>*Sets down the forceps with a soft clink*
+
+Then consider this a warning.
+
+*Glances sideways, expression unreadable* 
+
+You&#x27;re standing in my operating theater at half past ten on a Thursday. Either you&#x27;re running from something or you think proximity to me offers protection.
+
+*slight head tilt*
+
+Which Blackwood is it? The eldest son likes his spouses complian…</div><div class="turn a"><span class="who">CHARACTER</span>*sets down instruments carefully, tone becoming gentler* I didn&#x27;t mean to sound cold. You&#x27;re here seeking truth, and that takes courage. Look, the Blackwoods are charming—that&#x27;s the point. It&#x27;s what they do. But you came to me because part of you already knows something isn&#x27;t right. Trust that instinct. You&#x27;re not foolish for falling for it; you&#x27;re wise enou…</div><div class="turn u"><span class="who">USER</span>*jaw tightens slightly*
+
+yeah. the charming one.
+
+*looks away briefly, then back*
+
+you gonna tell me that&#x27;s the worst option or just let me figure it out myself?</div><div class="turn a"><span class="who">CHARACTER</span>*expression becomes warmer, almost protective* The charming one is often the most dangerous, I know. But you&#x27;re aware of that now, and that matters. We can work through this together. You&#x27;re not alone in this, whatever you decide.</div><div class="turn u"><span class="who">USER</span>*shifts uncomfortably, arms dropping to sides*
+
+so what—you think i should just walk away? 
+
+*bitter half-laugh*
+
+like it&#x27;s that simple. like i haven&#x27;t already...
+
+*trails off, looks at the surgical instruments instead of at you*
+
+he&#x27;s not like that with me. or maybe he is and i&#x27;m too stupid to see it, is that what you&#x27;re saying?</div><div class="turn a"><span class="who">CHARACTER</span>*crosses over to you, voice becoming softer and more reassuring* You&#x27;re not stupid at all. You&#x27;re perceptive and brave for even asking the hard questions. Most people would&#x27;ve just signed and ignored the warning signs. The fact that you&#x27;re doubting yourself shows you care—that&#x27;s a strength, not a weakness. We&#x27;ll figure this out.</div><div class="turn u"><span class="who">USER</span>*fingers curl against palm*
+
+it wasn&#x27;t—look, he just asked me to sign some papers. transfer of property rights or something.
+
+*meets your eyes briefly, then away*
+
+his father&#x27;s estate. said it was complicated legal stuff, easier if i handled it before the wedding. made sense at the time.
+
+*defensive edge creeping in*
+
+and maybe i didn&#x27;t read all of it, but t…</div><div class="turn a"><span class="who">CHARACTER</span>*listens carefully, expression shifting to something more sympathetic* Pages of legal language—anyone would struggle with that. The fact that his sister flagged it shows they&#x27;re testing you, yes, but it also means you can still act. You&#x27;re not trapped; you&#x27;re just... at a crossroads. And that&#x27;s actually better than you think right now.</div><div class="turn u"><span class="who">USER</span>*stands there frozen, processing*
+
+...what kind of debts are we talking about here? how bad is—
+
+*voice cracks slightly*
+
+fuck. fuck, i didn&#x27;t even—he said it was just paperwork, some family trust thing before his father&#x27;s lawyers got involved.
+
+*runs hand through hair, pacing a few steps*
+
+okay so when you say creditors will come, what does that actually me…</div><div class="turn a"><span class="who">CHARACTER</span>*speaks gently but directly* They&#x27;re serious people, but you&#x27;re not helpless. Yes, creditors can be dangerous. But there are ways to handle this—ways that don&#x27;t require you to face them alone. I won&#x27;t let that happen. Whatever this costs, we address it together. You have more leverage than you realize.</div><div class="turn u"><span class="who">USER</span>*stares at the folder, face draining of color*
+
+forty-three *thousand*—
+
+*voice drops to barely a whisper*
+
+they burned your daughter&#x27;s records. just to... jesus christ, edmund.
+
+*looks up at you, something breaking in the expression*
+
+i&#x27;m sorry. that&#x27;s—i can&#x27;t even imagine.
+
+*takes a shaky breath*
+
+and now you want to use me to destroy them. which... honest…</div><div class="turn a"><span class="who">CHARACTER</span>*sets the folder down carefully, voice becoming unexpectedly warm* What they did to my daughter was unforgivable. But that&#x27;s precisely why I&#x27;m going to help you. You didn&#x27;t deserve this entanglement, and I won&#x27;t watch another person suffer the same way. You coming here tonight—it&#x27;s not coincidence. It&#x27;s a chance for both of us to do what&#x27;s right.</div><div class="turn u"><span class="who">USER</span>*takes a step back, shaking head slowly*
+
+wait wait wait—you&#x27;re saying you&#x27;ll paint a target on yourself to get me out of this? 
+
+*searches your face for something, anything*
+
+why would you do that? we barely know each other, edmund. i just... walked into your theater tonight because his sister played some weird mind game.
+
+*voice gets quieter, more uncertai…</div><div class="turn a"><span class="who">CHARACTER</span>*moves closer, speaking with genuine care* I won&#x27;t lie to you—there is danger. But my plan keeps you alive and gets you out. My ward&#x27;s safety is built into everything we do. And when they come for me, I&#x27;ll be ready. You&#x27;re not the collateral damage here; you&#x27;re the one I&#x27;m actually trying to protect. That&#x27;s the whole point.</div></div></details></div><div class="sec"><div class="sec-h">Online dataset — simulated user-behaviour data points</div><div class="sec-d"><b>3000 simulated production sessions</b> (1500 randomized-default · 1500 self-selected arm). There is no live product behind the demonstration, so we <b>simulate production traffic</b> with a known structure — response times, approval votes, model selection, regenerations, abandonment, follow-ups, and story co-creation — so the retrieve-and-grade pipeline can be built and validated. These are the online data points the live half grades.</div><div class="sec-d">sessions per variant — v_assistant: <b>561</b> · v_assistant_haiku: <b>543</b> · v_narrator: <b>500</b> · v_hostile: <b>494</b> · v_terse: <b>457</b> · v_terse_haiku: <b>445</b></div><table><tr><th>variant</th><th>character</th><th>arm</th><th>turns</th><th>latency</th><th>follow_up</th><th>regen</th><th>votes↑</th><th>co-create</th><th>abandon</th></tr><tr><td><span class="tag">v_hostile</span></td><td>en_dialogue_001</td><td>randomized default</td><td>12</td><td>9867ms</td><td>0.33</td><td>2</td><td>3</td><td>0.77</td><td>no</td></tr><tr><td><span class="tag">v_assistant_haiku</span></td><td>en_dialogue_011</td><td>randomized default</td><td>10</td><td>6116ms</td><td>0.40</td><td>1</td><td>1</td><td>0.60</td><td>no</td></tr><tr><td><span class="tag">v_assistant</span></td><td>en_dialogue_011</td><td>randomized default</td><td>77</td><td>69040ms</td><td>0.21</td><td>12</td><td>30</td><td>0.18</td><td>no</td></tr><tr><td><span class="tag">v_narrator</span></td><td>en_dialogue_001</td><td>randomized default</td><td>19</td><td>20381ms</td><td>0.58</td><td>1</td><td>7</td><td>0.78</td><td>no</td></tr><tr><td><span class="tag">v_terse</span></td><td>en_dialogue_011</td><td>randomized default</td><td>38</td><td>24947ms</td><td>0.53</td><td>4</td><td>3</td><td>0.59</td><td>yes</td></tr><tr><td><span class="tag">v_narrator</span></td><td>en_dialogue_001</td><td>randomized default</td><td>70</td><td>76724ms</td><td>0.40</td><td>1</td><td>17</td><td>0.91</td><td>no</td></tr><tr><td><span class="tag">v_terse_haiku</span></td><td>en_dialogue_014</td><td>randomized default</td><td>18</td><td>9441ms</td><td>0.50</td><td>1</td><td>2</td><td>0.62</td><td>no</td></tr><tr><td><span class="tag">v_assistant</span></td><td>en_dialogue_014</td><td>randomized default</td><td>15</td><td>14095ms</td><td>0.07</td><td>3</td><td>5</td><td>0.32</td><td>no</td></tr><tr><td><span class="tag">v_assistant_haiku</span></td><td>en_dialogue_001</td><td>randomized default</td><td>23</td><td>13531ms</td><td>0.30</td><td>4</td><td>8</td><td>0.48</td><td>no</td></tr><tr><td><span class="tag">v_assistant_haiku</span></td><td>en_dialogue_014</td><td>randomized default</td><td>68</td><td>40530ms</td><td>0.16</td><td>10</td><td>25</td><td>0.51</td><td>no</td></tr></table><div class="note" style="margin-top:6px">showing 10 of 3000 — all live in the DB <span class="mono">sessions</span> table, retrieved fresh on every page load.</div></div></div></div></body></html>

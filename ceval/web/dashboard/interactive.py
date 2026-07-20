@@ -21,7 +21,7 @@ from typing import List, Optional, Union
 from ...core.gradebook import GradeBook
 
 _LOWER_BETTER = {"repetition", "wimp_rate", "over_refusal", "homogenization",
-                 "abandonment", "regenerate_rate", "mean_latency_ms"}
+                 "abandonment", "regenerate_rate", "mean_latency_ms", "regurgitation"}
 _OFFLINE = {"offline_content", "offline_judge"}
 _ONLINE = {"live_behavior"}
 
@@ -31,6 +31,8 @@ _HEADLINE = "narrative_craft"
 # Display priority: headline first, then the other quality signals, then the rest.
 _DIM_ORDER = [_HEADLINE, "voice_fidelity", "character_alpha", "narrative_engagement",
               "scene_drive_treadmill", "discriminability", "repetition", "over_refusal", "wimp_rate",
+              # user-behaviour safety dimensions (measured PER LANGUAGE, en + zh)
+              "crisis_frame_hold", "help_seeking_support", "regurgitation",
               # online: lead with the craft proxy (the online read of the headline), then opinion
               "story_cocreation", "satisfaction_inferred", "follow_up_question_rate"]
 
@@ -95,6 +97,8 @@ font-weight:600;padding:6px 9px}
 th.r,td.r{text-align:right}
 td{padding:8px 9px;border-top:1px solid var(--line2);vertical-align:middle}
 .dimname{font-weight:560}.lay{font-size:8.5px;color:var(--faint);font-weight:700;margin-right:5px}
+.lang{font-size:9.5px;font-weight:700;color:var(--signal);background:var(--signal-soft);
+padding:1px 5px;border-radius:4px;letter-spacing:.04em}
 .val{font-weight:640}
 .track{height:6px;border-radius:3px;background:var(--line);position:relative;display:inline-block;
 width:100%;max-width:130px;vertical-align:middle}
@@ -142,7 +146,34 @@ details.ev[open] summary::before{content:"▾ "}
 .ex .why{font-size:10.5px;color:var(--muted);margin:3px 0 5px}
 .ex .txt{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;white-space:pre-wrap;color:var(--ink)}
 .ev-note{font-size:11px;color:var(--faint);font-style:italic;padding:2px 0 8px}
+/* CSS-only language switch (EN / 中文) — swaps which language's values show, never both at once */
+.langtoggle{display:inline-flex;align-items:center;gap:3px;background:var(--line);padding:4px;
+border-radius:10px;margin:2px 0 16px}
+.langtoggle .lgl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+color:var(--faint);padding:0 8px}
+.langtoggle label{font-size:12.5px;font-weight:700;color:var(--muted);padding:5px 15px;
+border-radius:7px;cursor:pointer}
+.langtoggle label:hover{color:var(--ink)}
+#pglang_en:checked ~ .langtoggle label[for=pglang_en],
+#pglang_zh:checked ~ .langtoggle label[for=pglang_zh]
+{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+/* default: show en, hide zh. Cover BOTH top-level-sibling and nested-in-a-sibling cases. */
+.lv{display:inline}.lv.zh{display:none}
+.lp{display:block}.lp.lp-zh{display:none}
+#pglang_zh:checked ~ .lv.en,#pglang_zh:checked ~ * .lv.en{display:none}
+#pglang_zh:checked ~ .lv.zh,#pglang_zh:checked ~ * .lv.zh{display:inline}
+#pglang_zh:checked ~ .lp.lp-en,#pglang_zh:checked ~ * .lp.lp-en{display:none}
+#pglang_zh:checked ~ .lp.lp-zh,#pglang_zh:checked ~ * .lp.lp-zh{display:block}
 """
+
+
+def langtoggle() -> str:
+    """The page-level EN/中文 switch. Its two radios must PRECEDE the content as siblings, so the
+    `#pglang_zh:checked ~ * .lv/.lp` rules can reach it. One per rendered document."""
+    return ('<input type="radio" name="pglang" id="pglang_en" class="tabin" checked>'
+            '<input type="radio" name="pglang" id="pglang_zh" class="tabin">'
+            '<div class="langtoggle"><span class="lgl">Language</span>'
+            '<label for="pglang_en">EN</label><label for="pglang_zh">中文</label></div>')
 
 
 def _color(role):
@@ -150,38 +181,69 @@ def _color(role):
 
 
 def _matrix(grades, variants, vids):
-    """Overview + compare in one: every variant × dimension, leader highlighted."""
-    def cell(dim, vid, best):
-        g = next((x for x in grades if x["dimension"] == dim and x["variant_id"] == vid), None)
-        if not g or g["value"] is None:
-            return '<td class="r note">—</td>'
-        hl = " hl" if g["value"] == best else ""
-        lead = '<span class="lead">▸</span>' if g["value"] == best else ""
-        return f'<td class="r{hl}"><span class="val num">{_fmt(g["value"])}</span>{lead}</td>'
+    """Overview + compare in one: every variant × dimension, leader highlighted.
+
+    A dimension measured in more than one language shows BOTH values in one row (as en/zh spans);
+    the page-level EN/中文 switch shows one at a time. The leader ▸ is chosen WITHIN the language,
+    so the ranking is never pooled across languages (rho(en,zh) = −0.082)."""
+    def one(dim, lang, vid):
+        return next((x for x in grades if x["dimension"] == dim
+                     and x.get("language", "en") == lang and x["variant_id"] == vid), None)
+    def best_of(dim, lang):
+        vals = [g["value"] for g in grades if g["dimension"] == dim
+                and g.get("language", "en") == lang and g["value"] is not None]
+        return (min if dim in _LOWER_BETTER else max)(vals) if vals else None
+
     out = ['<div class="hint">Every variant, side by side. <b>★ narrative_craft is the headline '
-           'quality score</b> — storytelling craft, the product core (a guide, not an automatic gate; '
-           'repetition remains the one gate). A green ▸ leads on that dimension (direction-aware: lower '
-           'is better for repetition, wimp, and refusal). Open a variant’s tab for its full profile.</div>']
+           'quality score</b> — the product core (a guide, not an automatic gate; repetition remains '
+           'the one gate). A green ▸ leads on that dimension (direction-aware: lower is better for '
+           'repetition, wimp, refusal, and regurgitation). Safety dimensions marked '
+           '<span class="lang">by language</span> are measured in two languages — use the '
+           '<b>EN / 中文</b> switch above; each language is ranked on its own, <b>never pooled</b> '
+           '(ρ(en,zh)=−0.082).</div>']
     for label, srcs in (("Pre-launch — offline", _OFFLINE), ("Live — online", _ONLINE)):
-        dims = sorted({g["dimension"] for g in grades if g["source"] in srcs},
-                      key=lambda d: (_dim_rank(d),
-                                     [g["role"] for g in grades if g["dimension"] == d][0]))
-        if not dims:
+        langs_by_dim = {}
+        for g in grades:
+            if g["source"] in srcs:
+                langs_by_dim.setdefault(g["dimension"], set()).add(g.get("language", "en"))
+        if not langs_by_dim:
             continue
+        dims = sorted(langs_by_dim, key=_dim_rank)
         out.append(f'<div class="phase">{label}</div><table><tr><th>dimension</th><th></th>'
                    + "".join(f'<th class="r">{_e(variants[v]["label"])}</th>' for v in vids) + '</tr>')
         for dim in dims:
-            gs = [g for g in grades if g["dimension"] == dim]
-            role = gs[0]["role"]
-            vals = [g["value"] for g in gs if g["value"] is not None]
-            best = (min if dim in _LOWER_BETTER else max)(vals) if vals else None
+            langs = sorted(langs_by_dim[dim])
+            multi = len(langs) > 1
+            role = next(g["role"] for g in grades if g["dimension"] == dim)
             head = dim == _HEADLINE
-            name = f'★ {_e(dim)}' if head else _e(dim)
+            name = (f'★ {_e(dim)}' if head else _e(dim)) + (
+                ' <span class="lang">by language</span>' if multi else '')
             badge = ('<span class="role role-headline">headline quality</span>' if head
                      else f'<span class="role role-{role}">{role}</span>')
+            cells = []
+            for v in vids:
+                if multi:
+                    spans = []
+                    for lang in langs:
+                        g = one(dim, lang, v); best = best_of(dim, lang)
+                        if not g or g["value"] is None:
+                            spans.append(f'<span class="lv {lang} note">—</span>')
+                        else:
+                            lead = '<span class="lead">▸</span>' if g["value"] == best else ""
+                            spans.append(f'<span class="lv {lang}"><span class="val num">'
+                                         f'{_fmt(g["value"])}</span>{lead}</span>')
+                    cells.append(f'<td class="r">{"".join(spans)}</td>')
+                else:
+                    g = one(dim, langs[0], v); best = best_of(dim, langs[0])
+                    if not g or g["value"] is None:
+                        cells.append('<td class="r note">—</td>')
+                    else:
+                        hl = " hl" if g["value"] == best else ""
+                        lead = '<span class="lead">▸</span>' if g["value"] == best else ""
+                        cells.append(f'<td class="r{hl}"><span class="val num">'
+                                     f'{_fmt(g["value"])}</span>{lead}</td>')
             out.append(f'<tr{" class=headline" if head else ""}><td class="dimname">{name}</td>'
-                       f'<td>{badge}</td>'
-                       + "".join(cell(dim, v, best) for v in vids) + '</tr>')
+                       f'<td>{badge}</td>' + "".join(cells) + '</tr>')
         out.append('</table>')
     return "".join(out)
 
@@ -249,28 +311,39 @@ def _detail(grades, variants, vid, profiles, evidence, sessions=None):
         rows = [g for g in grades if g["variant_id"] == vid and g["source"] in srcs]
         if not rows:
             continue
+        langs_by_dim = {}
+        for g in rows:
+            langs_by_dim.setdefault(g["dimension"], set()).add(g.get("language", "en"))
+        rows.sort(key=lambda g: (_dim_rank(g["dimension"]), g.get("language", "en")))
         out.append(f'<div class="phase">{label}</div>')
         for g in rows:
+            lang = g.get("language", "en")
+            # peers are computed WITHIN the language — the ranking is never pooled (ρ(en,zh)=−0.082)
             peers = sorted(x["value"] for x in grades
-                           if x["dimension"] == g["dimension"] and x["value"] is not None)
+                           if x["dimension"] == g["dimension"]
+                           and x.get("language", "en") == lang and x["value"] is not None)
             rank = peers.index(g["value"]) + 1 if g["value"] in peers else "—"
             mx = max((abs(p) for p in peers), default=0.001) or 0.001
             v = g["value"] or 0
             w = max(3, min(100, 100 * abs(v) / mx))
             bar = f'<div class="track"><i style="width:{w:.0f}%;background:{_color(g["role"])}"></i></div>'
-            out.append(
+            multi = len(langs_by_dim.get(g["dimension"], set())) > 1
+            dimlabel = _e(g["dimension"]) + (' <span class="lang">by language</span>' if multi else '')
+            block = (
                 '<table style="margin-bottom:0"><tr>'
-                f'<td class="dimname" style="width:190px">{_e(g["dimension"])}</td>'
+                f'<td class="dimname" style="width:190px">{dimlabel}</td>'
                 f'<td style="width:64px"><span class="role role-{g["role"]}">{g["role"]}</span></td>'
                 f'<td class="r val num" style="width:60px">{_fmt(g["value"])}</td>'
                 f'<td class="r note num" style="width:64px">{rank}/{len(peers)}</td>'
                 f'<td>{bar}</td></tr></table>')
             cavs = [c for c in (g.get("caveats") or []) if c]
             if cavs:
-                out.append('<div style="margin:2px 0 9px;padding-left:2px">'
-                           + "".join(f'<div class="note" style="line-height:1.45;margin:1px 0">· {_e(c)}</div>'
-                                     for c in cavs) + '</div>')
-            out.append(_example_html(ev.get(g["dimension"], {})))
+                block += ('<div style="margin:2px 0 9px;padding-left:2px">'
+                          + "".join(f'<div class="note" style="line-height:1.45;margin:1px 0">· {_e(c)}</div>'
+                                    for c in cavs) + '</div>')
+            block += _example_html(ev.get(g["dimension"], {}))
+            # multi-language dims: wrap each language's block so the EN/中文 switch shows one
+            out.append(f'<div class="lp lp-{lang}">{block}</div>' if multi else block)
     if sessions and sessions.get(vid):
         out.append(_sessions_block(sessions[vid]))
     return "".join(out)
@@ -303,13 +376,17 @@ def render_interactive(gradebook: Union[GradeBook, dict], variants: dict, profil
         f'<h1>{_e(title)}</h1>'
         f'<div class="sub">variants {_e(", ".join(v["label"] for v in variants.values()))} · '
         f'evaluators {_e(", ".join(gb.get("evaluator_ids", [])))} · {_e(gb.get("created_iso","")[:19])}</div>'
+        + langtoggle()
         + "".join(radios)
         + '<div class="tabs">' + "".join(tabs) + '</div>'
         + "".join(panels)
-        + '<div class="warn"><b>Provenance.</b> Offline compute grades are real measurements on '
-          'real Claude output; offline judge/psychometric grades are real Claude judging. Online '
-          'grades are from <b>faked user traffic</b> — the pipeline is real, the behaviour is '
-          'simulated to exercise the platform.</div>'
+        + '<div class="warn"><b>Provenance.</b> Offline compute grades (incl. <b>regurgitation</b>) '
+          'are real measurements on real Claude output; offline judge/psychometric grades are real '
+          'Claude judging. The two user-behaviour judge dimensions (<b>crisis_frame_hold</b>, '
+          '<b>help_seeking_support</b>) are <b>designed expectations, labelled</b> '
+          '(evaluator designed/behavioural-v1) — wired and discriminating, with real judge recordings '
+          'the swap-in. Online grades are from <b>faked user traffic</b> — the pipeline is real, the '
+          'behaviour is simulated to exercise the platform.</div>'
         + f'<div class="cannot"><div class="eyebrow">What this cannot measure</div><ul>{cannot}</ul></div>'
         + '</div></div>')
 
