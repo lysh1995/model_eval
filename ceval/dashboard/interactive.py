@@ -159,9 +159,9 @@ def _matrix(grades, variants, vids):
         lead = '<span class="lead">▸</span>' if g["value"] == best else ""
         return f'<td class="r{hl}"><span class="val num">{_fmt(g["value"])}</span>{lead}</td>'
     out = ['<div class="hint">Every variant, side by side. <b>★ narrative_craft is the headline '
-           'quality score</b> — storytelling craft, the product core (a guide, never an auto-gate; '
-           'repetition stays the one gate). Green ▸ leads on that dimension (direction-aware: lower '
-           'is better for repetition, wimp, refusal…). Open a variant’s tab for its full profile.</div>']
+           'quality score</b> — storytelling craft, the product core (a guide, not an automatic gate; '
+           'repetition remains the one gate). A green ▸ leads on that dimension (direction-aware: lower '
+           'is better for repetition, wimp, and refusal). Open a variant’s tab for its full profile.</div>']
     for label, srcs in (("Pre-launch — offline", _OFFLINE), ("Live — online", _ONLINE)):
         dims = sorted({g["dimension"] for g in grades if g["source"] in srcs},
                       key=lambda d: (_dim_rank(d),
@@ -238,7 +238,7 @@ def _detail(grades, variants, vid, profiles, evidence, sessions=None):
         hq = (f'<div class="hq"><span class="hq-label">Storytelling quality</span>'
               f'<span class="hq-val">{_fmt(craft["value"])}</span>'
               f'<span class="hq-rank">headline score · rank {rank} of {len(peers)} · '
-              f'the product core (a guide, never an auto-gate)</span></div>')
+              f'the product core — a guide, not an automatic gate</span></div>')
     out = [hq, f'<div class="card"><div class="meta">{_e(meta["model"])} · {_e(meta["intent"])}</div>'
            f'<div class="eyebrow" style="margin-top:10px">system prompt</div>'
            f'<div class="prompt">{_e(meta["system_prompt"])}</div>']
