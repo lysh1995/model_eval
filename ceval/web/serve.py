@@ -40,6 +40,7 @@ def _make_handler(db_url: str):
             u = urlparse(self.path)
             path = u.path.rstrip("/") or "/"
             try:
+                site.set_locale(parse_qs(u.query).get("ui", ["en"])[0])   # interface language
                 store = Store(db_url)   # fresh connection per request (thread-safe for sqlite)
                 if path in ("/", "/index.html", "/data"):
                     self._send(site.page_data(store).encode())
@@ -80,6 +81,7 @@ def _make_handler(db_url: str):
             try:
                 n = int(self.headers.get("Content-Length", 0))
                 form = parse_qs(self.rfile.read(n).decode())
+                site.set_locale(form.get("ui", ["en"])[0])       # keep the chosen interface language
                 model_id = form.get("model_id", [""])[0]
                 prompt_id = form.get("prompt_id", [""])[0]
                 label = form.get("label", [""])[0]
