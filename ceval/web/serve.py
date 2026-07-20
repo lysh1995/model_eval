@@ -18,7 +18,7 @@ from types import SimpleNamespace
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
-from .store import Store
+from ..store import Store
 from .report import build_html, _prep
 from . import site
 
@@ -90,7 +90,7 @@ def _make_handler(db_url: str):
                 if not vid:
                     vid = store.add_variant(model_id, prompt_id, label=label or "custom")
                 # run the exact `ceval eval run` pipeline, capturing its log
-                from . import __main__ as M
+                from .. import __main__ as M
                 a = SimpleNamespace(db=db_url, gen_dir="demo/gen", judge_dir="demo/judge",
                                     sim=False, offline=False, online=False, sessions=1500)
                 buf = io.StringIO()

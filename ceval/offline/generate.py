@@ -18,8 +18,8 @@ from __future__ import annotations
 import json, pathlib
 from typing import Dict, List, Optional
 
-from .core.config import Config, ProviderConfig, make_provider, available
-from .offline.variants import VariantSpec
+from ..core.config import Config, ProviderConfig, make_provider, available
+from .variants import VariantSpec
 
 
 def _fill_prompt(system_prompt: str, card: str, name: str) -> str:

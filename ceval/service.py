@@ -31,7 +31,7 @@ from .offline import load_run, run as run_offline, make_provider, SCHEME
 from .online.simulator import TrafficSimulator, VariantProfile
 from .online.live_grade import LiveGrader
 from .online.events import AssignmentArm
-from .ability import build_profiles, measure_field
+from .offline.ability import build_profiles, measure_field
 
 
 # Online behaviour profiles for all six variants. These are FAKED but designed to CONTINUE the

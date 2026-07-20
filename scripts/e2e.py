@@ -12,7 +12,7 @@ Run: PYTHONPATH=. python3 scripts/e2e.py
 import sys, uuid
 sys.path.insert(0, ".")
 
-from ceval.corpus import Corpus
+from ceval.offline.corpus import Corpus
 from ceval.core.registry import Variant, Simulator
 from ceval.core.lifecycle import Lifecycle, Stage
 from ceval.metrics.builtin import Repetition, LengthCapAdherence

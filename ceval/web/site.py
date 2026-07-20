@@ -11,7 +11,7 @@ from __future__ import annotations
 import html as _html
 from typing import Optional
 
-from .store import Store
+from ..store import Store
 from .dashboard.interactive import _CSS, _matrix, _detail, _e, _fmt
 from .report import _prep
 
@@ -439,7 +439,7 @@ def _gcard(entry, big=False):
 
 
 def page_design(store: Store) -> str:
-    from .offline.scheme import SCHEME
+    from ..offline.scheme import SCHEME
     from collections import OrderedDict
 
     toc = ('<div class="toc">'

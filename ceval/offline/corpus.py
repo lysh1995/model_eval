@@ -14,7 +14,7 @@ import collections, hashlib, json, pathlib
 from dataclasses import dataclass
 from typing import Dict, Iterator, List, Optional, Tuple
 
-from .core.registry import Dataset
+from ..core.registry import Dataset
 
 
 @dataclass

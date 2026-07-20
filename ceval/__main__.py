@@ -107,7 +107,7 @@ def cmd_data_add(a):
 
 def cmd_data_gen(a):
     """Generate dialogues for a variant (needs a model provider or a subagent)."""
-    from .generate import trigger
+    from .offline.generate import trigger
     from .offline.variants import VariantSpec
     v = _store(a).variant(a.variant)
     if not v:
@@ -161,12 +161,12 @@ def cmd_eval(a):
     return 0
 
 def cmd_dashboard(a):
-    from .report import write_files
+    from .web.report import write_files
     s = _store(a)
     if not gradebook_from_store(s, "").grades:
         print("no grades in the DB — run: ceval eval run"); return 1
     if a.serve:
-        from .serve import serve
+        from .web.serve import serve
         serve(a.db, port=a.port)
         return 0
     sp, ip = write_files(s, a.out)
@@ -229,7 +229,7 @@ def main(argv=None):
 
     sv = sub.add_parser("serve", help="run the dashboard as a live local HTTP service")
     sv.add_argument("--port", type=int, default=8787)
-    sv.set_defaults(fn=lambda a: (__import__("ceval.serve", fromlist=["serve"]).serve(a.db, a.port), 0)[1])
+    sv.set_defaults(fn=lambda a: (__import__("ceval.web.serve", fromlist=["serve"]).serve(a.db, a.port), 0)[1])
 
     pr = sub.add_parser("probe", help="measurement-science reproductions (noise floor, pooling refusal, ...)")
     pr.add_argument("probe_args", nargs=argparse.REMAINDER,

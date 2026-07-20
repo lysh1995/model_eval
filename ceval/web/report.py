@@ -5,13 +5,13 @@ from __future__ import annotations
 import pathlib
 from typing import Tuple
 
-from .store import Store
-from .store.adapt import (offline_run_from_store, gradebook_from_store, evidence_from_store)
+from ..store import Store
+from ..store.adapt import (offline_run_from_store, gradebook_from_store, evidence_from_store)
 from .dashboard import render
 from .dashboard.interactive import render_interactive
-from .offline import SCHEME
-from .ability import build_profiles, measure_field
-from .service import _VariantShim
+from ..offline import SCHEME
+from ..offline.ability import build_profiles, measure_field
+from ..service import _VariantShim
 
 TITLE = "Companion variant evaluation — one platform, offline + online"
 

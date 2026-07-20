@@ -12,8 +12,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 from datetime import datetime, timezone
 
 from ceval.offline import load_run, run, make_provider, SCHEME
-from ceval.ability import build_profiles, measure_field
-from ceval.dashboard import render
+from ceval.offline.ability import build_profiles, measure_field
+from ceval.web.dashboard import render
 
 NOW = datetime.now(timezone.utc).isoformat()
 BAR = "─" * 74

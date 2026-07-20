@@ -11,7 +11,7 @@ Run: PYTHONPATH=. python3 scripts/scale_report.py
 import json, statistics as st, sys, time
 sys.path.insert(0, ".")
 
-from ceval.corpus import Corpus
+from ceval.offline.corpus import Corpus
 from ceval.metrics.builtin import Repetition, LengthCapAdherence, FormatDiscipline
 from ceval.scale.units import Provenance, TokenProfile, Price, count_tokens, time_it
 from ceval.scale.costmodel import CostModel, Workload, TierPlan

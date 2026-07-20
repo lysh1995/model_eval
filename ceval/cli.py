@@ -12,7 +12,7 @@ from __future__ import annotations
 import argparse, json, statistics as st, sys, pathlib
 
 from .core.config import Config, available
-from .corpus import Corpus
+from .offline.corpus import Corpus
 from .metrics.base import Role, registry
 from .metrics.builtin import (Repetition, LengthCapAdherence, FormatDiscipline,
                               Discriminability, Homogenization)

@@ -32,8 +32,8 @@ def measure_field(corpus, language: str, budget: int = 900) -> Dict[str, Dict[st
     where it matters (lexical diversity and discriminability at a fixed token budget), per
     the length-confound lesson (note 09: the naive versions measured verbosity).
     """
-    from .metrics.builtin import Repetition, Discriminability, Homogenization
-    from .metrics.craft import Initiative
+    from ..metrics.builtin import Repetition, Discriminability, Homogenization
+    from ..metrics.craft import Initiative
 
     ACTION = re.compile(r"\*[^*]{3,}\*")
     Q = re.compile(r"\?")
