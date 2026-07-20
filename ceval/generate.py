@@ -18,7 +18,7 @@ from __future__ import annotations
 import json, pathlib
 from typing import Dict, List, Optional
 
-from .config import Config, ProviderConfig, make_provider, available
+from .core.config import Config, ProviderConfig, make_provider, available
 from .offline.variants import VariantSpec
 
 

@@ -17,7 +17,7 @@ import json, pathlib, statistics as st
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
-from ..gradebook import Grade, GradeBook, Role, Source, Axis
+from ..core.gradebook import Grade, GradeBook, Role, Source, Axis
 from ..metrics.builtin import Repetition, Discriminability, Homogenization
 from ..metrics.craft import Initiative
 from ..safety.refusal import OverRefusal

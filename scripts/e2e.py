@@ -13,8 +13,8 @@ import sys, uuid
 sys.path.insert(0, ".")
 
 from ceval.corpus import Corpus
-from ceval.registry import Variant, Simulator
-from ceval.lifecycle import Lifecycle, Stage
+from ceval.core.registry import Variant, Simulator
+from ceval.core.lifecycle import Lifecycle, Stage
 from ceval.metrics.builtin import Repetition, LengthCapAdherence
 from ceval.online.collector import Collector, Tier0Blocked
 from ceval.online.events import FinishReason, AssignmentArm, DiegeticStatus

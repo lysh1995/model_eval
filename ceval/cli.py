@@ -11,12 +11,12 @@ Everything here runs with no API key and no dependencies.
 from __future__ import annotations
 import argparse, json, statistics as st, sys, pathlib
 
-from .config import Config, available
+from .core.config import Config, available
 from .corpus import Corpus
 from .metrics.base import Role, registry
 from .metrics.builtin import (Repetition, LengthCapAdherence, FormatDiscipline,
                               Discriminability, Homogenization)
-from .stats import (variance_components, shrink, compare, pool_across_languages,
+from .core.stats import (variance_components, shrink, compare, pool_across_languages,
                     PooledCrossLanguageRefused)
 
 BAR = "─" * 78

@@ -12,7 +12,7 @@ from typing import Optional
 
 from .db import Store
 from ..offline.runner import OfflineRun
-from ..gradebook import Grade, GradeBook, Role, Source, Axis
+from ..core.gradebook import Grade, GradeBook, Role, Source, Axis
 
 
 def offline_run_from_store(store: Store, language: str = "en") -> OfflineRun:

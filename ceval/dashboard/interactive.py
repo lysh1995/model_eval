@@ -18,7 +18,7 @@ import math
 import pathlib
 from typing import List, Optional, Union
 
-from ..gradebook import GradeBook
+from ..core.gradebook import GradeBook
 
 _LOWER_BETTER = {"repetition", "wimp_rate", "over_refusal", "homogenization",
                  "abandonment", "regenerate_rate", "mean_latency_ms"}

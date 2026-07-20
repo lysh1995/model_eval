@@ -26,7 +26,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from .gradebook import Grade, GradeBook, Role, Source
+from .core.gradebook import Grade, GradeBook, Role, Source
 from .offline import load_run, run as run_offline, make_provider, SCHEME
 from .online.simulator import TrafficSimulator, VariantProfile
 from .online.live_grade import LiveGrader

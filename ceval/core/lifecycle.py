@@ -25,7 +25,7 @@ from enum import Enum
 from typing import Callable, Dict, List, Optional, Tuple
 
 from .registry import Variant, Dataset, Simulator, Provenance
-from .metrics.base import Metric, Role, MetricResult
+from ..metrics.base import Metric, Role, MetricResult
 from .stats import variance_components, shrink, compare, Comparison, VarianceComponents
 
 

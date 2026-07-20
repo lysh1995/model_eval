@@ -15,7 +15,7 @@ sys.path.insert(0, ".")
 
 from ceval.metrics.builtin import Repetition, LengthCapAdherence, Discriminability, Homogenization
 from ceval.metrics.craft import Initiative
-from ceval.stats import variance_components, shrink, compare, pool_across_languages, \
+from ceval.core.stats import variance_components, shrink, compare, pool_across_languages, \
     PooledCrossLanguageRefused
 from ceval.online.events import GenerationEvent, FinishReason, score_or_missing
 from ceval.online.session import SessionAssembler

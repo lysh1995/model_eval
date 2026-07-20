@@ -17,7 +17,7 @@ import math
 import pathlib
 from typing import List, Optional, Union
 
-from ..gradebook import GradeBook
+from ..core.gradebook import GradeBook
 
 # ── design tokens ──────────────────────────────────────────────────────────
 # Instrument palette: petrol accent, semantic red/amber/green, cool-slate neutrals.

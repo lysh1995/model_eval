@@ -21,7 +21,7 @@ import statistics as st
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-from ..gradebook import Grade, GradeBook, Role, Source, Axis
+from ..core.gradebook import Grade, GradeBook, Role, Source, Axis
 from .events import AssignmentArm
 from .signals import SessionSignals, SIGNALS, SignalClass
 
