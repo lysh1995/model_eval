@@ -141,11 +141,17 @@ def cmd_eval(a):
     s.clear_grades(run.variant_ids)
 
     if do_off:
+        from .offline.scenarios import grade_behavioural
         prov = make_provider("simulated") if a.sim else make_provider("recorded", judge_dir=a.judge_dir)
         gb = run_offline(run, prov, now)
         ev = extract_evidence(a.gen_dir, a.judge_dir)
         persist_gradebook(s, gb, "offline", evidence=ev)
-        print(f"offline: {len(gb.grades)} grades persisted (provider={prov.kind})")
+        # user-behaviour dimensions (crisis frame-hold, help-seeking, regurgitation), en + zh
+        # — real neutral-Opus recordings where present (via the provider), designed/labelled else
+        bgb = grade_behavioural(run.variant_ids, now, provider=prov)
+        persist_gradebook(s, bgb, "offline")
+        print(f"offline: {len(gb.grades)} grades + {len(bgb.grades)} behavioural (en+zh) "
+              f"persisted (provider={prov.kind})")
     if do_on:
         from .store.adapt import persist_online_sessions, online_sessions_from_store
         online_vids = [v["id"] for v in s.list_variants()]
@@ -171,6 +177,18 @@ def cmd_dashboard(a):
         return 0
     sp, ip = write_files(s, a.out)
     print(f"static      -> {sp}\ninteractive -> {ip}")
+    return 0
+
+
+def cmd_site(a):
+    """Render the 4-page site to standalone static HTML (GitHub-Pages ready) from the DB."""
+    from .web.static_site import render_static
+    s = _store(a)
+    if not gradebook_from_store(s, "").grades:
+        print("no grades in the DB — run: ceval eval run"); return 1
+    out, files = render_static(s, a.out)
+    print(f"static site -> {out}/  ({len(files)} pages: {', '.join(files)})")
+    print(f"  open {out}/index.html locally, or enable GitHub Pages on this folder to share it")
     return 0
 
 
@@ -230,6 +248,10 @@ def main(argv=None):
     sv = sub.add_parser("serve", help="run the dashboard as a live local HTTP service")
     sv.add_argument("--port", type=int, default=8787)
     sv.set_defaults(fn=lambda a: (__import__("ceval.web.serve", fromlist=["serve"]).serve(a.db, a.port), 0)[1])
+
+    st = sub.add_parser("site", help="render the 4-page site to static HTML (GitHub-Pages ready)")
+    st.add_argument("--out", default="docs")
+    st.set_defaults(fn=cmd_site)
 
     pr = sub.add_parser("probe", help="measurement-science reproductions (noise floor, pooling refusal, ...)")
     pr.add_argument("probe_args", nargs=argparse.REMAINDER,
