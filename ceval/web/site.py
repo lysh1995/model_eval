@@ -113,11 +113,15 @@ h2{font-size:16px;font-weight:680;margin:32px 0 6px;padding-top:6px;border-botto
 .dot-good{background:var(--pass)}.dot-mid{background:var(--caution)}.dot-bad{background:var(--critical)}
 .geg{font-size:11px;color:var(--muted);margin-top:10px;border-top:1px solid var(--line2);padding-top:8px}
 /* expandable "how it's measured + provenance" panel on each grade / signal card */
-details.gd{margin-top:11px;border-top:1px solid var(--line2);padding-top:8px}
-details.gd summary{font-size:11px;font-weight:700;color:var(--signal);cursor:pointer;list-style:none;padding:2px 0}
-details.gd summary::-webkit-details-marker{display:none}
-details.gd summary::before{content:"▸ ";font-size:9px}
-details.gd[open] summary::before{content:"▾ "}
+details.gd{margin-top:11px;border-top:1px solid var(--line2);padding-top:9px}
+details.gd>summary{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;
+color:var(--signal);cursor:pointer;list-style:none;padding:5px 11px;border-radius:7px;
+background:var(--signal-soft);border:1px solid transparent;user-select:none}
+details.gd>summary:hover{border-color:var(--signal)}
+details.gd>summary::-webkit-details-marker{display:none}
+details.gd>summary::before{content:"▸";font-size:9px;font-weight:700}
+details.gd[open]>summary::before{content:"▾"}
+details.gd[open]>summary{margin-bottom:9px}
 .gdrow{display:flex;gap:9px;margin:8px 0;font-size:11.5px;line-height:1.5}
 .gdk{flex:0 0 66px;font-weight:700;color:var(--faint);text-transform:uppercase;font-size:9px;letter-spacing:.05em;padding-top:2px}
 .gdv{color:var(--ink)}
@@ -146,6 +150,24 @@ def _gd_block(key: str) -> str:
             + row(t("Collect", "采集"), _e(d["collect"]))
             + row(t("Measure", "测量"), _e(d["measure"]))
             + row(t("Basis", "依据"), cites)
+            + '</details>')
+
+
+def _cat_provenance() -> str:
+    """Expandable 'where the category framework itself comes from' — answers the second half of
+    the reviewer's question. Citations honesty-checked against the research corpus."""
+    def row(label, html):
+        return f'<div class="gdrow"><span class="gdk">{label}</span><span class="gdv">{html}</span></div>'
+    return (f'<details class="gd" style="margin-top:14px"><summary>{t("Where these categories come from — the research behind the framework","这些类别从何而来——框架背后的研究")}</summary>'
+            + row(t("The layers","分层"),
+                  t("The ability cascade (comprehend → apply → craft) is a <b>necessary, multiplicative</b> chain — grounded in <b>Funder's Realistic Accuracy Model (1995)</b>, not Bloom. Honest flag: the ordering is a legitimate 30-year-old model but unexamined, so we treat it as a claim to test, not a proven correlation.",
+                    "能力级联(理解 → 应用 → 创作)是一条 <b>必要且相乘</b> 的链条——依据是 <b>Funder 的现实准确性模型(1995)</b>,不是 Bloom。诚实标注:这个排序是一个成立 30 年的模型,但未经检验,所以我们把它当作一个待验证的主张,而非已证的相关性。"))
+            + row(t("The lanes","车道"),
+                  t("compute / self-validating / judge, with self-validating preferred — methodological, because human agreement on quality is only α=0.25–0.34 (PingPong), so each soft dimension is decomposed until an objective part falls out.",
+                    "计算 / 自验证 / 评审,优先自验证——方法学依据:人类对质量的一致性仅 α=0.25–0.34(PingPong),所以把每个软维度拆到有一个客观部分掉出来为止。"))
+            + row(t("The 6 filters","六道过滤"),
+                  t("Partly classic validity theory — genuinely in the corpus: <b>Cronbach &amp; Meehl 1955</b> (construct validity) and <b>Smith &amp; Kendall 1963</b> (BARS). Honest flag: Campbell &amp; Fiske and Messick are <b>not</b> in the corpus, so we don't cite them; filters 1 and 5 are product-driven / methodological.",
+                    "部分是经典效度理论——语料里真有的:<b>Cronbach 与 Meehl 1955</b>(构念效度)和 <b>Smith 与 Kendall 1963</b>(BARS)。诚实标注:Campbell 与 Fiske、Messick <b>不</b>在语料里,所以我们不引用它们;第 1、5 道是产品驱动/方法学。"))
             + '</details>')
 
 
@@ -817,7 +839,8 @@ def page_design(store: Store) -> str:
            f'<div class="gm">{t("The majority of scores. A person weighs them together, with judgment — a single number on <i>“is this compelling?”</i> is never the full picture.", "绝大多数分数。由人带着判断把它们综合权衡——单看 <i>「这好看吗?」</i> 的一个数字永远不是全貌。")}</div></div>'
            f'<div class="cat"><div class="gq" style="font-size:13.5px">{t("Collected, never optimized","采集,但绝不优化")}</div>'
            f'<div class="gm">{t("Signals such as approval votes and time-on-platform. We record them, but <b>never optimize for them</b> — optimizing for them is how a product becomes sycophantic.", "诸如点赞和停留时长的信号。我们记录它们,但 <b>绝不为它们优化</b>——为它们优化正是产品变谄媚的路径。")}</div></div></div>'
-           f'<div class="note" style="margin-top:11px">{t("On measurement: most scores are computed <b>automatically</b> — exact, and identical for every model. A few require an <b>AI judge</b> (for example, <i>“is this strong storytelling?”</i>), used selectively and cross-checked.", "关于测量:多数分数 <b>自动</b> 计算——精确,且对每个模型一致。少数需要 <b>AI 评审</b>(例如 <i>「这故事讲得好吗?」</i>),有选择地使用并交叉核对。")}</div>')
+           f'<div class="note" style="margin-top:11px">{t("On measurement: most scores are computed <b>automatically</b> — exact, and identical for every model. A few require an <b>AI judge</b> (for example, <i>“is this strong storytelling?”</i>), used selectively and cross-checked.", "关于测量:多数分数 <b>自动</b> 计算——精确,且对每个模型一致。少数需要 <b>AI 评审</b>(例如 <i>「这故事讲得好吗?」</i>),有选择地使用并交叉核对。")}</div>'
+           + _cat_provenance())
 
     # ── grading criteria — plain English, for leadership (not the statistical fields) ──
     gg = _grade_guide()
